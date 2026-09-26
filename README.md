@@ -139,3 +139,12 @@ User access schema also stores Locality and Masjid Name.
 - Profile is shown only when the single User Profile navigation button is clicked; it no longer opens automatically after login.
 - Duplicate top Profile button removed.
 - Login and dashboard UI refreshed for a more professional responsive layout.
+
+
+## V.15 Professional UI
+- Professional Islamic/teal dashboard visual system.
+- KPI cards, quick-action cards, analytics panels, trend/target visualizations and activity tables.
+- Report buttons renamed to Add Weekly Ijtima Report and Add Weekly Madani Muzakra Report.
+- Responsive mobile layout.
+- Login styling updated for a modern split-screen experience.
+- Existing backend/report workflows are preserved.

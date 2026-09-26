@@ -415,3 +415,17 @@ $("progressMuzakraBtn").onclick=()=>{progressType="Muzakra";$("progressMuzakraBt
 async function loadNotifications(){try{const d=await api('notifications',{sessionToken:session.token});const list=d.pending||[];const badge=$('notificationBadge');badge.textContent=list.length;badge.hidden=!list.length;$('notificationResult').innerHTML='<h3>Pending: '+list.length+'</h3><table><thead><tr><th>Masjid</th><th>Due Date</th><th>Message</th></tr></thead><tbody>'+list.map(x=>'<tr><td>'+esc(x.masjidName)+'</td><td>'+esc(x.dueDate)+'</td><td>'+esc(x.message)+'</td></tr>').join('')+'</tbody></table>'}catch(e){$('notificationResult').textContent=e.message}}
 $('notificationBell').onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.hidden=true);$('notificationTab').hidden=false;loadNotifications()};
 $('closeNotifications').onclick=()=>{document.querySelector('.tabs button')?.click()};
+/* V15 quick dashboard actions */
+document.querySelectorAll("[data-pro-action]").forEach(function(btn){
+  btn.addEventListener("click",function(){
+    const type=btn.getAttribute("data-pro-action");
+    const map={ijtima:"userIjtima",muzakra:"userMuzakra",volunteer:"userVolunteer",progress:"progressTab"};
+    const target=map[type];
+    if(target){
+      const el=document.getElementById(target);
+      if(el){el.hidden=false;el.scrollIntoView({behavior:"smooth",block:"start"});}
+      const tab=document.querySelector('[data-panel="'+target+'"]');
+      if(tab)tab.click();
+    }
+  });
+});

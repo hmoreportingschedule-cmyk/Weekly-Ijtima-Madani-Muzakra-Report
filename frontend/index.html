@@ -3,12 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Weekly Ijtima Report</title>
+<title>Add Weekly Ijtima Report</title>
 <link rel="stylesheet" href="style.css">
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 </head>
 <body>
+<div class="dashboard-shell">
 <div class="app">
 <header class="site-head">
   <div>
@@ -44,6 +45,30 @@
   </div>
 </section>
 
+
+<section id="proDashboardHome" class="content">
+  <div class="kpi-grid">
+    <div class="kpi-card"><div><div class="kpi-label">Total Masjid</div><div class="kpi-value" id="kpiMasjid">—</div><div class="kpi-trend">Live master data</div></div><div class="kpi-icon">🕌</div></div>
+    <div class="kpi-card"><div><div class="kpi-label">Weekly Ijtima</div><div class="kpi-value" id="kpiIjtima">—</div><div class="kpi-trend">Current reporting week</div></div><div class="kpi-icon">👥</div></div>
+    <div class="kpi-card"><div><div class="kpi-label">Madani Muzakra</div><div class="kpi-value" id="kpiMuzakra">—</div><div class="kpi-trend">Current reporting week</div></div><div class="kpi-icon">📖</div></div>
+    <div class="kpi-card"><div><div class="kpi-label">Volunteers</div><div class="kpi-value" id="kpiVolunteers">—</div><div class="kpi-trend">Reporting system</div></div><div class="kpi-icon">🤝</div></div>
+  </div>
+  <div class="quick-grid">
+    <button class="action-card green" data-pro-action="ijtima"><div><strong>Add Weekly Ijtima Report</strong><br><span>Submit this week's Ijtima</span></div><b>›</b></button>
+    <button class="action-card blue" data-pro-action="muzakra"><div><strong>Add Weekly Madani Muzakra Report</strong><br><span>Submit this week's report</span></div><b>›</b></button>
+    <button class="action-card purple" data-pro-action="volunteer"><div><strong>Volunteer Data</strong><br><span>Manage volunteer details</span></div><b>›</b></button>
+    <button class="action-card teal" data-pro-action="progress"><div><strong>Progress Report</strong><br><span>Actual vs Target analytics</span></div><b>›</b></button>
+  </div>
+  <div class="analytics-grid">
+    <div class="panel"><div class="panel-title"><h3>Ijtima & Madani Muzakra — Weekly Trend</h3><span>Current year</span></div><div class="chart-placeholder"><div class="chart-line"></div></div></div>
+    <div class="panel"><div class="panel-title"><h3>Region Wise Distribution</h3><span>Weekly Ijtima</span></div><div class="chart-bars"><i style="height:82%"></i><i style="height:68%"></i><i style="height:55%"></i><i style="height:74%"></i><i style="height:61%"></i><i style="height:48%"></i></div></div>
+    <div class="panel"><div class="panel-title"><h3>Actual vs Target</h3><span>This Week</span></div><div class="chart-bars"><i style="height:65%"></i><i style="height:90%;opacity:.45"></i><i style="height:52%"></i><i style="height:76%;opacity:.45"></i><i style="height:72%"></i><i style="height:82%;opacity:.45"></i></div></div>
+  </div>
+  <div class="data-grid">
+    <div class="panel"><div class="panel-title"><h3>Top Locations — Ijtima</h3><span>View all</span></div><div class="table-wrap"><table class="pro-table"><thead><tr><th>#</th><th>Location</th><th>Actual</th><th>Target</th><th>Achievement</th></tr></thead><tbody><tr><td>1</td><td>—</td><td>—</td><td>—</td><td><span class="badge-good">—</span></td></tr><tr><td>2</td><td>—</td><td>—</td><td>—</td><td><span class="badge-good">—</span></td></tr><tr><td>3</td><td>—</td><td>—</td><td>—</td><td><span class="badge-warn">—</span></td></tr></tbody></table></div></div>
+    <div class="panel"><div class="panel-title"><h3>Recent Activities</h3><span>Live</span></div><div class="table-wrap"><table class="pro-table"><tbody><tr><td>🟢</td><td>Dashboard ready</td><td>Now</td></tr><tr><td>🔵</td><td>Reporting system active</td><td>—</td></tr><tr><td>🟣</td><td>Targets & progress enabled</td><td>—</td></tr></tbody></table></div></div>
+  </div>
+</section>
 <main id="dashboard" hidden>
   <div class="topbar">
     <div><b id="welcome"></b><span id="roleBadge" class="badge"></span></div>
@@ -67,7 +92,7 @@
       <h2>Admin</h2>
       <div class="admin-buttons">
         <button data-panel="adminIjtima">Weekly Ijtima Report</button>
-        <button data-panel="adminMuzakra">Weekly Madani Muzakra Report</button>
+        <button data-panel="adminMuzakra">Add Weekly Madani Muzakra Report</button>
         <button data-panel="adminVolunteer">Volunteer Data</button>
         <button data-panel="adminTargets">Targets</button>
       </div>
@@ -314,5 +339,6 @@
 </main>
 </div>
 <script src="app.js"></script>
+</div>
 </body>
 </html>
