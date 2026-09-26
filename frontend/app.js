@@ -1,5 +1,5 @@
 const APP_BUILD="FINAL5";
-const API_URL="https://script.google.com/macros/s/AKfycbwbP22HW0lrV4vSjelbiiURjcn9E_MH1DphI5caVWMX8nwmcnkClw4kH_i9QxBXSOiqmA/exec";
+const API_URL="https://script.google.com/macros/s/AKfycbwMHtKs9d8KZdwmh8UeY-gr2WX3qumhZS3tBI47DyMr7YC06dVI9XqqvC025uLOVu51Wg/exec";
 let session=null,locations=[],progressType="Ijtima",progressRows=[];
 
 const $=id=>document.getElementById(id);
