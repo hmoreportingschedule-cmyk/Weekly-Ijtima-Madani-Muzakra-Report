@@ -70,3 +70,13 @@ body{overflow-x:hidden}
   .topbar-title small{font-size:11px}
   .dashboard-content{padding:10px}
 }
+
+/* V19 — requested fixes */
+html,body{overflow-x:hidden}
+.app-main{box-sizing:border-box;overflow-x:hidden}
+.dashboard-content{box-sizing:border-box;width:100%;max-width:none;overflow-x:hidden}
+.welcome-strip,.card{box-sizing:border-box;min-width:0}
+.nav-parent{cursor:pointer}
+.side-nav .nav-parent .chevron{display:inline-block}
+@media(max-width:850px){.app-main{width:100%;max-width:100%}.dashboard-content{width:100%}.topbar{width:100%;max-width:100%}}
+@media(max-width:600px){.card{overflow:hidden}.grid{width:100%;grid-template-columns:1fr}.topbar{overflow:hidden}.topbar-actions{min-width:0}.dashboard-clock{display:none}}

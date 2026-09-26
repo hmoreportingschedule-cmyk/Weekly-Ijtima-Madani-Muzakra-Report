@@ -86,8 +86,6 @@ function addNavGroup(label, children, defaultOpen=false){
   parent.innerHTML=`<span>${esc(label)}</span><span class="chevron">›</span>`;
   parent.onclick=()=>{
     group.classList.toggle("open");
-    const firstChild=childWrap?.querySelector("button");
-    if(firstChild) firstChild.click();
   };
   group.appendChild(parent);
   const childWrap=document.createElement("div"); childWrap.className="nav-children";
@@ -182,26 +180,31 @@ function applyAssignedLocationLocks(){
     ["District","district"],["Area","area"],["Pincode","pincode"],["Locality","locality"],["Masjid","masjidName"]
   ];
   ["r","v"].forEach(prefix=>{
-    levels.forEach(([id,key],idx)=>{
-      const el=$(prefix+id); if(!el)return;
-      const assigned=assignedValue(id);
-      const wrap=el.closest(".location-field");
+    let deepest=-1;
+    levels.forEach(([id],idx)=>{
+      const el=$(prefix+id), assigned=assignedValue(id), wrap=el?.closest(".location-field");
+      if(!el||!wrap)return;
       if(assigned && assigned.toLowerCase()!=="all"){
-        el.value=assigned; el.disabled=true;
-        if(wrap) wrap.classList.add("assigned-fixed");
-        // Hide the assigned level itself and every level above it.
-        // Example: Region assigned => Country + Region hidden; State onward visible.
-        levels.forEach(([upperId],upperIdx)=>{
-          const upperEl=$(prefix+upperId), upperWrap=upperEl?.closest(".location-field");
-          if(upperWrap) upperWrap.classList.toggle("assigned-hidden",upperIdx<=idx);
-        });
+        el.value=assigned;
+        el.disabled=true;
+        wrap.classList.add("assigned-fixed");
+        deepest=Math.max(deepest,idx);
       }else{
         el.disabled=false;
-        if(wrap) wrap.classList.remove("assigned-fixed");
+        wrap.classList.remove("assigned-fixed");
       }
     });
+    if(deepest>=0){
+      levels.forEach(([id],idx)=>{
+        const wrap=$(prefix+id)?.closest(".location-field");
+        if(wrap)wrap.classList.toggle("assigned-hidden",idx<=deepest);
+      });
+    }
   });
-  updateReportCascade(-1);
+  // Rebuild cascades after assignments are applied so the first visible
+  // dropdown starts exactly below the assigned level.
+  setupVolunteerCascades();
+  if(session.role!=="Admin" && session.role!=="HOD") updateReportCascade(Math.max(-1,levels.findIndex(([id])=>{const v=assignedValue(id);return v&&v.toLowerCase()!=="all";})));
 }
 
 function uniq(rows,key){return [...new Set(rows.map(x=>x[key]).filter(Boolean))]}
@@ -288,14 +291,17 @@ function showIjtimaDate(day){
   $("nextReportDate").textContent="Next reporting date: "+nextDateForDay(wanted);
 }
 function nextDateForDay(day){const names=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],idx=names.findIndex(x=>x.toLowerCase()===String(day).toLowerCase()),n=idx<0?4:idx,d=new Date(),diff=(n-d.getDay()+7)%7;d.setDate(d.getDate()+diff);return d.toISOString().slice(0,10)}
+function currentOrNextSaturday(){const d=new Date();d.setDate(d.getDate()+((6-d.getDay()+7)%7));return d.toISOString().slice(0,10)}
+function isSaturday(value){if(!value)return false;const d=new Date(value+"T00:00:00");return d.getDay()===6}
 
 function volRow(target){const d=document.createElement("div");d.className="vol";d.innerHTML='<input class="vname" placeholder="Volunteer Name"><input class="vmobile" placeholder="Mobile"><input class="vdetails" placeholder="Details"><button type="button" class="secondary">Remove</button>';d.querySelector("button").onclick=()=>d.remove();$(target).appendChild(d)}
-$("addVolunteer").onclick=()=>volRow("volunteers");$("addVolunteerOnly").onclick=()=>volRow("volunteerOnlyRows");
+if($("addVolunteer"))$("addVolunteer").onclick=()=>volRow("volunteers");
+if($("addVolunteerOnly"))$("addVolunteerOnly").onclick=()=>volRow("volunteerOnlyRows");
 
 async function submitIjtima(status){
   const r=filtered()[0],p=$("participants").value;if(!r)return msg("reportMsg","Please select a valid Masjid.");
   if(p===""||!Number.isInteger(Number(p))||Number(p)<0)return msg("reportMsg","Participants must be a whole number.");
-  const volunteers=[...document.querySelectorAll("#volunteers .vol")].map(x=>({name:x.querySelector(".vname").value.trim(),mobile:x.querySelector(".vmobile").value.trim(),details:x.querySelector(".vdetails").value.trim()}));
+  const volunteers=[];
   try{await api("saveReport",{sessionToken:session.token,type:"Ijtima",report:{weekDate:nextDateForDay(r.ijtimaDay),...r,participants:Number(p),volunteers,status}});msg("reportMsg",status==="Draft"?"Draft saved.":"Report submitted successfully.",true)}catch(e){msg("reportMsg",e.message)}
 }
 $("saveIjtimaDraft").onclick=()=>submitIjtima("Draft");$("submitIjtima").onclick=()=>submitIjtima("Submitted");
@@ -328,7 +334,24 @@ $("saveUser").onclick=async()=>{try{const u={userId:$("uId").value.trim(),userna
 $("downloadUserTemplate").onclick=()=>{const headers=['User ID','Username','Password','Name','Role','Active','Country','Region','State','Division','District','Area','Pincode'];const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([headers]),'Users');XLSX.writeFile(wb,'Weekly-Ijtima-Users-Format.xlsx')};
 $("importUsers").onclick=async()=>{try{const f=$("userFile").files[0];if(!f)throw Error('Select Excel/CSV file.');const wb=XLSX.read(await f.arrayBuffer(),{type:'array'}),rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});const d=await api('importUsers',{sessionToken:session.token,rows});msg('userImportMsg','Imported '+d.imported+' users.',true);$("userFile").value=''}catch(e){msg('userImportMsg',e.message)}};
 
-$("submitMuzakra").onclick=async()=>{try{const p=$("mParticipants").value;if(!Number.isInteger(Number(p))||Number(p)<0)throw Error("Participants must be a whole number.");await api("saveReport",{sessionToken:session.token,type:"Muzakra",report:{weekDate:$("mDate").value,participants:Number(p),status:"Submitted"}});msg("muzakraUserMsg","Madani Muzakra report submitted separately.",true)}catch(e){msg("muzakraUserMsg",e.message)}};
+function setupMuzakraDate(){
+  const el=$("mDate");if(!el)return;
+  if(!el.value)el.value=currentOrNextSaturday();
+  el.onchange=()=>{
+    if(!isSaturday(el.value)){
+      msg("muzakraUserMsg","Weekly Madani Muzakra sirf Saturday ko hota hai. Please Saturday ki date select karein.");
+      el.value=currentOrNextSaturday();
+    }else msg("muzakraUserMsg","");
+  };
+}
+setupMuzakraDate();
+$("submitMuzakra").onclick=async()=>{try{
+  const date=$("mDate").value;
+  if(!isSaturday(date))throw Error("Weekly Madani Muzakra ki report sirf Saturday ki date par add ki ja sakti hai.");
+  const p=$("mParticipants").value;if(!Number.isInteger(Number(p))||Number(p)<0)throw Error("Participants must be a whole number.");
+  await api("saveReport",{sessionToken:session.token,type:"Muzakra",report:{weekDate:date,participants:Number(p),status:"Submitted"}});
+  msg("muzakraUserMsg","Madani Muzakra report submitted successfully.",true);
+}catch(e){msg("muzakraUserMsg",e.message)}};
 const VOL_LEVELS=[
   ["Country","country"],["Region","region"],["State","state"],["Division","division"],
   ["District","district"],["Area","area"],["Pincode","pincode"],["Masjid","masjidName"]
@@ -348,15 +371,23 @@ function setupVolunteerCascades(){
       for(let j=i+1;j<VOL_LEVELS.length;j++){
         const [nextId,nextKey]=VOL_LEVELS[j];
         resetLocationSelect("v"+nextId,valuesForLocation(volRowsFor(j),nextKey));
+        const assigned=assignedValue(nextId);
+        if(assigned&&assigned.toLowerCase()!=="all"&&valuesForLocation(volRowsFor(j),nextKey).includes(assigned)){
+          $("v"+nextId).value=assigned;$("v"+nextId).disabled=true;
+        }
       }
     };
   });
-  resetLocationSelect("vCountry",valuesForLocation(locations,"country"));
-  for(let i=1;i<VOL_LEVELS.length;i++){
-    const [id,key]=VOL_LEVELS[i];
-    resetLocationSelect("v"+id,valuesForLocation(volRowsFor(i),key));
-  }
+  VOL_LEVELS.forEach(([id,key],i)=>{
+    const values=valuesForLocation(volRowsFor(i),key);
+    resetLocationSelect("v"+id,values);
+    const assigned=assignedValue(id);
+    if(assigned&&assigned.toLowerCase()!=="all"&&values.includes(assigned)){
+      $("v"+id).value=assigned;$("v"+id).disabled=true;
+    }
+  });
 }
+
 $("submitVolunteer").onclick=async()=>{
   try{
     const location={
@@ -407,9 +438,15 @@ async function loadProgress(){
     $("progressResult").innerHTML=`<h3>${progressType==="Ijtima"?"Weekly Ijtima":"Madani Muzakra"} — ${mode==="week"?"Week to Week":mode==="month"?"Month to Month":"Year to Year"}</h3><table><thead><tr><th>Period</th><th>Participants</th></tr></thead><tbody>${data.map(x=>`<tr><td>${esc(x.label)}</td><td>${Number(x.value).toLocaleString()}</td></tr>`).join("")}</tbody></table>`;
   }catch(e){$("progressResult").textContent=e.message}
 }
+function setupProgressDates(){
+  const from=$("fromDate"),to=$("toDate");if(!from||!to)return;
+  if(!from.value){const d=new Date();d.setMonth(d.getMonth()-12);from.value=d.toISOString().slice(0,10)}
+  if(!to.value)to.value=new Date().toISOString().slice(0,10);
+}
+setupProgressDates();
 $("loadProgress").onclick=loadProgress;
-$("progressIjtimaBtn").onclick=()=>{progressType="Ijtima";$("progressIjtimaBtn").classList.add("active");$("progressMuzakraBtn").classList.remove("active");loadProgress()};
-$("progressMuzakraBtn").onclick=()=>{progressType="Muzakra";$("progressMuzakraBtn").classList.add("active");$("progressIjtimaBtn").classList.remove("active");loadProgress()};
+$("progressIjtimaBtn").onclick=()=>{progressType="Ijtima";$("progressIjtimaBtn").classList.add("active");$("progressMuzakraBtn").classList.remove("active");setupProgressDates();loadProgress()};
+$("progressMuzakraBtn").onclick=()=>{progressType="Muzakra";$("progressMuzakraBtn").classList.add("active");$("progressIjtimaBtn").classList.remove("active");setupProgressDates();loadProgress()};
 async function loadNotifications(){try{const d=await api('notifications',{sessionToken:session.token});const list=d.pending||[];const badge=$('notificationBadge');badge.textContent=list.length;badge.hidden=!list.length;$('notificationResult').innerHTML='<h3>Pending: '+list.length+'</h3><table><thead><tr><th>Masjid</th><th>Due Date</th><th>Message</th></tr></thead><tbody>'+list.map(x=>'<tr><td>'+esc(x.masjidName)+'</td><td>'+esc(x.dueDate)+'</td><td>'+esc(x.message)+'</td></tr>').join('')+'</tbody></table>'}catch(e){$('notificationResult').textContent=e.message}}
 $('notificationBell').onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.hidden=true);$('notificationTab').hidden=false;loadNotifications()};
 $('closeNotifications').onclick=()=>{document.querySelector('.tabs button')?.click()};

@@ -150,9 +150,6 @@
       <label>Participants
         <input id="participants" type="number" min="0" step="1" inputmode="numeric" placeholder="Whole number only">
       </label>
-      <h3>Volunteer Details</h3>
-      <div id="volunteers"></div>
-      <button id="addVolunteer" class="secondary">+ Add Volunteer</button>
       <div class="actions">
         <button id="saveIjtimaDraft" class="secondary">Save Draft</button>
         <button id="submitIjtima">Submit Report</button>
@@ -162,7 +159,7 @@
 
     <div id="userMuzakra" class="card panel" hidden>
       <h2>Weekly Madani Muzakra Report</h2>
-      <label>Report Date<input id="mDate" type="date"></label>
+      <label>Report Date<input id="mDate" type="date" step="7" aria-label="Saturday report date" title="Only Saturday dates are allowed"></label>
       <label>Participants<input id="mParticipants" type="number" min="0" step="1"></label>
       <button id="submitMuzakra">Submit Report</button>
       <p id="muzakraUserMsg" class="msg"></p>
