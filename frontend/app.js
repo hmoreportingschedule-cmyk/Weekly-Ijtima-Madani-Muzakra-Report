@@ -349,29 +349,77 @@ function setDateFieldForMasterDay(day){
 async function submitIjtima(status){
   const r=filtered()[0];
   if(!r)return msg("reportMsg","Please select a valid Masjid.");
-  const date=$("ijtimaDate")?.value||"",allowedDay=String(r.ijtimaDay||"").trim();
+
+  const date=$("ijtimaDate")?.value||"";
+  // Use the same visible Ijtima Day shown to the user. This avoids a mismatch
+  // when multiple master rows exist for the same location.
+  const allowedDay=String($("rDay")?.value||r.ijtimaDay||"").trim();
+
   if(!date)return msg("reportMsg","Please select the report date.");
-  const d=new Date(date+"T00:00:00"),names=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-  const selectedDay=names[d.getDay()]||"";
-  if(!allowedDay || selectedDay.toLowerCase()!==allowedDay.toLowerCase())return msg("reportMsg",`Is Masjid ka Ijtima sirf ${allowedDay||"selected day"} ko hota hai. Please ${allowedDay||"selected day"} ki date select karein.`);
-  if($("ijtimaDate").validity && !$("ijtimaDate").validity.valid)return msg("reportMsg","Please select a valid date for this Masjid's Ijtima Day.");
-  const z=Number($("totalZimmedaran")?.value||0),m=Number($("totalMadarisWale")?.value||0),a=Number($("totalAwam")?.value||0),p=z+m+a;
-  const night=Number($("totalRaatRukneWale")?.value||0),cars=Number($("totalGadiyanAyi")?.value||0);
-  if(!Number.isInteger(z)||z<0||z>9999||!Number.isInteger(m)||m<0||m>9999||!Number.isInteger(a)||a<0||a>9999)return msg("reportMsg","Zimmedaran, Madaris Wale aur Total Awam mein maximum 4 digits allowed hain.");
-  if(!Number.isInteger(night)||night<0||night>9999)return msg("reportMsg","Total Raat Rukne Wale mein maximum 4 digits allowed hain.");
-  if(!Number.isInteger(cars)||cars<0||cars>999)return msg("reportMsg","Total Gadiyan Ayi mein maximum 3 digits allowed hain.");
+  if(!allowedDay)return msg("reportMsg","Please select the Masjid first so its Ijtima Day can be determined.");
+
+  // HTML date input value is always YYYY-MM-DD. Calculate weekday in UTC
+  // so browser timezone/locale cannot change the result.
+  const parts=date.split("-");
+  if(parts.length!==3)return msg("reportMsg","Please select a valid report date.");
+  const d=new Date(Date.UTC(Number(parts[0]),Number(parts[1])-1,Number(parts[2])));
+  if(Number.isNaN(d.getTime()))return msg("reportMsg","Please select a valid report date.");
+
+  const names=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  const selectedDay=names[d.getUTCDay()]||"";
+  if(selectedDay.trim().toLowerCase()!==allowedDay.trim().toLowerCase()){
+    return msg("reportMsg",`Sirf ${allowedDay} ki date select karein. Selected date ${selectedDay} hai.`);
+  }
+
+  const z=Number($("totalZimmedaran")?.value||0);
+  const m=Number($("totalMadarisWale")?.value||0);
+  const a=Number($("totalAwam")?.value||0);
+  const p=z+m+a;
+  const night=Number($("totalRaatRukneWale")?.value||0);
+  const cars=Number($("totalGadiyanAyi")?.value||0);
+
+  if(!Number.isInteger(z)||z<0||z>9999||!Number.isInteger(m)||m<0||m>9999||!Number.isInteger(a)||a<0||a>9999)
+    return msg("reportMsg","Zimmedaran, Madaris Wale aur Total Awam mein maximum 4 digits allowed hain.");
+  if(!Number.isInteger(night)||night<0||night>9999)
+    return msg("reportMsg","Total Raat Rukne Wale mein maximum 4 digits allowed hain.");
+  if(!Number.isInteger(cars)||cars<0||cars>999)
+    return msg("reportMsg","Total Gadiyan Ayi mein maximum 3 digits allowed hain.");
+
   $("participants").value=p;
+
   try{
-    const result=await api("saveReport",{sessionToken:session.token,type:"Ijtima",report:{weekDate:date,...r,participants:p,totalZimmedaran:z,totalMadarisWale:m,totalAwam:a,totalRaatRukneWale:night,totalGadiyanAyi:cars,alakaiDaura:$("alakaiDaura")?.value||"",langareRazawiyyah:$("langareRazawiyyah")?.value||"",jadwalIshraq:$("jadwalIshraq")?.value||"",volunteers:[],status}});
+    const result=await api("saveReport",{
+      sessionToken:session.token,
+      type:"Ijtima",
+      report:{
+        weekDate:date,...r,
+        ijtimaDay:allowedDay,
+        participants:p,
+        totalZimmedaran:z,
+        totalMadarisWale:m,
+        totalAwam:a,
+        totalRaatRukneWale:night,
+        totalGadiyanAyi:cars,
+        alakaiDaura:$("alakaiDaura")?.value||"",
+        langareRazawiyyah:$("langareRazawiyyah")?.value||"",
+        jadwalIshraq:$("jadwalIshraq")?.value||"",
+        volunteers:[],
+        status
+      }
+    });
+
     if(status==="Submitted" && session.role!=="Admin"){
       lockSubmittedIjtima();
       msg("reportMsg","Report saved successfully. Submitted reports cannot be edited by User.",true);
     }else{
-      msg("reportMsg",status==="Draft"?"Draft saved.":"Report saved successfully.",true);
+      msg("reportMsg",status==="Draft"?"Draft saved successfully.":"Report saved successfully.",true);
     }
     if(result.reportId)window._lastIjtimaReportId=result.reportId;
-  }catch(e){msg("reportMsg",e.message)}
+  }catch(e){
+    msg("reportMsg",e.message||"Report save failed.");
+  }
 }
+
 function lockSubmittedIjtima(){
   const box=$("userIjtima"); if(!box)return;
   box.dataset.submittedLocked="1";
