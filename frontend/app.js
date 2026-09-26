@@ -57,14 +57,100 @@ $("resetPasswordBtn").onclick=async()=>{
 };
 
 
+function navButton(label, id, cls=""){
+  const b=document.createElement("button");
+  b.type="button"; b.textContent=label; b.className=cls;
+  b.dataset.navTarget=id;
+  b.onclick=()=>openPanel(id,b);
+  return b;
+}
+function openPanel(id, button){
+  document.querySelectorAll(".tab").forEach(x=>x.hidden=true);
+  const target=$(id);
+  if(target){
+    const parentTab=target.closest(".tab");
+    if(parentTab) parentTab.hidden=false;
+    target.hidden=false;
+  }
+  document.querySelectorAll(".side-nav button").forEach(x=>x.classList.remove("active"));
+  if(button) button.classList.add("active");
+  const parent=button?.closest(".nav-group");
+  if(parent) parent.classList.add("open");
+  if(id && id!="adminTab" && id!="userTab"){
+    const el=$(id); if(el && el.classList.contains("panel")) el.scrollIntoView({behavior:"smooth",block:"start"});
+  }
+}
+function addNavGroup(label, children, defaultOpen=false){
+  const group=document.createElement("div"); group.className="nav-group"+(defaultOpen?" open":"");
+  const parent=document.createElement("button"); parent.type="button"; parent.className="nav-parent";
+  parent.innerHTML=`<span>${esc(label)}</span><span class="chevron">›</span>`;
+  parent.onclick=()=>{
+    group.classList.toggle("open");
+    const firstChild=childWrap?.querySelector("button");
+    if(firstChild) firstChild.click();
+  };
+  group.appendChild(parent);
+  const childWrap=document.createElement("div"); childWrap.className="nav-children";
+  children.forEach(item=>{
+    const b=navButton(item.label,item.id,"nav-child");
+    if(item.action)b.onclick=()=>item.action(b);
+    childWrap.appendChild(b);
+  });
+  group.appendChild(childWrap); $("nav").appendChild(group); return group;
+}
+function addSimpleNav(label,id){
+  const b=navButton(label,id,"nav-simple"); $("nav").appendChild(b); return b;
+}
+function addAssignedLocationNav(){
+  if(!session || session.role==="Admin" || session.role==="HOD") return;
+  const levels=[["Country","country"],["Region","region"],["State","state"],["Division","division"],["District","district"],["Area","area"],["Pincode","pincode"]];
+  const assigned=levels.filter(([id])=>{const v=assignedValue(id);return v && v.toLowerCase()!=="all"});
+  if(!assigned.length)return;
+  const divider=document.createElement("div");divider.className="nav-divider";$('nav').appendChild(divider);
+  const group=document.createElement("div");group.className="nav-group";
+  const parent=document.createElement("button");parent.type="button";parent.className="nav-parent";parent.innerHTML='<span>Assigned Location</span><span class="chevron">›</span>';
+  parent.onclick=()=>group.classList.toggle("open");group.appendChild(parent);
+  const children=document.createElement("div");children.className="nav-children";
+  assigned.forEach(([id])=>{const b=document.createElement("button");b.type="button";b.className="nav-child nav-location";b.textContent=`${id}: ${assignedValue(id)}`;b.onclick=()=>{const target=$('userIjtima');document.querySelectorAll('.tab').forEach(x=>x.hidden=true);target.hidden=false;target.scrollIntoView({behavior:'smooth',block:'start'});};children.appendChild(b)});
+  group.appendChild(children);$('nav').appendChild(group);
+}
 function buildNav(){
   $("nav").innerHTML="";
-  if(session.role==="Admin"){addNav("adminTab","Admin");addNav("progressTab","Progress Report");$("adminTab").hidden=false}
-  else{addNav("userTab","Reports");addNav("progressTab","Progress Report");$("userTab").hidden=false}
-  $("nav").querySelector("button")?.click();
+  if(session.role==="Admin"){
+    addNavGroup("User Management",[
+      {label:"Create / Update User",id:"userManagementPanel"},
+      {label:"Download User Excel Format",id:"userManagementPanel"},
+      {label:"Upload Users",id:"userManagementPanel"}
+    ],true);
+    addNavGroup("Add Weekly Ijtima Report",[
+      {label:"Master Import",id:"adminIjtima"},
+      {label:"Excel Format",id:"adminIjtima"}
+    ]);
+    addNavGroup("Add Weekly Madani Muzakra Report",[
+      {label:"Report Management",id:"adminMuzakra"}
+    ]);
+    addNavGroup("Volunteer Data",[
+      {label:"Excel Import / Format",id:"adminVolunteer"}
+    ]);
+    addSimpleNav("Progress Report","progressTab");
+    $("adminTab").hidden=false;
+  }else{
+    addSimpleNav("Add Weekly Ijtima Report","userIjtima");
+    addSimpleNav("Add Weekly Madani Muzakra Report","userMuzakra");
+    addSimpleNav("Volunteer Data","userVolunteer");
+    addSimpleNav("Progress Report","progressTab");
+    addAssignedLocationNav();
+    $("userTab").hidden=false;
+  }
+  const first=$("nav").querySelector(".nav-child,.nav-simple");
+  if(first) first.click();
 }
-function addNav(id,label){const b=document.createElement("button");b.textContent=label;b.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.hidden=true);$(id).hidden=false;document.querySelectorAll(".tabs button").forEach(x=>x.classList.remove("active"));b.classList.add("active")};$("nav").appendChild(b)}
-document.addEventListener("click",e=>{const p=e.target.dataset.panel;if(!p)return;document.querySelectorAll(".panel").forEach(x=>x.hidden=true);$(p).hidden=false});
+
+document.addEventListener("click",e=>{
+  const p=e.target.dataset.panel;if(!p)return;
+  document.querySelectorAll(".panel").forEach(x=>x.hidden=true);
+  $(p).hidden=false;
+});
 
 async function loadLocationsFast(){
   try{
@@ -91,24 +177,27 @@ function assignedValue(header){
 }
 function applyAssignedLocationLocks(){
   if(!session || session.role==="Admin" || session.role==="HOD") return;
+  const levels=[
+    ["Country","country"],["Region","region"],["State","state"],["Division","division"],
+    ["District","district"],["Area","area"],["Pincode","pincode"],["Locality","locality"],["Masjid","masjidName"]
+  ];
   ["r","v"].forEach(prefix=>{
-    const levels=[
-      ["Country","country"],["Region","region"],["State","state"],["Division","division"],
-      ["District","district"],["Area","area"],["Pincode","pincode"],["Locality","locality"],["Masjid","masjidName"]
-    ];
-    let rows=locations;
-    levels.forEach(([id,key])=>{
-      const el=$(prefix+id); if(!el) return;
+    levels.forEach(([id,key],idx)=>{
+      const el=$(prefix+id); if(!el)return;
       const assigned=assignedValue(id);
+      const wrap=el.closest(".location-field");
       if(assigned && assigned.toLowerCase()!=="all"){
         el.value=assigned; el.disabled=true;
-        const wrap=el.closest(".location-field");
         if(wrap) wrap.classList.add("assigned-fixed");
-        rows=rows.filter(r=>String(r[key]??"").trim()===assigned);
+        // Hide the assigned level itself and every level above it.
+        // Example: Region assigned => Country + Region hidden; State onward visible.
+        levels.forEach(([upperId],upperIdx)=>{
+          const upperEl=$(prefix+upperId), upperWrap=upperEl?.closest(".location-field");
+          if(upperWrap) upperWrap.classList.toggle("assigned-hidden",upperIdx<=idx);
+        });
       }else{
-        const wrap=el.closest(".location-field");
-        if(wrap) wrap.classList.remove("assigned-fixed");
         el.disabled=false;
+        if(wrap) wrap.classList.remove("assigned-fixed");
       }
     });
   });
@@ -173,7 +262,12 @@ function updateReportCascade(changedIndex){
   for(let i=start;i<LOCATION_LEVELS.length;i++){
     const [id,key]=LOCATION_LEVELS[i];
     const values=valuesForLocation(parentRows(i),key);
+    const assigned=assignedValue(id);
     resetLocationSelect("r"+id,values,"Select");
+    if(assigned && assigned.toLowerCase()!=="all" && values.includes(assigned)){
+      $("r"+id).value=assigned;
+      $("r"+id).disabled=true;
+    }
   }
   const rows=filtered();
   if(rows.length){
