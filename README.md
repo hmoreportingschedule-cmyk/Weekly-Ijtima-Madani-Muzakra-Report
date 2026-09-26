@@ -63,3 +63,12 @@ The script uses: My Drive / Dashboard Working / Dashboard Name / Weekly Ijtima &
 - User location fields are cascading from the Ijtima Master: Country -> Region -> State -> Division -> District -> Area -> Pincode.
 - User import validates assigned locations against the Ijtima Master.
 - Create/Update User remains available in Admin.
+
+
+## V.4 Feature Update
+- Notification bell icon added to the top-right dashboard header.
+- Notification badge shows the number of pending Weekly Ijtima reports.
+- Clicking the bell opens a table with Ijtima/Masjid name, location, Ijtima day, due date and the requested reminder message.
+- Notifications are based on each Masjid's assigned Ijtima Day and the current Monday-Sunday week.
+- Future scheduled Ijtima dates are not marked missing before their day arrives.
+- The notification list is filtered by the logged-in user's access.

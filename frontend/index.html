@@ -14,7 +14,11 @@
     <h1>Weekly Ijtima Report</h1>
     <p id="weekLabel">Weekly Ijtima / Madani Muzakra Dashboard</p><div id="clock" class="clock"></div>
   </div>
-  
+  <div class="header-actions">
+    <button id="notificationBell" class="notification-bell" title="Notifications" aria-label="Notifications">
+      <span class="bell-symbol">🔔</span><span id="notificationBadge" class="notification-badge" hidden>0</span>
+    </button>
+  </div>
 </header>
 
 <section id="loginCard" class="card login">
@@ -183,9 +187,14 @@
     </div>
   </section>
   <section id="notificationTab" class="tab" hidden>
-    <div class="card">
-      <h2>Notifications</h2>
-      <button id="loadNotifications">Check Pending Reports</button>
+    <div class="card notification-card">
+      <div class="notification-head">
+        <div>
+          <h2>Pending Report Notifications</h2>
+          <p class="small">Sirf aapke assigned Ijtima ki missing reports yahan show hongi.</p>
+        </div>
+        <button id="closeNotifications" class="secondary">Close</button>
+      </div>
       <div id="notificationResult" class="result"></div>
     </div>
   </section>

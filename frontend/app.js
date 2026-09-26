@@ -65,4 +65,47 @@ async function loadProgress(){
 $("loadProgress").onclick=loadProgress;
 $("progressIjtimaBtn").onclick=()=>{progressType="Ijtima";$("progressIjtimaBtn").classList.add("active");$("progressMuzakraBtn").classList.remove("active");loadProgress()};
 $("progressMuzakraBtn").onclick=()=>{progressType="Muzakra";$("progressMuzakraBtn").classList.add("active");$("progressIjtimaBtn").classList.remove("active");loadProgress()};
-$("loadNotifications").onclick=async()=>{try{const d=await api("notifications",{sessionToken:session.token,weekDate:nextDateForDay("Thursday")});$("notificationResult").innerHTML=`<h3>Pending: ${d.pending.length}</h3><pre>${esc(JSON.stringify(d.pending,null,2))}</pre>`}catch(e){$("notificationResult").textContent=e.message}};
+
+async function loadNotifications(){
+  try{
+    const d=await api("notifications",{sessionToken:session.token});
+    const list=d.pending||[];
+    const badge=$("notificationBadge");
+    badge.textContent=String(list.length);
+    badge.hidden=list.length===0;
+
+    if(!list.length){
+      $("notificationResult").innerHTML='<div class="notification-empty">✓ Is hafte ki koi pending Weekly Ijtima report nahi hai.</div>';
+      return;
+    }
+
+    $("notificationResult").innerHTML=`
+      <table class="notification-table">
+        <thead><tr><th>#</th><th>Ijtima / Masjid</th><th>Location</th><th>Ijtima Day</th><th>Due Date</th><th>Message</th></tr></thead>
+        <tbody>
+          ${list.map((x,i)=>`
+            <tr>
+              <td>${i+1}</td>
+              <td><b>${esc(x.masjidName)}</b><br><span class="small">Pincode: ${esc(x.pincode)}</span></td>
+              <td>${esc(x.area)}, ${esc(x.district)}, ${esc(x.state)}</td>
+              <td>${esc(x.ijtimaDay)}</td>
+              <td class="notification-due">${esc(x.dueDate)}</td>
+              <td class="notification-message">${esc(x.message)}</td>
+            </tr>`).join("")}
+        </tbody>
+      </table>`;
+  }catch(e){
+    $("notificationResult").textContent=e.message;
+  }
+}
+$("notificationBell").onclick=async()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.hidden=true);
+  $("notificationTab").hidden=false;
+  document.querySelectorAll(".tabs button").forEach(x=>x.classList.remove("active"));
+  await loadNotifications();
+};
+$("closeNotifications").onclick=()=>{
+  $("notificationTab").hidden=true;
+  document.querySelector(".tabs button")?.click();
+};
+$("notificationResult").innerHTML=`<h3>Pending: ${d.pending.length}</h3><pre>${esc(JSON.stringify(d.pending,null,2))}</pre>`}catch(e){$("notificationResult").textContent=e.message}};
