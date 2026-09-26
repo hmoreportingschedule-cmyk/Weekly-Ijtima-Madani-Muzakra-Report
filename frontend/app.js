@@ -248,24 +248,56 @@ function nextDateForDay(day){
   const n=idx,d=new Date(),diff=(n-d.getDay()+7)%7;
   d.setDate(d.getDate()+diff);return d.toISOString().slice(0,10);
 }
+function firstDateForWeekdayInYear(year, dayName){
+  const names=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  const wanted=names.findIndex(x=>x.toLowerCase()===String(dayName||"").trim().toLowerCase());
+  if(wanted<0)return "";
+  const d=new Date(year,0,1);
+  const add=(wanted-d.getDay()+7)%7;
+  d.setDate(d.getDate()+add);
+  return d.toISOString().slice(0,10);
+}
 function setIjtimaDateForDay(day){
   const el=$("ijtimaDate"); if(!el)return;
-  const date=nextDateForDay(day);
   const allowed=String(day||"").trim();
-  el.value=date;
+  if(!allowed){
+    el.value="";
+    el.min="";
+    el.max="";
+    el.step="1";
+    el.dataset.allowedDay="";
+    el.disabled=true;
+    el.title="Select a Masjid first.";
+    return;
+  }
+
+  // Anchor the 7-day step to the first occurrence of the selected weekday.
+  // This makes the native calendar accept only that weekday (e.g. Thursday).
+  const minDate=firstDateForWeekdayInYear(2020,allowed);
+  const maxDate=firstDateForWeekdayInYear(2035,allowed);
+  const today=nextDateForDay(allowed);
+
+  el.disabled=false;
   el.dataset.allowedDay=allowed;
-  el.min=date||"";
-  el.max="";
-  el.step=date?"7":"1";
-  el.title=date?`Only ${allowed} dates are allowed for this Masjid.`:"Select a Masjid first.";
-  el.onchange=()=>{
+  el.min=minDate;
+  el.max=maxDate;
+  el.step="7";
+  el.value=today;
+  el.title=`Only ${allowed} dates are allowed for this Masjid.`;
+  el.oninput=validateIjtimaDate;
+  el.onchange=validateIjtimaDate;
+
+  function validateIjtimaDate(){
     if(!el.value)return;
-    const d=new Date(el.value+"T00:00:00"),names=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-    if(!allowed || names[d.getDay()]!==allowed){
-      msg("reportMsg",`Is Masjid ka Ijtima sirf ${allowed||"selected day"} ko hota hai.`);
-      el.value=nextDateForDay(allowed);
-    }else msg("reportMsg","");
-  };
+    const d=new Date(el.value+"T00:00:00");
+    const names=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+    if(names[d.getDay()]!==allowed){
+      msg("reportMsg",`Is Masjid ka Ijtima sirf ${allowed} ko hota hai. Please ${allowed} ki date select karein.`);
+      el.value="";
+      return;
+    }
+    msg("reportMsg","");
+  }
 }
 function nextSaturday(){
   const d=new Date(),diff=(6-d.getDay()+7)%7;
@@ -309,7 +341,8 @@ async function submitIjtima(status){
   const date=$("ijtimaDate")?.value||"",allowedDay=String(r.ijtimaDay||"");
   if(!date)return msg("reportMsg","Please select the report date.");
   const d=new Date(date+"T00:00:00"),names=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-  if(!allowedDay || names[d.getDay()]!==allowedDay)return msg("reportMsg",`Is Masjid ka Ijtima sirf ${allowedDay||"selected day"} ko hota hai.`);
+  if(!allowedDay || names[d.getDay()]!==allowedDay)return msg("reportMsg",`Is Masjid ka Ijtima sirf ${allowedDay||"selected day"} ko hota hai. Please ${allowedDay||"selected day"} ki date select karein.`);
+  if($("ijtimaDate").validity && !$("ijtimaDate").validity.valid)return msg("reportMsg","Please select a valid date for this Masjid's Ijtima Day.");
   const z=Number($("totalZimmedaran")?.value||0),m=Number($("totalMadarisWale")?.value||0),a=Number($("totalAwam")?.value||0),p=z+m+a;
   const night=Number($("totalRaatRukneWale")?.value||0),cars=Number($("totalGadiyanAyi")?.value||0);
   if(!Number.isInteger(z)||z<0||z>9999||!Number.isInteger(m)||m<0||m>9999||!Number.isInteger(a)||a<0||a>9999)return msg("reportMsg","Zimmedaran, Madaris Wale aur Total Awam mein maximum 4 digits allowed hain.");
