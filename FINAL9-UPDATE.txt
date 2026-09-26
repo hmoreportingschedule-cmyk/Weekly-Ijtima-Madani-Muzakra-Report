@@ -1,0 +1,8 @@
+FINAL9 UPDATE
+
+- Fixed Ijtima weekday calendar mapping and made it derive from the CURRENT Ijtima Day field every time.
+- Thursday => only Thursday dates enabled; Friday => only Friday; Sunday => only Sunday; etc.
+- Prevents stale calendar state from enabling the wrong weekday.
+- Frontend cache version changed to FINAL9.
+- Added the user's supplied Islamic green/gold background reference as frontend/assets/dashboard-background-reference.png and applied it to the dashboard background.
+- Google Apps Script URL remains unchanged in frontend/app.js.

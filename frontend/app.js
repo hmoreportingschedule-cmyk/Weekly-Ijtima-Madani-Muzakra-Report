@@ -1,4 +1,4 @@
-const APP_BUILD="FINAL8";
+const APP_BUILD="FINAL9";
 const API_URL="https://script.google.com/macros/s/AKfycbwbP22HW0lrV4vSjelbiiURjcn9E_MH1DphI5caVWMX8nwmcnkClw4kH_i9QxBXSOiqmA/exec";
 let session=null,locations=[],progressType="Ijtima",progressRows=[];
 
@@ -241,8 +241,14 @@ function updateReportCascade(changedIndex){
 
 let ijtimaCalendarMonth=new Date();
 function ijtimaDayIndex(day){
-  const names=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-  return names.findIndex(x=>x.toLowerCase()===String(day||"").trim().toLowerCase());
+  const map={sunday:0,monday:1,tuesday:2,wednesday:3,thursday:4,friday:5,saturday:6};
+  const key=String(day||"").trim().toLowerCase();
+  return Object.prototype.hasOwnProperty.call(map,key)?map[key]:-1;
+}
+function activeIjtimaDayIndex(){
+  const select=$("rDay"), input=$("ijtimaDate");
+  const day=String(select?.value||input?.dataset.allowedName||"").trim();
+  return ijtimaDayIndex(day);
 }
 function isoToDisplay(iso){
   const m=String(iso||"").match(/^(\d{4})-(\d{2})-(\d{2})$/);return m?`${m[3]}/${m[2]}/${m[1]}`:"";
@@ -256,8 +262,12 @@ function setIjtimaDateValue(iso){
 }
 function renderIjtimaCalendar(){
   const box=$("ijtimaCalendar"),input=$("ijtimaDate");if(!box||!input)return;
-  const wanted=Number(input.dataset.allowedDay);
+  // Always use the CURRENT Ijtima Day field; never reuse a stale weekday.
+  const wanted=activeIjtimaDayIndex();
+  const wantedName=String($("rDay")?.value||input.dataset.allowedName||"").trim();
   if(!Number.isInteger(wanted)||wanted<0){box.hidden=true;return;}
+  input.dataset.allowedDay=String(wanted);
+  input.dataset.allowedName=wantedName;
   const y=ijtimaCalendarMonth.getFullYear(),m=ijtimaCalendarMonth.getMonth();
   const monthName=ijtimaCalendarMonth.toLocaleDateString("en-IN",{month:"long",year:"numeric"});
   const first=new Date(y,m,1),days=new Date(y,m+1,0).getDate(),offset=first.getDay();
@@ -289,13 +299,21 @@ function showIjtimaDate(day){
   $("ijtimaDateInfo") && ($("ijtimaDateInfo").textContent=wanted?`Only ${wanted} ki date select ki ja sakti hai.`:"Select a Masjid to determine the Ijtima Day.");
   setIjtimaDateForDay(wanted);
 }
+function syncIjtimaCalendarToDayField(){
+  const day=String($("rDay")?.value||"").trim();
+  if(day) showIjtimaDate(day);
+}
 function setIjtimaDateForDay(day){
   const el=$("ijtimaDate");if(!el)return;
   const wanted=ijtimaDayIndex(day);
-  el.disabled=false;el.required=wanted>=0;el.dataset.allowedDay=wanted>=0?String(wanted):"";
+  el.disabled=false;el.required=wanted>=0;
+  el.dataset.allowedDay=wanted>=0?String(wanted):"";
+  el.dataset.allowedName=wanted>=0?String(day).trim():"";
   if(wanted<0){setIjtimaDateValue("");closeIjtimaCalendar();return;}
   if(el.dataset.iso){
-    const d=new Date(el.dataset.iso+"T00:00:00");if(d.getDay()!==wanted)setIjtimaDateValue("");
+    const p=el.dataset.iso.split("-");
+    const d=p.length===3?new Date(Date.UTC(Number(p[0]),Number(p[1])-1,Number(p[2]))):null;
+    if(!d || d.getUTCDay()!==wanted)setIjtimaDateValue("");
   }
   renderIjtimaCalendar();
 }
@@ -303,6 +321,8 @@ function setupIjtimaCalendar(){
   const input=$("ijtimaDate"),btn=$("ijtimaDateCalendarBtn");if(!input||!btn)return;
   input.onclick=openIjtimaCalendar;btn.onclick=openIjtimaCalendar;
   document.addEventListener("click",e=>{if(!$('ijtimaDatePicker')?.contains(e.target))closeIjtimaCalendar()});
+  const dayField=$("rDay");
+  if(dayField) dayField.addEventListener("change",syncIjtimaCalendarToDayField);
   setIjtimaDateValue(input.dataset.iso||"");
 }
 

@@ -1626,3 +1626,11 @@ body{margin:0}
 .ijtima-calendar-day.today{box-shadow:inset 0 0 0 1px #d6ae4d}
 .ijtima-calendar-note{margin-top:9px;padding:8px 10px;border-radius:8px;background:#eef8f5;color:#245650;font-size:11px;font-weight:700}
 @media(max-width:650px){.ijtima-calendar{right:auto;left:0;width:min(320px,calc(100vw - 40px))}.top-refresh{padding:0 11px!important;font-size:12px!important}}
+
+/* FINAL9 — use the supplied Islamic reference as the dashboard background */
+#dashboard{background-image:url("assets/dashboard-background-reference.png")!important;background-size:cover!important;background-position:center top!important;background-attachment:fixed!important;background-repeat:no-repeat!important}
+.app-main{background:transparent!important}
+.dashboard-content{background:transparent!important}
+#ijtimaDatePicker{position:relative;z-index:100!important}
+.ijtima-calendar-day.allowed{cursor:pointer!important}
+.ijtima-calendar-day:not(.allowed){cursor:not-allowed!important}
