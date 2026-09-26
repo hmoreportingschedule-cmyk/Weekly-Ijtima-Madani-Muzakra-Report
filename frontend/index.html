@@ -142,15 +142,15 @@
           <section class="form-section masjid-section">
             <h3 class="section-title"><span class="section-icon">⌂</span> Masjid Information</h3>
             <div class="grid location-grid">
-              <label>Country<select id="rCountry"></select></label>
-              <label>Region<select id="rRegion"></select></label>
-              <label>State<select id="rState"></select></label>
-              <label>Division<select id="rDivision"></select></label>
-              <label>District<select id="rDistrict"></select></label>
-              <label>Area<select id="rArea"></select></label>
-              <label>Pincode<select id="rPincode"></select></label>
-              <label>Locality<select id="rLocality"></select></label>
-              <label>Masjid<select id="rMasjid"></select></label>
+              <label>Country<select id="rCountry" required></select></label>
+              <label>Region<select id="rRegion" required></select></label>
+              <label>State<select id="rState" required></select></label>
+              <label>Division<select id="rDivision" required></select></label>
+              <label>District<select id="rDistrict" required></select></label>
+              <label>Area<select id="rArea" required></select></label>
+              <label>Pincode<select id="rPincode" required></select></label>
+              <label>Locality<select id="rLocality" required></select></label>
+              <label>Masjid<select id="rMasjid" required></select></label>
             </div>
           </section>
 
@@ -158,22 +158,22 @@
             <h3 class="section-title"><span class="section-icon">♟</span> Participants</h3>
             <div class="participant-grid">
               <label>Total Zimmedaran
-                <div class="input-with-icon"><span>♟</span><input id="totalZimmedaran" type="number" min="0" max="9999" step="1" inputmode="numeric" maxlength="4" placeholder="0000"></div>
+                <div class="input-with-icon"><span>♟</span><input id="totalZimmedaran" type="number" required min="0" max="9999" step="1" inputmode="numeric" maxlength="4" placeholder="0000"></div>
               </label>
               <label>Total Madaris Wale
-                <div class="input-with-icon"><span>♟♟</span><input id="totalMadarisWale" type="number" min="0" max="9999" step="1" inputmode="numeric" maxlength="4" placeholder="0000"></div>
+                <div class="input-with-icon"><span>♟♟</span><input id="totalMadarisWale" type="number" required min="0" max="9999" step="1" inputmode="numeric" maxlength="4" placeholder="0000"></div>
               </label>
               <label>Total Awam (Islamic Brothers)
-                <div class="input-with-icon"><span>♟♟</span><input id="totalAwam" type="number" min="0" max="9999" step="1" inputmode="numeric" maxlength="4" placeholder="0000"></div>
+                <div class="input-with-icon"><span>♟♟</span><input id="totalAwam" type="number" required min="0" max="9999" step="1" inputmode="numeric" maxlength="4" placeholder="0000"></div>
               </label>
               <label class="total-participants-field">Total Participants
                 <div class="input-with-icon"><span>♟♟</span><input id="participants" type="number" min="0" max="29997" step="1" readonly placeholder="0000"></div>
               </label>
               <label>Total Raat Rukne Wale
-                <div class="input-with-icon"><span>▣</span><input id="totalRaatRukneWale" type="number" min="0" max="9999" step="1" inputmode="numeric" maxlength="4" placeholder="0000"></div>
+                <div class="input-with-icon"><span>▣</span><input id="totalRaatRukneWale" type="number" required min="0" max="9999" step="1" inputmode="numeric" maxlength="4" placeholder="0000"></div>
               </label>
               <label>Total Gadiyan Ayi
-                <div class="input-with-icon"><span>▣</span><input id="totalGadiyanAyi" type="number" min="0" max="999" step="1" inputmode="numeric" maxlength="3" placeholder="000"></div>
+                <div class="input-with-icon"><span>▣</span><input id="totalGadiyanAyi" type="number" required min="0" max="999" step="1" inputmode="numeric" maxlength="3" placeholder="000"></div>
               </label>
             </div>
           </section>
@@ -183,8 +183,8 @@
           <section class="form-section schedule-section">
             <h3 class="section-title"><span class="section-icon">▣</span> Ijtima Schedule</h3>
             <div class="date-day-row">
-              <label>Ijtima Day<select id="rDay" disabled></select></label>
-              <label>Report Date<input id="ijtimaDate" type="date" aria-describedby="ijtimaDateHelp"></label>
+              <label>Ijtima Day<select id="rDay" disabled required></select></label>
+              <label>Report Date<input id="ijtimaDate" type="date" step="7" required aria-describedby="ijtimaDateHelp"></label>
             </div>
             <div id="ijtimaDateHelp" class="date-box"><span class="info-dot">i</span> Report date will be limited to this Masjid's Ijtima Day.</div>
           </section>
@@ -193,13 +193,13 @@
             <h3 class="section-title"><span class="section-icon">✓</span> Ijtima Details</h3>
             <div class="detail-rows">
               <label>Alakai Daura Baraye Haftawar Ijtima Hua?
-                <select id="alakaiDaura"><option value="">Select</option><option value="Yes">Yes</option><option value="No">No</option></select>
+                <select id="alakaiDaura" required><option value="">Select</option><option value="Yes">Yes</option><option value="No">No</option></select>
               </label>
               <label>Kya Langare Razawiyyah Ka Ehtimaam Hua?
-                <select id="langareRazawiyyah"><option value="">Select</option><option value="Yes">Yes</option><option value="No">No</option></select>
+                <select id="langareRazawiyyah" required><option value="">Select</option><option value="Yes">Yes</option><option value="No">No</option></select>
               </label>
               <label>Kya Jadwal Ishraq Tak Chala?
-                <select id="jadwalIshraq"><option value="">Select</option><option value="Yes">Yes</option><option value="No">No</option></select>
+                <select id="jadwalIshraq" required><option value="">Select</option><option value="Yes">Yes</option><option value="No">No</option></select>
               </label>
             </div>
           </section>
@@ -208,7 +208,7 @@
 
       <div class="ijtima-actions">
         <button id="saveIjtimaDraft" class="secondary">▣ Save Draft</button>
-        <button id="submitIjtima">▣ Save Report</button>
+        <button id="submitIjtima">▣ Submit Report</button>
       </div>
       <p id="reportMsg" class="msg"></p>
     </div>
@@ -284,6 +284,6 @@
   </div>
 </main>
 </div>
-<script src="app.js?v=FINAL5"></script>
+<script src="app.js?v=FINAL6"></script>
 </body>
 </html>

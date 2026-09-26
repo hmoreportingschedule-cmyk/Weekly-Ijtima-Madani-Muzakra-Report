@@ -1,5 +1,5 @@
-const APP_BUILD="FINAL5";
-const API_URL="https://script.google.com/macros/s/AKfycbwMHtKs9d8KZdwmh8UeY-gr2WX3qumhZS3tBI47DyMr7YC06dVI9XqqvC025uLOVu51Wg/exec";
+const APP_BUILD="FINAL6";
+const API_URL="https://script.google.com/macros/s/AKfycbwbP22HW0lrV4vSjelbiiURjcn9E_MH1DphI5caVWMX8nwmcnkClw4kH_i9QxBXSOiqmA/exec";
 let session=null,locations=[],progressType="Ijtima",progressRows=[];
 
 const $=id=>document.getElementById(id);
@@ -240,30 +240,31 @@ function updateReportCascade(changedIndex){
 
 function showIjtimaDate(day){
   const wanted=String(day||"").trim();
-  $("ijtimaDateInfo").textContent=wanted
-    ? `This Masjid's Ijtima Day: ${wanted}`
-    : "Select a Masjid to determine the Ijtima Day.";
+  $("ijtimaDateInfo") && ($("ijtimaDateInfo").textContent=wanted
+    ? `Only ${wanted} ki date select ki ja sakti hai.`
+    : "Select a Masjid to determine the Ijtima Day.");
   setIjtimaDateForDay(wanted);
-}
-function nextDateForDay(day){
-  const names=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-  const idx=names.findIndex(x=>x.toLowerCase()===String(day||"").trim().toLowerCase());
-  if(idx<0)return "";
-  const d=new Date();
-  d.setHours(12,0,0,0);
-  d.setDate(d.getDate()+((idx-d.getDay()+7)%7));
-  return d.toISOString().slice(0,10);
 }
 function setIjtimaDateForDay(day){
   const el=$("ijtimaDate"); if(!el)return;
   const names=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
   const wanted=names.findIndex(x=>x.toLowerCase()===String(day||"").trim().toLowerCase());
 
-  el.removeAttribute("min");
+  // Use a weekday-specific 1970 anchor + 7-day step. This makes the native
+  // calendar accept only the selected weekday for every year from 1970 onward;
+  // there is no maximum-date restriction. The onchange check is the final safeguard.
   el.removeAttribute("max");
-  el.removeAttribute("step");
+  if(wanted>=0){
+    const anchor=["1970-01-04","1970-01-05","1970-01-06","1970-01-07","1970-01-01","1970-01-02","1970-01-03"][wanted];
+    el.min=anchor;
+    el.setAttribute("step","7");
+  }else{
+    el.removeAttribute("min");
+    el.setAttribute("step","1");
+  }
   el.disabled=wanted<0;
   el.dataset.allowedDay=wanted<0?"":names[wanted];
+  el.required=wanted>=0;
 
   if(wanted<0){
     el.value="";
@@ -271,16 +272,14 @@ function setIjtimaDateForDay(day){
     return;
   }
 
-  // HTML date inputs cannot disable individual weekdays in the calendar.
-  // We validate the selected weekday, but NEVER reject a valid matching date
-  // because of min/max/step/year restrictions.
   el.title=`Only ${names[wanted]} ki dates allowed hain.`;
   el.onchange=()=>{
-    if(!el.value)return;
-    const p=el.value.split("-");
-    if(p.length!==3)return;
+    const value=String(el.value||"").trim();
+    if(!value){ msg("reportMsg","Please select the report date."); return; }
+    const p=value.split("-");
+    if(p.length!==3){ el.value=""; return msg("reportMsg","Please select a valid report date."); }
     const d=new Date(Date.UTC(Number(p[0]),Number(p[1])-1,Number(p[2])));
-    if(names[d.getUTCDay()]!==names[wanted]){
+    if(!Number.isFinite(d.getTime()) || d.getUTCFullYear()!==Number(p[0]) || d.getUTCMonth()!==Number(p[1])-1 || d.getUTCDate()!==Number(p[2]) || d.getUTCDay()!==wanted){
       el.value="";
       msg("reportMsg",`Sirf ${names[wanted]} ki date select karein.`);
     }else{
@@ -323,88 +322,89 @@ function setYesNoStyle(id){
   if(el.value==="No")el.classList.add("no-choice");
 }
 ["alakaiDaura","langareRazawiyyah","jadwalIshraq"].forEach(id=>$(id)?.addEventListener("change",()=>setYesNoStyle(id)));
-function setDateFieldForMasterDay(day){
-  const el=$("ijtimaDate"); if(!el||!day)return;
-  const names=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-  const wanted=names.findIndex(x=>x.toLowerCase()===String(day).trim().toLowerCase());
-  if(wanted<0)return;
-  const d=new Date(); let delta=(wanted-d.getDay()+7)%7; d.setDate(d.getDate()+delta);
-  const iso=d.toISOString().slice(0,10);
-  el.step="7"; el.min=iso; el.value=iso;
-  el.onchange=()=>{
-    if(!el.value)return;
-    const chosen=new Date(el.value+"T00:00:00");
-    if(chosen.getDay()!==wanted){
-      el.value="";
-      msg("reportMsg",`Only ${day} ki dates select ki ja sakti hain.`);
-    }
-  };
-}
-
-
 async function submitIjtima(status){
   const rows=filtered();
-  if(!rows.length)return msg("reportMsg","Please select a valid Masjid.");
+  if(!rows.length)return msg("reportMsg","Please select all Masjid Information fields and choose a valid Masjid.");
   const r=rows[0];
 
-  const date=String($("ijtimaDate")?.value||"").trim();
+  // Every selectable location field is mandatory. Assigned/locked fields are
+  // already present in the filtered master row, so this also covers those.
+  const requiredLocations=[
+    ["Country",r.country],["Region",r.region],["State",r.state],["Division",r.division],
+    ["District",r.district],["Area",r.area],["Pincode",r.pincode],["Locality",r.locality],["Masjid",r.masjidName]
+  ];
+  const missingLocation=requiredLocations.find(([_,v])=>!String(v??"").trim());
+  if(missingLocation)return msg("reportMsg",`${missingLocation[0]} select karna mandatory hai.`);
+
   const allowedDay=String(r.ijtimaDay||"").trim();
-  if(!date)return msg("reportMsg","Please select the report date.");
   if(!allowedDay)return msg("reportMsg","Ijtima Day is not available for this Masjid.");
+  const dayValue=String($("rDay")?.value||"").trim();
+  if(!dayValue)return msg("reportMsg","Ijtima Day select hona mandatory hai.");
+  if(dayValue.toLowerCase()!==allowedDay.toLowerCase())return msg("reportMsg",`Sirf ${allowedDay} ka Ijtima allowed hai.`);
 
+  const date=String($("ijtimaDate")?.value||"").trim();
+  if(!date)return msg("reportMsg","Report Date select karna mandatory hai.");
   const pdate=date.split("-");
-  if(pdate.length!==3)return msg("reportMsg","Please select a valid report date.");
+  if(pdate.length!==3 || !/^\d{4}-\d{2}-\d{2}$/.test(date))return msg("reportMsg","Please select a valid report date.");
   const d=new Date(Date.UTC(Number(pdate[0]),Number(pdate[1])-1,Number(pdate[2])));
-  if(Number.isNaN(d.getTime()))return msg("reportMsg","Please select a valid report date.");
-
   const names=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-  const selectedDay=names[d.getUTCDay()];
-  if(selectedDay.toLowerCase()!==allowedDay.toLowerCase()){
+  if(!Number.isFinite(d.getTime()) || d.getUTCFullYear()!==Number(pdate[0]) || d.getUTCMonth()!==Number(pdate[1])-1 || d.getUTCDate()!==Number(pdate[2]))
+    return msg("reportMsg","Please select a valid report date.");
+  if(names[d.getUTCDay()].toLowerCase()!==allowedDay.toLowerCase())
     return msg("reportMsg",`Sirf ${allowedDay} ki date select karein.`);
-  }
 
-  const z=Number($("totalZimmedaran")?.value||0);
-  const m=Number($("totalMadarisWale")?.value||0);
-  const a=Number($("totalAwam")?.value||0);
-  const p=z+m+a;
-  const night=Number($("totalRaatRukneWale")?.value||0);
-  const cars=Number($("totalGadiyanAyi")?.value||0);
+  // All numeric entry fields are mandatory. Zero is a valid entered value.
+  const raw={
+    z:String($("totalZimmedaran")?.value??"").trim(),
+    m:String($("totalMadarisWale")?.value??"").trim(),
+    a:String($("totalAwam")?.value??"").trim(),
+    night:String($("totalRaatRukneWale")?.value??"").trim(),
+    cars:String($("totalGadiyanAyi")?.value??"").trim()
+  };
+  if(!raw.z)return msg("reportMsg","Total Zimmedaran fill karna mandatory hai.");
+  if(!raw.m)return msg("reportMsg","Total Madaris Wale fill karna mandatory hai.");
+  if(!raw.a)return msg("reportMsg","Total Awam fill karna mandatory hai.");
+  if(!raw.night)return msg("reportMsg","Total Raat Rukne Wale fill karna mandatory hai.");
+  if(!raw.cars)return msg("reportMsg","Total Gadiyan Ayi fill karna mandatory hai.");
 
-  if(!Number.isInteger(z)||z<0||z>9999||!Number.isInteger(m)||m<0||m>9999||!Number.isInteger(a)||a<0||a>9999)
-    return msg("reportMsg","Zimmedaran, Madaris Wale aur Total Awam mein maximum 4 digits allowed hain.");
-  if(!Number.isInteger(night)||night<0||night>9999)
-    return msg("reportMsg","Total Raat Rukne Wale mein maximum 4 digits allowed hain.");
-  if(!Number.isInteger(cars)||cars<0||cars>999)
-    return msg("reportMsg","Total Gadiyan Ayi mein maximum 3 digits allowed hain.");
+  const z=Number(raw.z),m=Number(raw.m),a=Number(raw.a),night=Number(raw.night),cars=Number(raw.cars),p=z+m+a;
+  if(!Number.isInteger(z)||z<0||z>9999)return msg("reportMsg","Total Zimmedaran mein 0 se 9999 tak whole number enter karein.");
+  if(!Number.isInteger(m)||m<0||m>9999)return msg("reportMsg","Total Madaris Wale mein 0 se 9999 tak whole number enter karein.");
+  if(!Number.isInteger(a)||a<0||a>9999)return msg("reportMsg","Total Awam mein 0 se 9999 tak whole number enter karein.");
+  if(!Number.isInteger(night)||night<0||night>9999)return msg("reportMsg","Total Raat Rukne Wale mein 0 se 9999 tak whole number enter karein.");
+  if(!Number.isInteger(cars)||cars<0||cars>999)return msg("reportMsg","Total Gadiyan Ayi mein 0 se 999 tak whole number enter karein.");
 
-  $("participants").value=p;
+  const alakai=String($("alakaiDaura")?.value||"").trim();
+  const langare=String($("langareRazawiyyah")?.value||"").trim();
+  const ishraq=String($("jadwalIshraq")?.value||"").trim();
+  if(!alakai)return msg("reportMsg","Alakai Daura ka jawab select karna mandatory hai.");
+  if(!langare)return msg("reportMsg","Langare Razawiyyah ka jawab select karna mandatory hai.");
+  if(!ishraq)return msg("reportMsg","Jadwal Ishraq ka jawab select karna mandatory hai.");
 
+  const draftBtn=$("saveIjtimaDraft"),submitBtn=$("submitIjtima");
+  draftBtn.disabled=true; submitBtn.disabled=true;
   try{
     const result=await api("saveReport",{
       sessionToken:session.token,
       type:"Ijtima",
       report:{
-        weekDate:date,
-        country:r.country,region:r.region,state:r.state,division:r.division,
-        district:r.district,area:r.area,locality:r.locality,
-        masjidName:r.masjidName,pincode:r.pincode,ijtimaDay:allowedDay,
-        participants:p,totalZimmedaran:z,totalMadarisWale:m,totalAwam:a,
-        totalRaatRukneWale:night,totalGadiyanAyi:cars,
-        alakaiDaura:$("alakaiDaura")?.value||"",
-        langareRazawiyyah:$("langareRazawiyyah")?.value||"",
-        jadwalIshraq:$("jadwalIshraq")?.value||"",
-        volunteers:[],status
+        weekDate:date, country:r.country,region:r.region,state:r.state,division:r.division,
+        district:r.district,area:r.area,locality:r.locality,masjidName:r.masjidName,pincode:r.pincode,
+        ijtimaDay:allowedDay,participants:p,totalZimmedaran:z,totalMadarisWale:m,totalAwam:a,
+        totalRaatRukneWale:night,totalGadiyanAyi:cars,alakaiDaura:alakai,
+        langareRazawiyyah:langare,jadwalIshraq:ishraq,volunteers:[],status
       }
     });
-
-    if(status==="Submitted" && session.role!=="Admin"){
-      lockSubmittedIjtima();
-      msg("reportMsg","Report saved successfully. Submitted reports cannot be edited by User.",true);
-    }else{
-      msg("reportMsg",status==="Draft"?"Draft saved successfully.":"Report saved successfully.",true);
-    }
     if(result.reportId)window._lastIjtimaReportId=result.reportId;
+    if(status==="Submitted"){
+      lockSubmittedIjtima();
+      msg("reportMsg","Report submitted successfully. Ab yeh report edit nahi ki ja sakti.",true);
+    }else{
+      msg("reportMsg","Draft saved successfully. Aap is Draft ko edit karke dobara save kar sakte hain.",true);
+      draftBtn.disabled=false; submitBtn.disabled=false;
+    }
   }catch(e){
+    draftBtn.disabled=false; submitBtn.disabled=false;
     msg("reportMsg",e.message||"Report save failed.");
   }
 }
@@ -412,13 +412,12 @@ async function submitIjtima(status){
 function lockSubmittedIjtima(){
   const box=$("userIjtima"); if(!box)return;
   box.dataset.submittedLocked="1";
-  box.querySelectorAll("input,select,button").forEach(el=>{
-    if(el.id!=="saveIjtimaDraft" && el.id!=="submitIjtima") el.disabled=true;
-  });
-  $("saveIjtimaDraft").disabled=true;
-  $("submitIjtima").disabled=true;
+  box.querySelectorAll("input,select,button").forEach(el=>{el.disabled=true;});
+  const btn=$("submitIjtima"); if(btn)btn.textContent="✓ Report Submitted";
+  const draft=$("saveIjtimaDraft"); if(draft)draft.textContent="✓ Submitted";
 }
-$("saveIjtimaDraft").onclick=()=>submitIjtima("Draft");$("submitIjtima").onclick=()=>submitIjtima("Submitted");
+$("saveIjtimaDraft").onclick=()=>submitIjtima("Draft");
+$("submitIjtima").onclick=()=>submitIjtima("Submitted");
 
 function downloadTemplate(type){
   const headers=type==="Ijtima"?["Country","Region","State","Division","District","Area","Locality","Masjid Name","Pincode","Ijtima Day"]:["Country","Region","State","Division","District","Area","Pincode","Masjid Name","Name","Mobile","Details"];

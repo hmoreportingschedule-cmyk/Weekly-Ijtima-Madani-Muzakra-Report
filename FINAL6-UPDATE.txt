@@ -1,0 +1,24 @@
+FINAL6 – Weekly Ijtima Report Rules
+
+Only the Weekly Ijtima Report form was updated.
+
+1. All Masjid Information selections are mandatory.
+2. Ijtima Day is auto-filled from the selected Masjid and remains locked.
+3. Report Date is mandatory and the native calendar is restricted to the Masjid's Ijtima weekday using a weekday-specific 7-day step. No maximum-date restriction is applied.
+4. All five numeric entry fields are mandatory:
+   - Total Zimmedaran
+   - Total Madaris Wale
+   - Total Awam
+   - Total Raat Rukne Wale
+   - Total Gadiyan Ayi
+5. The three Ijtima Details Yes/No fields are mandatory.
+6. Save Draft saves the report as Draft and keeps it editable.
+7. Submit Report submits the report and locks the form.
+8. A Submitted Ijtima report cannot be edited, including by Admin, through the save endpoint.
+9. Frontend and Google Apps Script both enforce these rules.
+10. Other dashboard sections/layout were not intentionally changed.
+
+Deployment:
+- Replace the frontend files from this ZIP and redeploy Vercel.
+- Replace apps-script/Code.gs and deploy a new Apps Script Web App version while keeping the same Web App URL.
+- Frontend cache version is FINAL6.

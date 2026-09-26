@@ -4,3 +4,5 @@
 4. Confirm Users sheet admin row: Username admin, Password Admin@2026!, Role Admin, Active TRUE.
 5. Change temporary admin password immediately in the sheet and restrict sheet access. Plaintext passwords are visible to anyone with sheet access.
 6. V7 frontend restored from intact V2 after discovering V6 app.js was truncated; login click handlers are restored.
+
+V16: Deploy the updated apps-script/Code.gs to enable login-page password reset.
