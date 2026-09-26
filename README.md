@@ -97,3 +97,14 @@ The script uses: My Drive / Dashboard Working / Dashboard Name / Weekly Ijtima &
 - Older Users sheets with Password Hash in column C are migrated by inserting Password after Username.
 - Exact Admin credentials automatically repair/create the Admin row on login.
 - User template includes Password as a visible column.
+
+
+## V.9 Location & Volunteer Update
+- Fixed cascading location dropdowns: Country -> Region -> State -> Division -> District -> Area -> Pincode -> Locality -> Masjid.
+- Region now shows Region names, not Masjid names.
+- Pincode now shows Pincode values.
+- Selecting a parent location repopulates only valid child values from the master data.
+- Volunteer Data now has Country, Region, State, Division, District, Area, Pincode and Masjid selectors.
+- Volunteer Excel download format now includes all location fields plus Name, Mobile and Details.
+- Volunteer backend stores Pincode and validates non-admin users against their assigned location.
+- Old volunteer Excel files containing only Name/Mobile/Details remain importable.

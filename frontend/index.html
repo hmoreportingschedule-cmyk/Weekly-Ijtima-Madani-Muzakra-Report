@@ -158,7 +158,20 @@
 
     <div id="userVolunteer" class="card panel" hidden>
       <h2>Volunteer Data</h2>
-      <button id="downloadVolunteerTemplate" class="secondary">Download Excel Format</button>
+      <p class="small">Volunteer report ke liye location bhi select karein. Har dropdown sirf selected parent location ka data dikhayega.</p>
+      <div class="grid">
+        <label>Country<select id="vCountry"></select></label>
+        <label>Region<select id="vRegion"></select></label>
+        <label>State<select id="vState"></select></label>
+        <label>Division<select id="vDivision"></select></label>
+        <label>District<select id="vDistrict"></select></label>
+        <label>Area<select id="vArea"></select></label>
+        <label>Pincode<select id="vPincode"></select></label>
+        <label>Masjid<select id="vMasjid"></select></label>
+      </div>
+      <div class="actions">
+        <button id="downloadVolunteerTemplate" class="secondary">Download Excel Format</button>
+      </div>
       <div id="volunteerOnlyRows"></div>
       <button id="addVolunteerOnly" class="secondary">+ Add Volunteer</button>
       <button id="submitVolunteer">Save Volunteer Data</button>

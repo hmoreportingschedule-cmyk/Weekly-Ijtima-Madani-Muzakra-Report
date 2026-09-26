@@ -35,22 +35,80 @@ function buildNav(){
 function addNav(id,label){const b=document.createElement("button");b.textContent=label;b.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.hidden=true);$(id).hidden=false;document.querySelectorAll(".tabs button").forEach(x=>x.classList.remove("active"));b.classList.add("active")};$("nav").appendChild(b)}
 document.addEventListener("click",e=>{const p=e.target.dataset.panel;if(!p)return;document.querySelectorAll(".panel").forEach(x=>x.hidden=true);$(p).hidden=false});
 
-async function loadLocationsFast(){try{const d=await api("getLocations",{sessionToken:session.token});locations=d.locations||[];setupCascades();setupUserCascades();if(session.role!=="Admin")document.querySelector('[data-panel="userIjtima"]')?.click()}catch(e){msg("loginMsg",e.message)}}
+async function loadLocationsFast(){try{const d=await api("getLocations",{sessionToken:session.token});locations=d.locations||[];setupCascades();setupUserCascades();setupVolunteerCascades();if(session.role!=="Admin")document.querySelector('[data-panel="userIjtima"]')?.click()}catch(e){msg("loginMsg",e.message)}}
 
 function uniq(rows,key){return [...new Set(rows.map(x=>x[key]).filter(Boolean))]}
 function fill(id,vals){if(!$(id))return;$(id).innerHTML='<option value="">Select</option>'+vals.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("")}
-function currentFilters(){return{country:$("rCountry").value,region:$("rRegion").value,state:$("rState").value,division:$("rDivision").value,district:$("rDistrict").value,area:$("rArea").value,locality:$("rLocality").value,masjidName:$("rMasjid").value,pincode:$("rPincode").value}}
-function filtered(){const f=currentFilters();return locations.filter(r=>Object.entries(f).every(([k,v])=>!v||String(r[k])===v))}
+function currentFilters(){
+  return {
+    country:$("rCountry")?.value||"",
+    region:$("rRegion")?.value||"",
+    state:$("rState")?.value||"",
+    division:$("rDivision")?.value||"",
+    district:$("rDistrict")?.value||"",
+    area:$("rArea")?.value||"",
+    pincode:$("rPincode")?.value||"",
+    locality:$("rLocality")?.value||"",
+    masjidName:$("rMasjid")?.value||""
+  };
+}
+function filtered(){
+  const f=currentFilters();
+  return locations.filter(r=>Object.entries(f).every(([k,v])=>!v||String(r[k]||"")===String(v)));
+}
+const LOCATION_LEVELS=[
+  ["Country","country"],["Region","region"],["State","state"],["Division","division"],
+  ["District","district"],["Area","area"],["Pincode","pincode"],["Locality","locality"],["Masjid","masjidName"]
+];
+function valuesForLocation(rows,key){
+  return [...new Set(rows.map(r=>String(r[key]??"").trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+}
+function parentRows(levelIndex, source=locations){
+  let rows=source;
+  for(let i=0;i<levelIndex;i++){
+    const [id,key]=LOCATION_LEVELS[i];
+    const el=$("r"+id);
+    const value=el?.value||"";
+    if(value) rows=rows.filter(r=>String(r[key]??"")===value);
+  }
+  return rows;
+}
+function resetLocationSelect(id, values, allLabel="All"){
+  const el=$(id);if(!el)return;
+  const old=el.value;
+  el.innerHTML=`<option value="">${allLabel}</option>`+values.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("");
+  if(values.includes(old))el.value=old;
+}
 function setupCascades(){
-  const c=[["rCountry","country"],["rRegion","region"],["rState","state"],["rDivision","division"],["rDistrict","district"],["rArea","area"],["rLocality","locality"],["rMasjid","masjidName"],["rPincode","pincode"],["rDay","ijtimaDay"]];
-  fill("rCountry",uniq(locations,"country"));c.forEach(([id,key])=>$(id).onchange=()=>cascade(id,key));
+  LOCATION_LEVELS.forEach(([id,key],i)=>{
+    const el=$("r"+id);if(!el)return;
+    el.onchange=()=>updateReportCascade(i);
+  });
+  resetLocationSelect("rCountry",valuesForLocation(locations,"country"));
+  for(let i=1;i<LOCATION_LEVELS.length;i++){
+    const [id,key]=LOCATION_LEVELS[i];
+    resetLocationSelect("r"+id,valuesForLocation(parentRows(i),""));
+    resetLocationSelect("r"+id,valuesForLocation(parentRows(i),key));
+  }
+  if($("rDay"))$("rDay").innerHTML='<option value="">Select</option>';
 }
-function cascade(id,key){
-  const c=[["rCountry","country"],["rRegion","region"],["rState","state"],["rDivision","division"],["rDistrict","district"],["rArea","area"],["rLocality","locality"],["rMasjid","masjidName"],["rPincode","pincode"],["rDay","ijtimaDay"]];
-  const i=c.findIndex(x=>x[0]===id),rows=filtered();
-  for(let j=i+1;j<c.length;j++)fill(c[j][0],uniq(rows,c[j][1]));
-  const r=filtered()[0];if(r&&id!=="rDay"){$("rDay").value=r.ijtimaDay||"";showIjtimaDate(r.ijtimaDay)}
+function updateReportCascade(changedIndex){
+  // Clear every lower level first; then populate it only from the selected parent chain.
+  for(let i=changedIndex+1;i<LOCATION_LEVELS.length;i++){
+    const [id,key]=LOCATION_LEVELS[i];
+    resetLocationSelect("r"+id,valuesForLocation(parentRows(i),key));
+  }
+  const rows=filtered();
+  if(rows.length){
+    const r=rows[0];
+    if($("rDay"))$("rDay").value=r.ijtimaDay||"";
+    showIjtimaDate(r.ijtimaDay);
+  }else if($("rDay")){
+    $("rDay").value="";
+    showIjtimaDate("");
+  }
 }
+
 function showIjtimaDate(day){
   const wanted=String(day||"Thursday");$("ijtimaDateInfo").textContent=`This Masjid's Ijtima Day: ${wanted}`;
   $("nextReportDate").textContent="Next reporting date: "+nextDateForDay(wanted);
@@ -69,8 +127,8 @@ async function submitIjtima(status){
 $("saveIjtimaDraft").onclick=()=>submitIjtima("Draft");$("submitIjtima").onclick=()=>submitIjtima("Submitted");
 
 function downloadTemplate(type){
-  const headers=type==="Ijtima"?["Country","Region","State","Division","District","Area","Locality","Masjid Name","Pincode","Ijtima Day"]:["Name","Mobile","Details"];
-  const ws=XLSX.utils.aoa_to_sheet([headers, type==="Ijtima"?["India","","","","","","","Example Masjid","400001","Thursday"]:["Example Volunteer","9876543210",""]]);
+  const headers=type==="Ijtima"?["Country","Region","State","Division","District","Area","Locality","Masjid Name","Pincode","Ijtima Day"]:["Country","Region","State","Division","District","Area","Pincode","Masjid Name","Name","Mobile","Details"];
+  const ws=XLSX.utils.aoa_to_sheet([headers, type==="Ijtima"?["India","","","","","","","Example Masjid","400001","Thursday"]:["India","","","","","","400001","Example Masjid","Example Volunteer","9876543210",""]]);
   const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,type==="Ijtima"?"Weekly Ijtima Master":"Volunteer Data");
   XLSX.writeFile(wb,type==="Ijtima"?"Weekly-Ijtima-Master-Format.xlsx":"Volunteer-Data-Format.xlsx");
 }
@@ -97,7 +155,51 @@ $("downloadUserTemplate").onclick=()=>{const headers=['User ID','Username','Pass
 $("importUsers").onclick=async()=>{try{const f=$("userFile").files[0];if(!f)throw Error('Select Excel/CSV file.');const wb=XLSX.read(await f.arrayBuffer(),{type:'array'}),rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});const d=await api('importUsers',{sessionToken:session.token,rows});msg('userImportMsg','Imported '+d.imported+' users.',true);$("userFile").value=''}catch(e){msg('userImportMsg',e.message)}};
 
 $("submitMuzakra").onclick=async()=>{try{const p=$("mParticipants").value;if(!Number.isInteger(Number(p))||Number(p)<0)throw Error("Participants must be a whole number.");await api("saveReport",{sessionToken:session.token,type:"Muzakra",report:{weekDate:$("mDate").value,participants:Number(p),status:"Submitted"}});msg("muzakraUserMsg","Madani Muzakra report submitted separately.",true)}catch(e){msg("muzakraUserMsg",e.message)}};
-$("submitVolunteer").onclick=async()=>{try{const rows=[...document.querySelectorAll("#volunteerOnlyRows .vol")].map(x=>({name:x.querySelector(".vname").value.trim(),mobile:x.querySelector(".vmobile").value.trim(),details:x.querySelector(".vdetails").value.trim()}));const r=filtered()[0]||{};await api("saveVolunteer",{sessionToken:session.token,location:r,rows});msg("volunteerUserMsg","Volunteer data saved.",true)}catch(e){msg("volunteerUserMsg",e.message)}};
+const VOL_LEVELS=[
+  ["Country","country"],["Region","region"],["State","state"],["Division","division"],
+  ["District","district"],["Area","area"],["Pincode","pincode"],["Masjid","masjidName"]
+];
+function volRowsFor(i){
+  let rows=locations;
+  for(let j=0;j<i;j++){
+    const [id,key]=VOL_LEVELS[j],v=$("v"+id)?.value||"";
+    if(v)rows=rows.filter(r=>String(r[key]??"")===String(v));
+  }
+  return rows;
+}
+function setupVolunteerCascades(){
+  VOL_LEVELS.forEach(([id,key],i)=>{
+    const el=$("v"+id);if(!el)return;
+    el.onchange=()=>{
+      for(let j=i+1;j<VOL_LEVELS.length;j++){
+        const [nextId,nextKey]=VOL_LEVELS[j];
+        resetLocationSelect("v"+nextId,valuesForLocation(volRowsFor(j),nextKey));
+      }
+    };
+  });
+  resetLocationSelect("vCountry",valuesForLocation(locations,"country"));
+  for(let i=1;i<VOL_LEVELS.length;i++){
+    const [id,key]=VOL_LEVELS[i];
+    resetLocationSelect("v"+id,valuesForLocation(volRowsFor(i),key));
+  }
+}
+$("submitVolunteer").onclick=async()=>{
+  try{
+    const location={
+      country:$("vCountry")?.value||"",region:$("vRegion")?.value||"",state:$("vState")?.value||"",
+      division:$("vDivision")?.value||"",district:$("vDistrict")?.value||"",area:$("vArea")?.value||"",
+      pincode:$("vPincode")?.value||"",masjidName:$("vMasjid")?.value||""
+    };
+    if(!location.region||!location.state||!location.division||!location.district||!location.pincode)
+      throw Error("Please select Country, Region, State, Division, District and Pincode.");
+    const rows=[...document.querySelectorAll("#volunteerOnlyRows .vol")].map(x=>({
+      name:x.querySelector(".vname").value.trim(),mobile:x.querySelector(".vmobile").value.trim(),details:x.querySelector(".vdetails").value.trim()
+    })).filter(x=>x.name);
+    if(!rows.length)throw Error("At least one volunteer is required.");
+    await api("saveVolunteer",{sessionToken:session.token,location,rows});
+    msg("volunteerUserMsg","Volunteer data saved successfully.",true);
+  }catch(e){msg("volunteerUserMsg",e.message)}
+};
 
 function periodLabel(date,mode){const d=new Date(date);if(mode==="year")return d.getFullYear();if(mode==="month")return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");return date}
 function aggregate(rows,mode){const m={};rows.forEach(r=>{const k=periodLabel(r.date,mode);m[k]=(m[k]||0)+(Number(r.participants)||0)});return Object.entries(m).sort((a,b)=>String(a[0]).localeCompare(String(b[0]))).map(([label,value])=>({label,value}))}
