@@ -12,7 +12,7 @@
 <section id="loginCard" class="login-card-shell">
   <div class="login-brand-side">
     <div class="brand-mark-large">◈</div>
-    <div class="login-brand-title">Weekly Ijtima</div>
+    <div class="login-brand-title">Weekly Ijtima &amp; Madani Muzakra</div>
     <div class="login-brand-sub">Ijtima • Madani Muzakra • Volunteer Reporting</div>
     <div class="login-brand-note">Fast, secure & location-based reporting dashboard</div>
   </div>
@@ -42,14 +42,14 @@
 
 <main id="dashboard" hidden>
   <aside class="app-sidebar">
-    <div class="sidebar-brand"><div class="sidebar-logo">◈</div><div><strong>Weekly Ijtima</strong><small>REPORTING SYSTEM</small></div></div>
+    <div class="sidebar-brand"><div class="sidebar-logo">◈</div><div><strong>Weekly Ijtima &amp; Madani Muzakra</strong><small>REPORTING SYSTEM</small></div></div>
     <div class="sidebar-caption">OPERATIONS CONSOLE</div>
     <nav id="nav" class="side-nav"></nav>
     <div class="sidebar-footer"><div class="side-user"><span id="sideAvatar">U</span><div><b id="sideUserName">User</b><small id="sideUserRole">User</small></div></div></div>
   </aside>
   <div class="app-main">
     <div class="topbar">
-      <div class="topbar-title"><span class="mobile-menu" id="mobileMenu">☰</span><div><h1>Weekly Ijtima Report</h1><small id="topSubtitle">Reporting Dashboard</small></div></div>
+      <div class="topbar-title"><span class="mobile-menu" id="mobileMenu">☰</span><div><h1>Weekly Ijtima &amp; Madani Muzakra</h1><small id="topSubtitle">Reporting Dashboard</small></div></div>
       <div class="topbar-actions"><div id="dashboardClock" class="dashboard-clock"></div><button id="notificationBell" class="notification-bell" hidden title="Notifications" aria-label="Notifications"><span class="bell-symbol">🔔</span><span id="notificationBadge" class="notification-badge" hidden>0</span></button><button id="logoutBtn" class="secondary top-logout">Logout</button></div>
     </div>
     <div class="dashboard-content">
@@ -162,7 +162,7 @@
 
     <div id="userMuzakra" class="card panel" hidden>
       <h2>Weekly Madani Muzakra Report</h2>
-      <label>Report Date<input id="mDate" type="date"></label>
+      <label>Report Date<input id="mDate" type="date" aria-describedby="muzakraDateHelp"></label><div id="muzakraDateHelp" class="date-box">Weekly Madani Muzakra: Saturday only.</div>
       <label>Participants<input id="mParticipants" type="number" min="0" step="1"></label>
       <button id="submitMuzakra">Submit Report</button>
       <p id="muzakraUserMsg" class="msg"></p>

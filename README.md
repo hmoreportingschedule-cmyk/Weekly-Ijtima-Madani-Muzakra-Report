@@ -1,3 +1,13 @@
+# Weekly Ijtima Dashboard — V.20
+
+V.20 requested updates:
+- Assigned location boundary hides Country/Region/etc. through the assigned level while keeping lower selections available.
+- Weekly Madani Muzakra is Saturday-only, with Saturday default and backend validation.
+- Madani Muzakra progress control uses the same progress workflow as Weekly Ijtima.
+- Dashboard/login/sidebar title updated to “Weekly Ijtima & Madani Muzakra” with Arial Black styling.
+- Existing functionality otherwise retained.
+
+
 # Weekly Ijtima Dashboard – Drive Connected Update
 
 This update uses the exact Google Drive structure supplied:

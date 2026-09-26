@@ -30,3 +30,20 @@ button:disabled{opacity:.6;cursor:not-allowed}
 
 /* V17 critical visibility fix: the HTML hidden attribute must always win over layout rules. */
 [hidden], .login-card-shell[hidden], #dashboard[hidden] { display:none !important; }
+
+/* V20: Assigned-location boundaries and dashboard heading */
+.location-field.assigned-hidden{display:none!important}
+.sidebar-brand strong,.login-brand-title,.topbar-title h1{
+  font-family:"Arial Black",Arial,sans-serif;
+  font-weight:900;
+}
+.sidebar-brand strong{font-size:15px;line-height:1.15;max-width:165px}
+.topbar-title{
+  background:var(--teal);
+  color:#fff;
+  padding:9px 14px;
+  border-radius:10px;
+}
+.topbar-title h1{color:#fff;font-size:20px;line-height:1.05}
+.topbar-title small{color:#fff;opacity:.9;font-weight:700}
+.login-brand-title{font-size:34px;line-height:1.08}

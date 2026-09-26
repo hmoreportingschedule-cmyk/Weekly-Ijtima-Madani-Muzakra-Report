@@ -5,7 +5,7 @@ const $=id=>document.getElementById(id);
 const msg=(id,t,ok=false)=>{if($(id)){ $(id).textContent=t;$(id).style.color=ok?"#087f5b":"#c92a2a"; }};
 async function api(action,payload={}){
   if(!API_URL.startsWith("http"))throw Error("Set API_URL in frontend/app.js");
-  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),15000);
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),30000);
   try{
     const r=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action,...payload}),signal:controller.signal});
     const d=await r.json();if(!d.ok)throw Error(d.error||"Request failed");return d;
@@ -34,7 +34,7 @@ async function login(){
     $("sideUserRole").textContent=session.role;
     $("sideAvatar").textContent=(session.name||session.username||"U").split(/\s+/).map(x=>x[0]).join("").slice(0,2).toUpperCase();
     buildNav();
-    setTimeout(loadLocationsFast,20);
+    setupMuzakraDate(); setTimeout(loadLocationsFast,20);
   }catch(e){msg("loginMsg",e.message)}
   finally{$("loginBtn").disabled=false;$("loginBtn").textContent="SIGN IN"}
 }
@@ -91,27 +91,63 @@ function assignedValue(header){
 }
 function applyAssignedLocationLocks(){
   if(!session || session.role==="Admin" || session.role==="HOD") return;
+  const levels=[
+    ["Country","country"],["Region","region"],["State","state"],["Division","division"],
+    ["District","district"],["Area","area"],["Pincode","pincode"],["Locality","locality"],["Masjid","masjidName"]
+  ];
+
+  // The first assigned location is the user's access boundary. Everything
+  // above and including that boundary is fixed/hidden; only lower levels
+  // remain selectable.
+  const assignedIndex=levels.findIndex(([id])=>{
+    const v=assignedValue(id);
+    return v && v.toLowerCase()!=="all";
+  });
+
   ["r","v"].forEach(prefix=>{
-    const levels=[
-      ["Country","country"],["Region","region"],["State","state"],["Division","division"],
-      ["District","district"],["Area","area"],["Pincode","pincode"],["Locality","locality"],["Masjid","masjidName"]
-    ];
     let rows=locations;
-    levels.forEach(([id,key])=>{
+    levels.forEach(([id,key],i)=>{
       const el=$(prefix+id); if(!el) return;
+      const wrap=el.closest(".location-field");
       const assigned=assignedValue(id);
+
       if(assigned && assigned.toLowerCase()!=="all"){
-        el.value=assigned; el.disabled=true;
-        const wrap=el.closest(".location-field");
+        el.value=assigned;
+        el.disabled=true;
         if(wrap) wrap.classList.add("assigned-fixed");
-        rows=rows.filter(r=>String(r[key]??"").trim()===assigned);
       }else{
-        const wrap=el.closest(".location-field");
-        if(wrap) wrap.classList.remove("assigned-fixed");
         el.disabled=false;
+        if(wrap) wrap.classList.remove("assigned-fixed");
+      }
+
+      // Hide Country/Region/etc. once that level is the assigned boundary.
+      // Lower levels stay visible so the user can continue selecting downwards.
+      if(wrap){
+        const shouldHide=assignedIndex>=0 && i<=assignedIndex;
+        wrap.classList.toggle("assigned-hidden",shouldHide);
+      }
+
+      if(assigned && assigned.toLowerCase()!=="all"){
+        rows=rows.filter(r=>String(r[key]??"").trim()===assigned);
       }
     });
+
+    // Rebuild only the visible child dropdowns from the already restricted
+    // master rows. Assigned fields retain their fixed values.
+    for(let i=0;i<levels.length;i++){
+      const [id,key]=levels[i],el=$(prefix+id);
+      if(!el) continue;
+      const wrap=el.closest(".location-field");
+      if(wrap?.classList.contains("assigned-hidden")) continue;
+      const vals=valuesForLocation(rows,key);
+      const current=el.value;
+      if(vals.length){
+        el.innerHTML='<option value="">Select</option>'+vals.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("");
+        if(vals.includes(current)) el.value=current;
+      }
+    }
   });
+
   updateReportCascade(-1);
 }
 
@@ -194,6 +230,28 @@ function showIjtimaDate(day){
   $("nextReportDate").textContent="Next reporting date: "+nextDateForDay(wanted);
 }
 function nextDateForDay(day){const names=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],idx=names.findIndex(x=>x.toLowerCase()===String(day).toLowerCase()),n=idx<0?4:idx,d=new Date(),diff=(n-d.getDay()+7)%7;d.setDate(d.getDate()+diff);return d.toISOString().slice(0,10)}
+function nextSaturday(){
+  const d=new Date(),diff=(6-d.getDay()+7)%7;
+  d.setDate(d.getDate()+diff);
+  return d.toISOString().slice(0,10);
+}
+function setupMuzakraDate(){
+  const el=$("mDate"); if(!el)return;
+  const saturday=nextSaturday();
+  el.value=saturday;
+  el.min="2020-01-04"; // Saturday
+  el.step="7";
+  el.onchange=()=>{
+    if(!el.value)return;
+    const d=new Date(el.value+"T00:00:00");
+    if(d.getDay()!==6){
+      msg("muzakraUserMsg","Weekly Madani Muzakra sirf Saturday ko hota hai. Please Saturday select karein.");
+      el.value=nextSaturday();
+    }else{
+      $("muzakraUserMsg").textContent="";
+    }
+  };
+}
 
 function volRow(target){const d=document.createElement("div");d.className="vol";d.innerHTML='<input class="vname" placeholder="Volunteer Name"><input class="vmobile" placeholder="Mobile"><input class="vdetails" placeholder="Details"><button type="button" class="secondary">Remove</button>';d.querySelector("button").onclick=()=>d.remove();$(target).appendChild(d)}
 $("addVolunteer").onclick=()=>volRow("volunteers");$("addVolunteerOnly").onclick=()=>volRow("volunteerOnlyRows");
@@ -234,7 +292,18 @@ $("saveUser").onclick=async()=>{try{const u={userId:$("uId").value.trim(),userna
 $("downloadUserTemplate").onclick=()=>{const headers=['User ID','Username','Password','Name','Role','Active','Country','Region','State','Division','District','Area','Pincode'];const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([headers]),'Users');XLSX.writeFile(wb,'Weekly-Ijtima-Users-Format.xlsx')};
 $("importUsers").onclick=async()=>{try{const f=$("userFile").files[0];if(!f)throw Error('Select Excel/CSV file.');const wb=XLSX.read(await f.arrayBuffer(),{type:'array'}),rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});const d=await api('importUsers',{sessionToken:session.token,rows});msg('userImportMsg','Imported '+d.imported+' users.',true);$("userFile").value=''}catch(e){msg('userImportMsg',e.message)}};
 
-$("submitMuzakra").onclick=async()=>{try{const p=$("mParticipants").value;if(!Number.isInteger(Number(p))||Number(p)<0)throw Error("Participants must be a whole number.");await api("saveReport",{sessionToken:session.token,type:"Muzakra",report:{weekDate:$("mDate").value,participants:Number(p),status:"Submitted"}});msg("muzakraUserMsg","Madani Muzakra report submitted separately.",true)}catch(e){msg("muzakraUserMsg",e.message)}};
+$("submitMuzakra").onclick=async()=>{
+  try{
+    const date=$("mDate").value;
+    if(!date)throw Error("Please select a Saturday.");
+    const day=new Date(date+"T00:00:00").getDay();
+    if(day!==6)throw Error("Weekly Madani Muzakra sirf Saturday ko submit kiya ja sakta hai.");
+    const p=$("mParticipants").value;
+    if(!Number.isInteger(Number(p))||Number(p)<0)throw Error("Participants must be a whole number.");
+    await api("saveReport",{sessionToken:session.token,type:"Muzakra",report:{weekDate:date,participants:Number(p),status:"Submitted"}});
+    msg("muzakraUserMsg","Madani Muzakra report submitted separately.",true);
+  }catch(e){msg("muzakraUserMsg",e.message)}
+};
 const VOL_LEVELS=[
   ["Country","country"],["Region","region"],["State","state"],["Division","division"],
   ["District","district"],["Area","area"],["Pincode","pincode"],["Masjid","masjidName"]
