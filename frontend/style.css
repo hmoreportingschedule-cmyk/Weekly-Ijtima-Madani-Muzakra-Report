@@ -847,3 +847,75 @@ body{font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--ref-ink)}
   .welcome-strip h2{font-size:19px}
   #userIjtima .grid{grid-template-columns:1fr}
 }
+
+
+/* ===== FINAL FIX: FULL-WIDTH DESKTOP DASHBOARD ===== */
+html,body{width:100%;min-width:0}
+body{margin:0}
+.app{
+  width:100%!important;
+  max-width:none!important;
+  margin:0!important;
+  padding:0!important;
+}
+#dashboard{
+  width:100%!important;
+  max-width:none!important;
+  margin:0!important;
+  padding:0!important;
+}
+.app-main{
+  width:calc(100% - 302px)!important;
+  margin-left:302px!important;
+  min-height:100vh!important;
+  background:#eef6f3!important;
+}
+.topbar{
+  width:100%!important;
+  box-sizing:border-box!important;
+}
+.dashboard-content{
+  width:100%!important;
+  max-width:none!important;
+  box-sizing:border-box!important;
+  margin:0!important;
+  padding:20px 22px 34px!important;
+}
+.dashboard-content > .welcome-strip,
+.dashboard-content > section,
+.dashboard-content > section > .card,
+.dashboard-content > section > .panel{
+  width:100%!important;
+  max-width:none!important;
+  box-sizing:border-box!important;
+}
+.welcome-strip{
+  width:100%!important;
+  box-sizing:border-box!important;
+}
+#userTab > .card:first-child,
+#userIjtima{
+  width:100%!important;
+  box-sizing:border-box!important;
+}
+.user-buttons{
+  width:100%!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+}
+#userIjtima .grid{
+  width:100%!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+}
+@media(max-width:900px){
+  .app-main{
+    width:100%!important;
+    margin-left:0!important;
+  }
+  .app-sidebar{
+    width:280px!important;
+  }
+  .user-buttons,
+  #userIjtima .grid{
+    grid-template-columns:1fr!important;
+  }
+}
