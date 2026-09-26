@@ -1590,3 +1590,39 @@ body{margin:0}
   .topbar-title small{font-size:16px!important}
   .topbar:after{display:none!important}
 }
+
+
+/* FINAL8 — Refresh control + reliable Ijtima calendar */
+.top-refresh{
+  min-height:48px!important;
+  padding:0 15px!important;
+  border-radius:11px!important;
+  font-weight:800!important;
+  white-space:nowrap;
+}
+.ijtima-date-picker{position:relative;width:100%;display:flex;align-items:stretch;margin-top:6px}
+.ijtima-date-picker #ijtimaDate{width:100%!important;margin-top:0!important;padding-right:52px!important;cursor:pointer!important;background:#fff!important}
+.ijtima-date-picker .calendar-trigger{
+  position:absolute;right:0;top:0;width:48px;height:100%;min-height:43px;border:0!important;
+  border-left:1px solid #d5e2df!important;border-radius:0 9px 9px 0!important;
+  background:#edf7f5!important;color:#087f73!important;font-size:18px!important;cursor:pointer!important;
+}
+.ijtima-date-picker .calendar-trigger:hover{background:#e1f2ee!important}
+.ijtima-calendar{
+  position:absolute;z-index:9999;right:0;top:calc(100% + 7px);width:320px;
+  background:#fff;border:1px solid #cbded9;border-radius:14px;box-shadow:0 18px 45px rgba(0,50,44,.20);
+  padding:13px;box-sizing:border-box;
+}
+.ijtima-calendar[hidden]{display:none!important}
+.ijtima-calendar-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.ijtima-calendar-title{font-size:15px;font-weight:900;color:#123f3a}
+.ijtima-calendar-nav{width:34px;height:34px;border-radius:9px!important;border:1px solid #cbded9!important;background:#f0f8f6!important;color:#087f73!important;cursor:pointer!important;font-weight:900}
+.ijtima-calendar-week,.ijtima-calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.ijtima-calendar-week span{text-align:center;font-size:11px;font-weight:800;color:#70827f;padding:4px 0}
+.ijtima-calendar-day{height:34px;border-radius:8px!important;border:1px solid transparent!important;background:#f7faf9!important;color:#314b48!important;cursor:not-allowed!important;font-weight:700!important}
+.ijtima-calendar-day.allowed{background:#e5f6f2!important;color:#006f63!important;border-color:#a7d9d0!important;cursor:pointer!important}
+.ijtima-calendar-day.allowed:hover{background:#087f73!important;color:#fff!important}
+.ijtima-calendar-day.selected{background:#087f73!important;color:#fff!important;border-color:#087f73!important}
+.ijtima-calendar-day.today{box-shadow:inset 0 0 0 1px #d6ae4d}
+.ijtima-calendar-note{margin-top:9px;padding:8px 10px;border-radius:8px;background:#eef8f5;color:#245650;font-size:11px;font-weight:700}
+@media(max-width:650px){.ijtima-calendar{right:auto;left:0;width:min(320px,calc(100vw - 40px))}.top-refresh{padding:0 11px!important;font-size:12px!important}}

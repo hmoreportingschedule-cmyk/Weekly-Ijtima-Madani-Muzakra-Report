@@ -1,4 +1,4 @@
-const APP_BUILD="FINAL7";
+const APP_BUILD="FINAL8";
 const API_URL="https://script.google.com/macros/s/AKfycbwbP22HW0lrV4vSjelbiiURjcn9E_MH1DphI5caVWMX8nwmcnkClw4kH_i9QxBXSOiqmA/exec";
 let session=null,locations=[],progressType="Ijtima",progressRows=[];
 
@@ -27,7 +27,7 @@ async function login(){
   $("loginBtn").disabled=true;$("loginBtn").textContent="SIGNING IN…";msg("loginMsg","Connecting…",true);
   try{
     const d=await api("login",{username:$("username").value.trim(),password:$("password").value});
-    session=d.user;$("loginCard").hidden=true;$("dashboard").hidden=false;
+    session=d.user;localStorage.setItem("ijtimaDashboardSession",JSON.stringify(session));$("loginCard").hidden=true;$("dashboard").hidden=false;
     $("notificationBell").hidden=false;
     $("welcome").textContent="Welcome, "+session.name;
     $("roleBadge").textContent=session.role;
@@ -41,6 +41,7 @@ async function login(){
 }
 $("loginBtn").onclick=login;$("password").onkeydown=e=>{if(e.key==="Enter")login()};
 $("showPassword").onchange=e=>{if($("password"))$("password").type=e.target.checked?"text":"password"};
+setupIjtimaCalendar();
 $("resetPasswordOpen").onclick=()=>{$("resetPasswordPanel").hidden=false;$("resetUserId").value=$("username").value.trim();$("resetMsg").textContent=""};
 $("resetCancel").onclick=()=>{$("resetPasswordPanel").hidden=true;$("resetMsg").textContent=""};
 $("resetPasswordBtn").onclick=async()=>{
@@ -238,53 +239,71 @@ function updateReportCascade(changedIndex){
   }
 }
 
+let ijtimaCalendarMonth=new Date();
+function ijtimaDayIndex(day){
+  const names=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  return names.findIndex(x=>x.toLowerCase()===String(day||"").trim().toLowerCase());
+}
+function isoToDisplay(iso){
+  const m=String(iso||"").match(/^(\d{4})-(\d{2})-(\d{2})$/);return m?`${m[3]}/${m[2]}/${m[1]}`:"";
+}
+function displayToIso(v){
+  const m=String(v||"").match(/^(\d{2})\/(\d{2})\/(\d{4})$/);return m?`${m[3]}-${m[2]}-${m[1]}`:"";
+}
+function setIjtimaDateValue(iso){
+  const el=$("ijtimaDate");if(!el)return;
+  el.dataset.iso=iso||"";el.value=isoToDisplay(iso);renderIjtimaCalendar();
+}
+function renderIjtimaCalendar(){
+  const box=$("ijtimaCalendar"),input=$("ijtimaDate");if(!box||!input)return;
+  const wanted=Number(input.dataset.allowedDay);
+  if(!Number.isInteger(wanted)||wanted<0){box.hidden=true;return;}
+  const y=ijtimaCalendarMonth.getFullYear(),m=ijtimaCalendarMonth.getMonth();
+  const monthName=ijtimaCalendarMonth.toLocaleDateString("en-IN",{month:"long",year:"numeric"});
+  const first=new Date(y,m,1),days=new Date(y,m+1,0).getDate(),offset=first.getDay();
+  const selected=input.dataset.iso||"";
+  let html=`<div class="ijtima-calendar-head"><button type="button" class="ijtima-calendar-nav" data-cal-nav="-1">‹</button><div class="ijtima-calendar-title">${monthName}</div><button type="button" class="ijtima-calendar-nav" data-cal-nav="1">›</button></div>`;
+  html+='<div class="ijtima-calendar-week"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div><div class="ijtima-calendar-grid">';
+  for(let i=0;i<offset;i++)html+='<span></span>';
+  const today=new Date();
+  for(let day=1;day<=days;day++){
+    const dow=new Date(y,m,day).getDay(),iso=`${y}-${String(m+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+    const allowed=dow===wanted,sel=iso===selected,todayCls=(today.getFullYear()===y&&today.getMonth()===m&&today.getDate()===day)?" today":"";
+    html+=`<button type="button" class="ijtima-calendar-day${allowed?" allowed":""}${sel?" selected":""}${todayCls}" data-iso="${iso}" ${allowed?"":"disabled"}>${day}</button>`;
+  }
+  html+='</div><div class="ijtima-calendar-note">Sirf <b>'+["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][wanted]+'</b> ki dates select ki ja sakti hain.</div>';
+  box.innerHTML=html;
+  box.querySelectorAll("[data-cal-nav]").forEach(b=>b.onclick=()=>{ijtimaCalendarMonth.setMonth(ijtimaCalendarMonth.getMonth()+Number(b.dataset.calNav));renderIjtimaCalendar()});
+  box.querySelectorAll(".ijtima-calendar-day.allowed").forEach(b=>b.onclick=()=>{setIjtimaDateValue(b.dataset.iso);box.hidden=true;input.setAttribute("aria-expanded","false");msg("reportMsg","")});
+}
+function openIjtimaCalendar(){
+  const input=$("ijtimaDate"),box=$("ijtimaCalendar");if(!input||!box)return;
+  const existing=input.dataset.iso;
+  if(existing){const p=existing.split("-");if(p.length===3)ijtimaCalendarMonth=new Date(Number(p[0]),Number(p[1])-1,1)}
+  else ijtimaCalendarMonth=new Date();
+  renderIjtimaCalendar();box.hidden=false;input.setAttribute("aria-expanded","true");
+}
+function closeIjtimaCalendar(){const box=$("ijtimaCalendar"),input=$("ijtimaDate");if(box)box.hidden=true;if(input)input.setAttribute("aria-expanded","false")}
 function showIjtimaDate(day){
   const wanted=String(day||"").trim();
-  $("ijtimaDateInfo") && ($("ijtimaDateInfo").textContent=wanted
-    ? `Only ${wanted} ki date select ki ja sakti hai.`
-    : "Select a Masjid to determine the Ijtima Day.");
+  $("ijtimaDateInfo") && ($("ijtimaDateInfo").textContent=wanted?`Only ${wanted} ki date select ki ja sakti hai.`:"Select a Masjid to determine the Ijtima Day.");
   setIjtimaDateForDay(wanted);
 }
 function setIjtimaDateForDay(day){
-  const el=$("ijtimaDate"); if(!el)return;
-  const names=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-  const wanted=names.findIndex(x=>x.toLowerCase()===String(day||"").trim().toLowerCase());
-
-  // Keep the native calendar OPEN and show the complete month. Browser-native
-  // date pickers cannot reliably hide individual weekdays, so the selected
-  // Ijtima Day is enforced when a date is chosen. This avoids the date field
-  // becoming disabled while still allowing only the correct weekday to save.
-  el.disabled=false;
-  el.removeAttribute("min");
-  el.removeAttribute("max");
-  el.removeAttribute("step");
-  el.dataset.allowedDay=wanted<0?"":names[wanted];
-  el.required=wanted>=0;
-
-  if(wanted<0){
-    el.value="";
-    el.onchange=null;
-    return;
+  const el=$("ijtimaDate");if(!el)return;
+  const wanted=ijtimaDayIndex(day);
+  el.disabled=false;el.required=wanted>=0;el.dataset.allowedDay=wanted>=0?String(wanted):"";
+  if(wanted<0){setIjtimaDateValue("");closeIjtimaCalendar();return;}
+  if(el.dataset.iso){
+    const d=new Date(el.dataset.iso+"T00:00:00");if(d.getDay()!==wanted)setIjtimaDateValue("");
   }
-
-  el.title=`Only ${names[wanted]} ki date select karein.`;
-  el.onchange=()=>{
-    const value=String(el.value||"").trim();
-    if(!value){ msg("reportMsg","Report Date select karna mandatory hai."); return; }
-    const p=value.split("-");
-    if(p.length!==3 || !/^\d{4}-\d{2}-\d{2}$/.test(value)){
-      el.value=""; return msg("reportMsg","Please select a valid report date.");
-    }
-    const d=new Date(Date.UTC(Number(p[0]),Number(p[1])-1,Number(p[2])));
-    if(!Number.isFinite(d.getTime()) || d.getUTCFullYear()!==Number(p[0]) || d.getUTCMonth()!==Number(p[1])-1 || d.getUTCDate()!==Number(p[2])){
-      el.value=""; return msg("reportMsg","Please select a valid report date.");
-    }
-    if(d.getUTCDay()!==wanted){
-      el.value="";
-      return msg("reportMsg",`Sirf ${names[wanted]} ki date select karein.`);
-    }
-    msg("reportMsg","");
-  };
+  renderIjtimaCalendar();
+}
+function setupIjtimaCalendar(){
+  const input=$("ijtimaDate"),btn=$("ijtimaDateCalendarBtn");if(!input||!btn)return;
+  input.onclick=openIjtimaCalendar;btn.onclick=openIjtimaCalendar;
+  document.addEventListener("click",e=>{if(!$('ijtimaDatePicker')?.contains(e.target))closeIjtimaCalendar()});
+  setIjtimaDateValue(input.dataset.iso||"");
 }
 
 function nextSaturday(){
@@ -342,7 +361,7 @@ async function submitIjtima(status){
   if(!dayValue)return msg("reportMsg","Ijtima Day select hona mandatory hai.");
   if(dayValue.toLowerCase()!==allowedDay.toLowerCase())return msg("reportMsg",`Sirf ${allowedDay} ka Ijtima allowed hai.`);
 
-  const date=String($("ijtimaDate")?.value||"").trim();
+  const date=String($("ijtimaDate")?.dataset.iso||displayToIso($("ijtimaDate")?.value)||"").trim();
   if(!date)return msg("reportMsg","Report Date select karna mandatory hai.");
   const pdate=date.split("-");
   if(pdate.length!==3 || !/^\d{4}-\d{2}-\d{2}$/.test(date))return msg("reportMsg","Please select a valid report date.");
@@ -545,8 +564,40 @@ $("progressMuzakraBtn").onclick=()=>{progressType="Muzakra";$("progressMuzakraBt
 async function loadNotifications(){try{const d=await api('notifications',{sessionToken:session.token});const list=d.pending||[];const badge=$('notificationBadge');badge.textContent=list.length;badge.hidden=!list.length;$('notificationResult').innerHTML='<h3>Pending: '+list.length+'</h3><table><thead><tr><th>Masjid</th><th>Due Date</th><th>Message</th></tr></thead><tbody>'+list.map(x=>'<tr><td>'+esc(x.masjidName)+'</td><td>'+esc(x.dueDate)+'</td><td>'+esc(x.message)+'</td></tr>').join('')+'</tbody></table>'}catch(e){$('notificationResult').textContent=e.message}}
 $('notificationBell').onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.hidden=true);$('notificationTab').hidden=false;loadNotifications()};
 $('closeNotifications').onclick=()=>{document.querySelector('.tabs button')?.click()};
+$("refreshBtn").onclick=()=>{
+  $("refreshBtn").disabled=true;$("refreshBtn").textContent="↻ Refreshing…";
+  window.location.reload();
+};
 $("logoutBtn").onclick=()=>{
+  localStorage.removeItem("ijtimaDashboardSession");
   session=null;locations=[];document.querySelectorAll(".tab").forEach(x=>x.hidden=true);
   $("dashboard").hidden=true;$("loginCard").hidden=false;$("password").value="";$("loginMsg").textContent="";
 };
 $("mobileMenu").onclick=()=>document.querySelector(".app-sidebar")?.classList.toggle("open");
+async function restoreSavedSession(){
+  try{
+    const raw=localStorage.getItem("ijtimaDashboardSession");
+    if(!raw)return;
+    const saved=JSON.parse(raw);
+    if(!saved||!saved.token)return;
+    session=saved;
+    $("loginCard").hidden=true;
+    $("dashboard").hidden=false;
+    $("notificationBell").hidden=false;
+    $("welcome").textContent="Welcome, "+session.name;
+    $("roleBadge").textContent=session.role;
+    $("sideUserName").textContent=session.name||session.username;
+    $("sideUserRole").textContent=session.role;
+    $("sideAvatar").textContent=(session.name||session.username||"U").split(/\s+/).map(x=>x[0]).join("").slice(0,2).toUpperCase();
+    buildNav();
+    setupMuzakraDate();
+    await loadLocationsFast();
+  }catch(e){
+    localStorage.removeItem("ijtimaDashboardSession");
+    session=null;
+    $("dashboard").hidden=true;
+    $("loginCard").hidden=false;
+  }
+}
+
+setTimeout(restoreSavedSession,0);

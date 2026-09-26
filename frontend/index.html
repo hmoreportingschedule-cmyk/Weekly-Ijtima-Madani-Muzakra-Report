@@ -52,7 +52,7 @@
   <div class="app-main">
     <div class="topbar">
       <div class="topbar-title"><span class="mobile-menu" id="mobileMenu">☰</span><div><h1>Weekly Ijtima &amp; Madani Muzakra</h1><small id="topSubtitle">Reporting Dashboard</small></div></div>
-      <div class="topbar-actions"><div id="dashboardClock" class="dashboard-clock"></div><button id="notificationBell" class="notification-bell" hidden title="Notifications" aria-label="Notifications"><span class="bell-symbol">🔔</span><span id="notificationBadge" class="notification-badge" hidden>0</span></button><button id="logoutBtn" class="secondary top-logout">Logout</button></div>
+      <div class="topbar-actions"><div id="dashboardClock" class="dashboard-clock"></div><button id="notificationBell" class="notification-bell" hidden title="Notifications" aria-label="Notifications"><span class="bell-symbol">🔔</span><span id="notificationBadge" class="notification-badge" hidden>0</span></button><button id="refreshBtn" class="secondary top-refresh" title="Refresh page" aria-label="Refresh page">↻ Refresh</button><button id="logoutBtn" class="secondary top-logout">Logout</button></div>
     </div>
     <div class="dashboard-content">
       <div class="welcome-strip"><div><span class="eyebrow">WELCOME</span><h2 id="welcome"></h2><span id="roleBadge" class="badge"></span></div><div class="live-pill">● LIVE SYSTEM</div></div>
@@ -184,7 +184,13 @@
             <h3 class="section-title"><span class="section-icon">▣</span> Ijtima Schedule</h3>
             <div class="date-day-row">
               <label>Ijtima Day<select id="rDay" disabled required></select></label>
-              <label>Report Date<input id="ijtimaDate" type="date" required aria-describedby="ijtimaDateHelp"></label>
+              <label>Report Date
+  <div class="ijtima-date-picker" id="ijtimaDatePicker">
+    <input id="ijtimaDate" type="text" inputmode="none" autocomplete="off" readonly required placeholder="dd/mm/yyyy" aria-describedby="ijtimaDateHelp" aria-haspopup="dialog" aria-expanded="false">
+    <button type="button" id="ijtimaDateCalendarBtn" class="calendar-trigger" title="Open calendar" aria-label="Open calendar">▣</button>
+    <div id="ijtimaCalendar" class="ijtima-calendar" hidden></div>
+  </div>
+</label>
             </div>
             <div id="ijtimaDateHelp" class="date-box"><span class="info-dot">i</span> Report date will be limited to this Masjid's Ijtima Day.</div>
           </section>
@@ -284,6 +290,6 @@
   </div>
 </main>
 </div>
-<script src="app.js?v=FINAL7"></script>
+<script src="app.js?v=FINAL8"></script>
 </body>
 </html>
