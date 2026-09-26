@@ -37,7 +37,10 @@
 <main id="dashboard" hidden>
   <div class="topbar">
     <div><b id="welcome"></b><span id="roleBadge" class="badge"></span></div>
-    <button id="logoutBtn" class="secondary">Logout</button>
+    <div class="top-actions">
+      <button id="profileBtn" class="secondary">User Profile</button>
+      <button id="logoutBtn" class="secondary">Logout</button>
+    </div>
   </div>
 
   <nav id="nav" class="tabs"></nav>
@@ -94,6 +97,7 @@
         <select id="uActive"><option value="TRUE">Active</option><option value="FALSE">Inactive</option></select>
       </div>
       <h3>Access Location</h3>
+      <div id="userAssignmentContext" class="location-fixed" hidden></div>
       <div class="grid">
         <label>Country<select id="uCountry"></select></label>
         <label>Region<select id="uRegion"></select></label>
@@ -181,6 +185,43 @@
     </div>
   </section>
 
+  <section id="profileTab" class="tab" hidden>
+    <div class="card">
+      <h2>User Profile</h2>
+      <div class="profile-grid">
+        <div class="profile-photo-wrap">
+          <img id="profilePhoto" class="profile-photo" alt="Profile Photo" hidden>
+          <div id="profileInitials" class="profile-initials">U</div>
+          <input id="profilePhotoFile" type="file" accept="image/*">
+          <button id="uploadProfilePhoto" class="secondary">Upload Photo</button>
+        </div>
+        <div class="profile-details">
+          <div><b>User ID:</b> <span id="profileUserId"></span></div>
+          <div><b>Username:</b> <span id="profileUsername"></span></div>
+          <div><b>Name:</b> <span id="profileName"></span></div>
+          <div><b>Role:</b> <span id="profileRole"></span></div>
+          <div><b>Country:</b> <span id="profileCountry"></span></div>
+          <div><b>Region:</b> <span id="profileRegion"></span></div>
+          <div><b>State:</b> <span id="profileState"></span></div>
+          <div><b>Division:</b> <span id="profileDivision"></span></div>
+          <div><b>District:</b> <span id="profileDistrict"></span></div>
+          <div><b>Area:</b> <span id="profileArea"></span></div>
+          <div><b>Pincode:</b> <span id="profilePincode"></span></div>
+          <div><b>Locality:</b> <span id="profileLocality"></span></div>
+          <div><b>Masjid:</b> <span id="profileMasjid"></span></div>
+        </div>
+      </div>
+      <hr>
+      <h3>Change Password</h3>
+      <div class="grid">
+        <input id="inOldPassword" type="password" placeholder="Old Password">
+        <input id="inNewPassword" type="password" placeholder="New Password">
+        <input id="inConfirmPassword" type="password" placeholder="Confirm New Password">
+      </div>
+      <button id="changePasswordInside" class="secondary">Change Password</button>
+      <p id="profileMsg" class="msg"></p>
+    </div>
+  </section>
   <section id="progressTab" class="tab" hidden>
     <div class="card">
       <h2>Progress Report & Comparison</h2>

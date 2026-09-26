@@ -21,3 +21,14 @@
 .notification-bell[hidden]{display:none!important}
 
 button:disabled{opacity:.65;cursor:wait}
+
+.top-actions{display:flex;gap:8px;align-items:center}
+.change-password-box{margin-top:16px;padding:16px;border:1px solid #dbe5e7;border-radius:12px;background:#f8fbfb}
+.profile-grid{display:grid;grid-template-columns:220px 1fr;gap:24px;align-items:start}
+.profile-photo-wrap{text-align:center}.profile-photo{width:160px;height:160px;object-fit:cover;border-radius:50%;border:4px solid #e2eeee}
+.profile-initials{width:160px;height:160px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#e8f4f2;color:#0d766e;font-size:48px;font-weight:700;margin:auto}
+.profile-details{display:grid;grid-template-columns:repeat(2,minmax(220px,1fr));gap:10px}
+.profile-details>div{padding:10px 12px;background:#f7fafb;border-radius:8px}
+.location-fixed{padding:8px 12px;border-radius:8px;background:#eef7f5;color:#0d766e;font-weight:600}
+.location-change-btn{margin-top:6px}
+@media(max-width:700px){.profile-grid{grid-template-columns:1fr}.profile-details{grid-template-columns:1fr}.top-actions{flex-wrap:wrap}}

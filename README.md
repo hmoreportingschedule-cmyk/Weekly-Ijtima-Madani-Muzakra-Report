@@ -115,3 +115,11 @@ Admin User Access Location now uses the exact hierarchy:
 Country -> Region -> State -> Division -> District -> Area -> Pincode -> Locality -> Masjid Name.
 Each dropdown is populated only from the rows matching all previous selections. Pincode never displays Region names.
 User access schema also stores Locality and Masjid Name.
+
+
+## V.11 Updates
+- Volunteer Data backend and Excel format now exactly use: Country, Region, State, Division, District, Area, Pincode, Masjid Name, Volunteer Name, Mobile, Whatsapp, Zimmedari Level.
+- Working logout now clears the server session and returns to Login.
+- User Profile added with assigned location details and profile photo upload.
+- Password change available both before login (User ID + Old Password + New Password) and inside User Profile.
+- Admin user-location assignment remains hierarchical; once an upper location is assigned, its parent selectors are hidden and only lower-level selectors remain visible.

@@ -31,8 +31,61 @@ async function login(){
 }
 $("loginBtn").onclick=login;$("password").onkeydown=e=>{if(e.key==="Enter")login()};
 
+$("logoutBtn").onclick=async()=>{
+  try{if(session?.token)await api("logout",{sessionToken:session.token})}catch(e){}
+  session=null;locations=[];
+  $("dashboard").hidden=true;$("loginCard").hidden=false;$("notificationBell").hidden=true;
+  $("username").value="";$("password").value="";$("loginMsg").textContent="";
+  document.querySelectorAll(".tab").forEach(x=>x.hidden=true);
+  window.scrollTo({top:0,behavior:"smooth"});
+};
+
+$("profileBtn").onclick=async()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.hidden=true);
+  $("profileTab").hidden=false;
+  document.querySelectorAll(".tabs button").forEach(x=>x.classList.remove("active"));
+  const btn=[...document.querySelectorAll(".tabs button")].find(x=>x.textContent==="User Profile");if(btn)btn.classList.add("active");
+  try{
+    const d=await api("profile",{sessionToken:session.token});
+    const p=d.profile;
+    ["UserId","Username","Name","Role","Country","Region","State","Division","District","Area","Pincode","Locality","Masjid"].forEach(k=>{
+      const el=$("profile"+k);if(el)el.textContent=p[k.charAt(0).toLowerCase()+k.slice(1)]||"All";
+    });
+    const initials=(p.name||p.username||"U").split(/\s+/).map(x=>x[0]).join("").slice(0,2).toUpperCase();
+    $("profileInitials").textContent=initials;
+    if(p.photoUrl){$("profilePhoto").src=p.photoUrl;$("profilePhoto").hidden=false;$("profileInitials").hidden=true}
+    else{$("profilePhoto").hidden=true;$("profileInitials").hidden=false}
+  }catch(e){msg("profileMsg",e.message)}
+};
+
+$("showChangePassword").onclick=()=>{$("changePasswordBox").hidden=false;$("cpUserId").value=$("username").value.trim()};
+$("closeChangePassword").onclick=()=>{$("changePasswordBox").hidden=true;$("changePasswordMsg").textContent=""};
+$("changePasswordBtn").onclick=async()=>{
+  try{
+    const uid=$("cpUserId").value.trim(),oldp=$("cpOld").value,newp=$("cpNew").value,conf=$("cpConfirm").value;
+    if(!uid||!oldp||!newp)throw Error("User ID, Old Password and New Password are required.");
+    if(newp!==conf)throw Error("New Password and Confirm Password do not match.");
+    if(newp.length<6)throw Error("New Password must be at least 6 characters.");
+    const d=await api("changePasswordPreLogin",{userId:uid,oldPassword:oldp,newPassword:newp});
+    msg("changePasswordMsg",d.message,true);
+    $("cpOld").value="";$("cpNew").value="";$("cpConfirm").value="";
+  }catch(e){msg("changePasswordMsg",e.message)}
+};
+
+$("changePasswordInside").onclick=async()=>{
+  try{
+    const oldp=$("inOldPassword").value,newp=$("inNewPassword").value,conf=$("inConfirmPassword").value;
+    if(!oldp||!newp)throw Error("Old Password and New Password are required.");
+    if(newp!==conf)throw Error("New Password and Confirm Password do not match.");
+    const d=await api("changePassword",{sessionToken:session.token,oldPassword:oldp,newPassword:newp});
+    msg("profileMsg",d.message,true);$("inOldPassword").value="";$("inNewPassword").value="";$("inConfirmPassword").value="";
+  }catch(e){msg("profileMsg",e.message)}
+};
+
+
 function buildNav(){
   $("nav").innerHTML="";
+  addNav("profileTab","User Profile");
   if(session.role==="Admin"){addNav("adminTab","Admin");addNav("progressTab","Progress Report");$("adminTab").hidden=false}
   else{addNav("userTab","Reports");addNav("progressTab","Progress Report");$("userTab").hidden=false}
   $("nav").querySelector("button")?.click();
@@ -120,7 +173,11 @@ function showIjtimaDate(day){
 }
 function nextDateForDay(day){const names=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],idx=names.findIndex(x=>x.toLowerCase()===String(day).toLowerCase()),n=idx<0?4:idx,d=new Date(),diff=(n-d.getDay()+7)%7;d.setDate(d.getDate()+diff);return d.toISOString().slice(0,10)}
 
-function volRow(target){const d=document.createElement("div");d.className="vol";d.innerHTML='<input class="vname" placeholder="Volunteer Name"><input class="vmobile" placeholder="Mobile"><input class="vdetails" placeholder="Details"><button type="button" class="secondary">Remove</button>';d.querySelector("button").onclick=()=>d.remove();$(target).appendChild(d)}
+function volRow(target){
+  const d=document.createElement("div");d.className="vol";
+  d.innerHTML='<input class="vname" placeholder="Volunteer Name"><input class="vmobile" placeholder="Mobile"><input class="vwhatsapp" placeholder="Whatsapp"><input class="vlevel" placeholder="Zimmedari Level"><button type="button" class="secondary">Remove</button>';
+  d.querySelector("button").onclick=()=>d.remove();$(target).appendChild(d)
+}
 $("addVolunteer").onclick=()=>volRow("volunteers");$("addVolunteerOnly").onclick=()=>volRow("volunteerOnlyRows");
 
 async function submitIjtima(status){
@@ -132,9 +189,9 @@ async function submitIjtima(status){
 $("saveIjtimaDraft").onclick=()=>submitIjtima("Draft");$("submitIjtima").onclick=()=>submitIjtima("Submitted");
 
 function downloadTemplate(type){
-  const headers=type==="Ijtima"?["Country","Region","State","Division","District","Area","Locality","Masjid Name","Pincode","Ijtima Day"]:["Country","Region","State","Division","District","Area","Pincode","Masjid Name","Name","Mobile","Details"];
-  const ws=XLSX.utils.aoa_to_sheet([headers, type==="Ijtima"?["India","","","","","","","Example Masjid","400001","Thursday"]:["India","","","","","","400001","Example Masjid","Example Volunteer","9876543210",""]]);
-  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,type==="Ijtima"?"Weekly Ijtima Master":"Volunteer Data");
+  const headers=type==="Ijtima"?["Country","Region","State","Division","District","Area","Locality","Masjid Name","Pincode","Ijtima Day"]:["Country","Region","State","Division","District","Area","Pincode","Masjid Name","Volunteer Name","Mobile","Whatsapp","Zimmedari Level"];
+  const sample=type==="Ijtima"?["India","","","","","","","Example Masjid","400001","Thursday"]:["India","","","","","","400001","Example Masjid","Example Volunteer","9876543210","9876543210","Area Volunteer"];
+  const ws=XLSX.utils.aoa_to_sheet([headers,sample]);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,type==="Ijtima"?"Weekly Ijtima Master":"Volunteer Data");
   XLSX.writeFile(wb,type==="Ijtima"?"Weekly-Ijtima-Master-Format.xlsx":"Volunteer-Data-Format.xlsx");
 }
 $("downloadIjtimaTemplate").onclick=()=>downloadTemplate("Ijtima");
@@ -235,7 +292,8 @@ $("submitVolunteer").onclick=async()=>{
     if(!location.region||!location.state||!location.division||!location.district||!location.pincode)
       throw Error("Please select Country, Region, State, Division, District and Pincode.");
     const rows=[...document.querySelectorAll("#volunteerOnlyRows .vol")].map(x=>({
-      name:x.querySelector(".vname").value.trim(),mobile:x.querySelector(".vmobile").value.trim(),details:x.querySelector(".vdetails").value.trim()
+      name:x.querySelector(".vname").value.trim(),mobile:x.querySelector(".vmobile").value.trim(),
+      whatsapp:x.querySelector(".vwhatsapp").value.trim(),zimmedariLevel:x.querySelector(".vlevel").value.trim()
     })).filter(x=>x.name);
     if(!rows.length)throw Error("At least one volunteer is required.");
     await api("saveVolunteer",{sessionToken:session.token,location,rows});
