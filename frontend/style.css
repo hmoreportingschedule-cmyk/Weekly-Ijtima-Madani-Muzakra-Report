@@ -56,3 +56,206 @@ button:disabled{opacity:.6;cursor:not-allowed}
 #ijtimaDate,#mDate{font-variant-numeric:tabular-nums}
 @media(max-width:850px){.participant-grid,.yes-no-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.participant-grid,.yes-no-grid{grid-template-columns:1fr}}
+
+/* V23 — Islamic visual theme + equal-width dashboard cards (visual-only update) */
+:root{
+  --islamic-deep:#063b34;
+  --islamic-green:#087f73;
+  --islamic-gold:#d8b45a;
+  --islamic-cream:#fffdf7;
+  --islamic-mint:#eef9f6;
+}
+
+body{
+  background:
+    radial-gradient(circle at 12% 18%,rgba(216,180,90,.07),transparent 24%),
+    radial-gradient(circle at 88% 12%,rgba(8,127,115,.08),transparent 25%),
+    #f3f8f7;
+}
+
+.app-main{
+  background:
+    radial-gradient(circle at 94% 4%,rgba(216,180,90,.07),transparent 18%),
+    #f3f8f7;
+}
+
+/* Header: full-width Islamic emerald banner */
+.topbar{
+  min-height:82px;
+  height:auto;
+  padding:12px 24px;
+  background-color:var(--islamic-deep);
+  background-image:
+    radial-gradient(circle at 85% 30%,rgba(216,180,90,.16) 0 1px,transparent 2px),
+    radial-gradient(circle at 92% 72%,rgba(255,255,255,.08) 0 1px,transparent 2px),
+    repeating-linear-gradient(45deg,rgba(255,255,255,.025) 0 2px,transparent 2px 16px),
+    linear-gradient(120deg,#06372f,#087f73);
+  background-size:36px 36px,44px 44px,28px 28px,100% 100%;
+  border-bottom:2px solid rgba(216,180,90,.62);
+  box-shadow:0 5px 20px rgba(3,48,43,.16);
+}
+
+.topbar-title{
+  background:transparent;
+  padding:0;
+  border-radius:0;
+  color:#fff;
+}
+.topbar-title h1{
+  color:#fff;
+  font-family:"Arial Black",Arial,sans-serif;
+  font-size:25px;
+  letter-spacing:-.35px;
+  line-height:1.05;
+  text-shadow:0 1px 1px rgba(0,0,0,.15);
+}
+.topbar-title small{
+  color:#fff;
+  opacity:.88;
+  font-weight:800;
+  letter-spacing:.2px;
+}
+.dashboard-clock{color:#fff;font-weight:800}
+.top-logout{background:rgba(255,255,255,.95)!important;color:var(--islamic-deep)!important}
+.notification-bell{background:#fff!important;border-color:rgba(216,180,90,.45)}
+
+/* Consistent content width / alignment */
+.dashboard-content{
+  width:100%;
+  max-width:none;
+  margin:0;
+  padding:22px 22px 38px;
+}
+.dashboard-content > .card,
+.dashboard-content > section > .card,
+.dashboard-content > section > .panel{
+  width:100%;
+  max-width:none;
+  margin-left:0;
+  margin-right:0;
+}
+
+/* Welcome card */
+.welcome-strip{
+  position:relative;
+  overflow:hidden;
+  min-height:106px;
+  width:100%;
+  background:
+    radial-gradient(circle at 93% 80%,rgba(8,127,115,.08),transparent 22%),
+    linear-gradient(90deg,#fffdf8,#ffffff);
+  border:1px solid rgba(216,180,90,.35);
+  border-left:4px solid var(--islamic-gold);
+  border-radius:16px;
+  padding:20px 22px;
+}
+.welcome-strip:after{
+  content:"☪";
+  position:absolute;
+  right:38px;
+  bottom:-28px;
+  font-size:120px;
+  line-height:1;
+  color:rgba(8,127,115,.045);
+  pointer-events:none;
+}
+.eyebrow{color:var(--islamic-green)}
+.welcome-strip h2{font-family:"Arial Black",Arial,sans-serif;font-size:20px}
+.live-pill{position:relative;z-index:1}
+
+/* All cards share one clean professional width */
+.card{
+  width:100%;
+  background:rgba(255,255,255,.97);
+  border:1px solid #dfe9e7;
+  border-radius:16px;
+  box-shadow:0 12px 30px rgba(4,57,51,.075);
+  padding:22px;
+}
+.card > h2{
+  font-family:"Arial Black",Arial,sans-serif;
+  letter-spacing:-.2px;
+}
+
+/* Reports shortcut buttons: equal visual size */
+.user-buttons,.admin-buttons{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+  width:100%;
+}
+.user-buttons button,.admin-buttons button{
+  width:100%;
+  min-height:48px;
+  padding:12px 15px;
+  border:1px solid rgba(216,180,90,.38);
+  border-radius:10px;
+  background:linear-gradient(135deg,#087f73,#05685f);
+  color:#fff;
+  font-weight:800;
+  box-shadow:0 5px 14px rgba(5,92,83,.14);
+}
+.user-buttons button:hover,.admin-buttons button:hover{
+  background:linear-gradient(135deg,#0a9182,#08766b);
+  transform:translateY(-1px);
+}
+
+/* Form section with subtle Islamic framing */
+.panel{
+  border-left:4px solid var(--islamic-gold);
+  position:relative;
+  overflow:hidden;
+}
+.panel:after{
+  content:"";
+  position:absolute;
+  right:-55px;
+  top:-55px;
+  width:150px;
+  height:150px;
+  border:1px solid rgba(216,180,90,.22);
+  transform:rotate(45deg);
+  border-radius:18px;
+  pointer-events:none;
+}
+.notice,.date-box{
+  background:linear-gradient(90deg,#edf9f6,#f5fbfa);
+  border-left:3px solid rgba(8,127,115,.25);
+}
+
+/* Sidebar Islamic styling */
+.app-sidebar{
+  background-color:var(--islamic-deep);
+  background-image:
+    radial-gradient(circle at 50% 68%,rgba(216,180,90,.10) 0 2px,transparent 3px),
+    repeating-linear-gradient(45deg,rgba(255,255,255,.018) 0 2px,transparent 2px 18px),
+    linear-gradient(180deg,#032e28,#06443b);
+  box-shadow:7px 0 24px rgba(2,44,39,.16);
+}
+.sidebar-brand{border-bottom-color:rgba(216,180,90,.28)}
+.sidebar-caption{color:#d8b45a}
+.side-nav button:hover,.side-nav button.active{
+  background:linear-gradient(90deg,#087f73,#0a6c62);
+  box-shadow:inset 3px 0 0 var(--islamic-gold),0 4px 12px rgba(0,0,0,.10);
+}
+.sidebar-footer{border-top-color:rgba(216,180,90,.22)}
+.side-user{background:rgba(255,255,255,.075);border:1px solid rgba(216,180,90,.16)}
+
+/* Inputs retain equal widths inside their grid */
+.grid{width:100%}
+.grid > *{min-width:0}
+.card input,.card select{width:100%;max-width:100%}
+
+@media(max-width:850px){
+  .user-buttons,.admin-buttons{grid-template-columns:1fr}
+  .topbar-title h1{font-size:20px}
+  .dashboard-content{padding:14px}
+}
+@media(max-width:600px){
+  .topbar{padding:10px 12px;min-height:68px}
+  .topbar-title h1{font-size:17px}
+  .dashboard-content{padding:10px}
+  .welcome-strip{min-height:94px;padding:16px}
+  .welcome-strip:after{font-size:80px;right:12px}
+  .card{padding:16px}
+}
