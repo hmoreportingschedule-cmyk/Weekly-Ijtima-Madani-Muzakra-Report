@@ -1,4 +1,4 @@
-const APP_BUILD="FINAL9";
+const APP_BUILD="FINAL10";
 const API_URL="https://script.google.com/macros/s/AKfycbwbP22HW0lrV4vSjelbiiURjcn9E_MH1DphI5caVWMX8nwmcnkClw4kH_i9QxBXSOiqmA/exec";
 let session=null,locations=[],progressType="Ijtima",progressRows=[];
 
@@ -277,9 +277,12 @@ function renderIjtimaCalendar(){
   for(let i=0;i<offset;i++)html+='<span></span>';
   const today=new Date();
   for(let day=1;day<=days;day++){
-    const dow=new Date(y,m,day).getDay(),iso=`${y}-${String(m+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+    // Use the same UTC weekday calculation everywhere (calendar + validation).
+    // This guarantees that Friday means Friday, Thursday means Thursday, etc.
+    const dow=new Date(Date.UTC(y,m,day)).getUTCDay();
+    const iso=`${y}-${String(m+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
     const allowed=dow===wanted,sel=iso===selected,todayCls=(today.getFullYear()===y&&today.getMonth()===m&&today.getDate()===day)?" today":"";
-    html+=`<button type="button" class="ijtima-calendar-day${allowed?" allowed":""}${sel?" selected":""}${todayCls}" data-iso="${iso}" ${allowed?"":"disabled"}>${day}</button>`;
+    html+=`<button type="button" class="ijtima-calendar-day${allowed?" allowed":""}${sel?" selected":""}${todayCls}" data-iso="${iso}" data-weekday="${dow}" ${allowed?"":"disabled"}>${day}</button>`;
   }
   html+='</div><div class="ijtima-calendar-note">Sirf <b>'+["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][wanted]+'</b> ki dates select ki ja sakti hain.</div>';
   box.innerHTML=html;

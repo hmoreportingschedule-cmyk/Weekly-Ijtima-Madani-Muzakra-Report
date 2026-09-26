@@ -1628,7 +1628,7 @@ body{margin:0}
 @media(max-width:650px){.ijtima-calendar{right:auto;left:0;width:min(320px,calc(100vw - 40px))}.top-refresh{padding:0 11px!important;font-size:12px!important}}
 
 /* FINAL9 — use the supplied Islamic reference as the dashboard background */
-#dashboard{background-image:url("assets/dashboard-background-reference.png")!important;background-size:cover!important;background-position:center top!important;background-attachment:fixed!important;background-repeat:no-repeat!important}
+#dashboard{background-image:none!important;background-color:#eef6f3!important}
 .app-main{background:transparent!important}
 .dashboard-content{background:transparent!important}
 #ijtimaDatePicker{position:relative;z-index:100!important}

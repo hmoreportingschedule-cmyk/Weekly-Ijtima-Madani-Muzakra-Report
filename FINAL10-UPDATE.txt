@@ -1,0 +1,8 @@
+FINAL10 UPDATE
+
+- Fixed Ijtima calendar weekday calculation to use UTC consistently with report validation.
+- The calendar now enables ONLY the exact Ijtima Day shown in the Ijtima Day field: Thursday->Thursday, Friday->Friday, Sunday->Sunday, etc.
+- Removed the previously added dashboard-background-reference.png and its dashboard background styling.
+- Kept the existing dashboard styling/decorative sidebar assets unchanged.
+- Frontend cache version changed to FINAL10.
+- Google Apps Script URL remains unchanged.
