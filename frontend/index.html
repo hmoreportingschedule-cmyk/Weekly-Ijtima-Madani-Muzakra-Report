@@ -96,18 +96,19 @@
         <input id="uPassword" type="password" placeholder="Password">
         <select id="uActive"><option value="TRUE">Active</option><option value="FALSE">Inactive</option></select>
       </div>
-      <h3>Access Location</h3>
+      <h3>Access Location</h3><p class="small">Country → Region → State → Division → District → Area → Pincode → Locality → Masjid.</p>
       <div id="userAssignmentContext" class="location-fixed" hidden></div>
-      <div class="grid">
-        <label>Country<select id="uCountry"></select></label>
-        <label>Region<select id="uRegion"></select></label>
-        <label>State<select id="uState"></select></label>
-        <label>Division<select id="uDivision"></select></label>
-        <label>District<select id="uDistrict"></select></label>
-        <label>Area<select id="uArea"></select></label>
-        <label>Pincode<select id="uPincode"></select></label>
-        <label>Locality<select id="uLocality"></select></label>
-        <label>Masjid Name<select id="uMasjid"></select></label>
+      <button id="resetUserAssignment" class="secondary location-change-btn" type="button" hidden>Change Assignment</button>
+      <div class="grid assignment-grid">
+        <label class="assignment-field" data-level="0">Country<select id="uCountry"></select></label>
+        <label class="assignment-field" data-level="1">Region<select id="uRegion"></select></label>
+        <label class="assignment-field" data-level="2">State<select id="uState"></select></label>
+        <label class="assignment-field" data-level="3">Division<select id="uDivision"></select></label>
+        <label class="assignment-field" data-level="4">District<select id="uDistrict"></select></label>
+        <label class="assignment-field" data-level="5">Area<select id="uArea"></select></label>
+        <label class="assignment-field" data-level="6">Pincode<select id="uPincode"></select></label>
+        <label class="assignment-field" data-level="7">Locality<select id="uLocality"></select></label>
+        <label class="assignment-field" data-level="8">Masjid Name<select id="uMasjid"></select></label>
       </div>
       <div class="actions">
         <button id="saveUser">Create / Update User</button>

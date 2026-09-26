@@ -58,7 +58,7 @@ $("profileBtn").onclick=async()=>{
   }catch(e){msg("profileMsg",e.message)}
 };
 
-$("showChangePassword").onclick=()=>{$("changePasswordBox").hidden=false;$("cpUserId").value=$("username").value.trim()};
+$("showChangePassword").onclick=()=>{$("changePasswordBox").hidden=false;$("cpUserId").value=$("username").value.trim();$("cpOld").focus()};
 $("closeChangePassword").onclick=()=>{$("changePasswordBox").hidden=true;$("changePasswordMsg").textContent=""};
 $("changePasswordBtn").onclick=async()=>{
   try{
@@ -69,6 +69,7 @@ $("changePasswordBtn").onclick=async()=>{
     const d=await api("changePasswordPreLogin",{userId:uid,oldPassword:oldp,newPassword:newp});
     msg("changePasswordMsg",d.message,true);
     $("cpOld").value="";$("cpNew").value="";$("cpConfirm").value="";
+    setTimeout(()=>{$("changePasswordBox").hidden=true},1200);
   }catch(e){msg("changePasswordMsg",e.message)}
 };
 
@@ -208,49 +209,72 @@ const USER_LEVELS=[
   ["Country","country"],["Region","region"],["State","state"],["Division","division"],
   ["District","district"],["Area","area"],["Pincode","pincode"],["Locality","locality"],["Masjid","masjidName"]
 ];
-
-function userRowsFor(levelIndex){
+function norm(v){return String(v??"").trim().toLowerCase()}
+function rowsForUserLevel(level){
   let rows=locations.slice();
-  for(let j=0;j<levelIndex;j++){
-    const [id,key]=USER_LEVELS[j];
-    const value=$( "u"+id )?.value||"";
-    if(value) rows=rows.filter(r=>String(r[key]??"").trim()===String(value).trim());
+  for(let i=0;i<level;i++){
+    const [id,key]=USER_LEVELS[i],v=$("u"+id)?.value||"";
+    if(v && norm(v)!=="all") rows=rows.filter(r=>norm(r[key])===norm(v));
   }
   return rows;
 }
-function userOptions(levelIndex){
-  const [,key]=USER_LEVELS[levelIndex];
-  return valuesForLocation(userRowsFor(levelIndex),key);
-}
-function resetUserSelect(id, values, label="All"){
-  const el=$(id); if(!el)return;
+function userOptions(level){return valuesForLocation(rowsForUserLevel(level),USER_LEVELS[level][1])}
+function resetUserSelect(id,values,label="All"){
+  const el=$("u"+id);if(!el)return;
   const old=el.value;
-  el.innerHTML='<option value="">'+label+'</option>'+values.map(v=>'<option value="'+esc(v)+'">'+esc(v)+'</option>').join("");
-  if(values.includes(old))el.value=old;
+  const vals=[...new Set((values||[]).map(v=>String(v).trim()).filter(Boolean))];
+  el.innerHTML='<option value="">'+label+'</option>'+vals.map(v=>'<option value="'+esc(v)+'">'+esc(v)+'</option>').join("");
+  if(vals.some(v=>norm(v)===norm(old)))el.value=old;
 }
-function clearUserBelow(index){
-  for(let j=index+1;j<USER_LEVELS.length;j++){
-    const [id]=USER_LEVELS[j];
-    resetUserSelect("u"+id,[],"All");
-  }
+function deepestUserSelection(){
+  let d=-1;
+  USER_LEVELS.forEach(([id],i)=>{const v=$("u"+id)?.value||"";if(v&&norm(v)!=="all")d=i});
+  return d;
 }
-function updateUserCascade(changedIndex){
-  clearUserBelow(changedIndex);
-  for(let j=changedIndex+1;j<USER_LEVELS.length;j++){
-    const [id]=USER_LEVELS[j];
-    resetUserSelect("u"+id,userOptions(j),"All");
-  }
+function updateAssignmentUI(){
+  const d=deepestUserSelection();
+  USER_LEVELS.forEach(([id],i)=>{
+    const field=document.querySelector('.assignment-field[data-level="'+i+'"]');
+    if(field)field.hidden=d>=0 && i<=d;
+  });
+  const ctx=$("userAssignmentContext"),btn=$("resetUserAssignment");
+  if(d>=0){
+    const parts=[];
+    for(let i=0;i<=d;i++){const [id,label]=USER_LEVELS[i];const v=$("u"+id)?.value;if(v&&norm(v)!=="all")parts.push(label+": "+v)}
+    ctx.hidden=false;ctx.textContent="Assigned: "+parts.join("  •  ");
+    btn.hidden=false;
+  }else{ctx.hidden=true;ctx.textContent="";btn.hidden=true}
+}
+function clearUserBelow(i){
+  for(let j=i+1;j<USER_LEVELS.length;j++)resetUserSelect(USER_LEVELS[j][0],[],"All");
+}
+function updateUserCascade(changed){
+  clearUserBelow(changed);
+  for(let j=changed+1;j<USER_LEVELS.length;j++)resetUserSelect(USER_LEVELS[j][0],userOptions(j),"All");
+  updateAssignmentUI();
 }
 function setupUserCascades(){
-  USER_LEVELS.forEach(([id],i)=>{
-    const el=$("u"+id);
-    if(el) el.onchange=()=>updateUserCascade(i);
-  });
-  USER_LEVELS.forEach(([id],i)=>resetUserSelect("u"+id,userOptions(i),"All"));
+  USER_LEVELS.forEach(([id],i)=>{const el=$("u"+id);if(el)el.onchange=()=>updateUserCascade(i)});
+  resetUserSelect("uCountry",valuesForLocation(locations,"country"),"All");
+  for(let i=1;i<USER_LEVELS.length;i++)resetUserSelect(USER_LEVELS[i][0],userOptions(i),"All");
+  updateAssignmentUI();
 }
-
-$("saveUser").onclick=async()=>{try{const u={userId:$("uId").value.trim(),username:$("uUsername").value.trim(),name:$("uName").value.trim(),role:$("uRole").value,active:$("uActive").value,password:$("uPassword").value};USER_LEVELS.forEach(([id])=>u[id.toLowerCase()==="masjid"?"masjidName":id.toLowerCase()]=$("u"+id)?.value||"All");const d=await api("saveUser",{sessionToken:session.token,user:u});msg("userMsg",d.message,true)}catch(e){msg("userMsg",e.message)}};
-$("downloadUserTemplate").onclick=()=>{const headers=['User ID','Username','Password','Name','Role','Active','Country','Region','State','Division','District','Area','Pincode'];const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([headers]),'Users');XLSX.writeFile(wb,'Weekly-Ijtima-Users-Format.xlsx')};
+$("resetUserAssignment").onclick=()=>{
+  USER_LEVELS.forEach(([id])=>resetUserSelect(id,[],"All"));
+  resetUserSelect("uCountry",valuesForLocation(locations,"country"),"All");
+  for(let i=1;i<USER_LEVELS.length;i++)resetUserSelect(USER_LEVELS[i][0],userOptions(i),"All");
+  updateAssignmentUI();
+};
+$("saveUser").onclick=async()=>{
+  try{
+    const u={userId:$("uId").value.trim(),username:$("uUsername").value.trim(),name:$("uName").value.trim(),role:$("uRole").value,active:$("uActive").value,password:$("uPassword").value};
+    if(!u.userId||!u.username)throw Error("User ID and Username are required.");
+    USER_LEVELS.forEach(([id,key])=>u[key]=$("u"+id)?.value||"All");
+    const d=await api("saveUser",{sessionToken:session.token,user:u});
+    msg("userMsg",d.message,true);updateAssignmentUI();
+  }catch(e){msg("userMsg",e.message)}
+};
+$("downloadUserTemplate").onclick=()=>{const headers=['User ID','Username','Password','Name','Role','Active','Country','Region','State','Division','District','Area','Pincode','Locality','Masjid Name'];const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([headers]),'Users');XLSX.writeFile(wb,'Weekly-Ijtima-Users-Format.xlsx')};
 $("importUsers").onclick=async()=>{try{const f=$("userFile").files[0];if(!f)throw Error('Select Excel/CSV file.');const wb=XLSX.read(await f.arrayBuffer(),{type:'array'}),rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});const d=await api('importUsers',{sessionToken:session.token,rows});msg('userImportMsg','Imported '+d.imported+' users.',true);$("userFile").value=''}catch(e){msg('userImportMsg',e.message)}};
 
 $("submitMuzakra").onclick=async()=>{try{const p=$("mParticipants").value;if(!Number.isInteger(Number(p))||Number(p)<0)throw Error("Participants must be a whole number.");await api("saveReport",{sessionToken:session.token,type:"Muzakra",report:{weekDate:$("mDate").value,participants:Number(p),status:"Submitted"}});msg("muzakraUserMsg","Madani Muzakra report submitted separately.",true)}catch(e){msg("muzakraUserMsg",e.message)}};
