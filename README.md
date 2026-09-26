@@ -1,27 +1,21 @@
-# Weekly Ijtima Dashboard
+# Weekly Ijtima Dashboard – Drive Connected Update
 
-Starter implementation for a weekly Ijtima reporting dashboard using:
-- Frontend: static HTML/CSS/JS (can be deployed to Vercel)
-- Backend: Google Apps Script Web App
-- Database: Google Sheets
-- Files: Google Drive
+This update uses the exact Google Drive structure supplied:
 
-## Google Drive structure
-Weekly Ijtima Dashboard/
-  User Photo/
-  Report Files Weekly Ijtima/
+`My Drive / Dashboard Working / Dashboard Name / Weekly Ijtima & Muzakra`
 
-## Important
-1. Create a Google Sheet named `Weekly Ijtima User Details`.
-2. Open Extensions -> Apps Script.
-3. Copy `apps-script/Code.gs` into the Apps Script project.
-4. Run `setupSystem()` once and authorize. This creates the default Admin user if it does not already exist.
-5. Default Admin credentials:
-   - User ID: `admin`
-   - Password: `Admin@2026!`
-   Change the password in the Users sheet/backend before production use.
-6. Deploy as Web app.
-7. Put the Web App URL in `frontend/app.js` as `API_URL`.
-8. Deploy the frontend to Vercel.
+Inside `Weekly Ijtima & Muzakra`, Apps Script creates if missing:
+- `User Photo`
+- `Report Files Weekly Ijtima`
 
-This is a clean starter package. To update an existing dashboard without changing its design, provide the current project ZIP.
+The existing Google Sheet must be named:
+- `Weekly Ijtima Users`
+
+The Apps Script searches for that Sheet inside the exact folder above. It no longer depends on `getActiveSpreadsheet()`, which fixes the `Cannot read properties of null (reading getDataRange)` web-app error.
+
+## Deploy
+1. Replace the Apps Script `Code.gs` with the file in this ZIP.
+2. Run `setupSystem()` once and authorize Drive/Sheets access.
+3. Deploy the Apps Script as a Web App, executing as the owner, with access allowed for the users who need the dashboard.
+4. The frontend `app.js` already contains the supplied Web App URL.
+5. Vercel Root Directory should remain `frontend`, Framework Preset `Other`.
