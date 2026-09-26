@@ -1,0 +1,23 @@
+FINAL SAVE/DRAFT FIX
+
+IMPORTANT: This ZIP contains BOTH frontend and Google Apps Script fixes.
+
+1. Apps Script:
+   - Replace the existing Code.gs with apps-script/Code.gs.
+   - Save.
+   - Deploy > Manage deployments > Edit the Web App > New version > Deploy.
+   - Keep Execute as: Me.
+   - Keep the same Web App URL.
+
+2. Vercel/GitHub:
+   - Replace the frontend folder with this ZIP's frontend folder.
+   - Redeploy Vercel.
+   - The app.js URL now has ?v=FINAL5 so an older cached JavaScript file is not used.
+
+3. The date rule:
+   - Thursday Masjid -> any Thursday in any month/year.
+   - Friday Masjid -> any Friday in any month/year.
+   - Sunday Masjid -> any Sunday in any month/year.
+   - Save Draft and Save Report both use the same rule.
+
+NO dashboard layout change is included in this fix.

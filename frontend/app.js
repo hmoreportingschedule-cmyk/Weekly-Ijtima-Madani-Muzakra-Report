@@ -1,3 +1,4 @@
+const APP_BUILD="FINAL5";
 const API_URL="https://script.google.com/macros/s/AKfycbwbP22HW0lrV4vSjelbiiURjcn9E_MH1DphI5caVWMX8nwmcnkClw4kH_i9QxBXSOiqmA/exec";
 let session=null,locations=[],progressType="Ijtima",progressRows=[];
 
@@ -238,60 +239,55 @@ function updateReportCascade(changedIndex){
 }
 
 function showIjtimaDate(day){
-  const wanted=String(day||"");
-  $("ijtimaDateInfo").textContent=wanted?`This Masjid's Ijtima Day: ${wanted}`:"Select a Masjid to determine the Ijtima Day.";
+  const wanted=String(day||"").trim();
+  $("ijtimaDateInfo").textContent=wanted
+    ? `This Masjid's Ijtima Day: ${wanted}`
+    : "Select a Masjid to determine the Ijtima Day.";
   setIjtimaDateForDay(wanted);
 }
 function nextDateForDay(day){
-  const names=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],idx=names.findIndex(x=>x.toLowerCase()===String(day).toLowerCase());
-  if(idx<0)return "";
-  const n=idx,d=new Date(),diff=(n-d.getDay()+7)%7;
-  d.setDate(d.getDate()+diff);return d.toISOString().slice(0,10);
-}
-function firstDateForWeekdayInYear(year, dayName){
   const names=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-  const wanted=names.findIndex(x=>x.toLowerCase()===String(dayName||"").trim().toLowerCase());
-  if(wanted<0)return "";
-  const d=new Date(year,0,1);
-  d.setDate(d.getDate()+((wanted-d.getDay()+7)%7));
+  const idx=names.findIndex(x=>x.toLowerCase()===String(day||"").trim().toLowerCase());
+  if(idx<0)return "";
+  const d=new Date();
+  d.setHours(12,0,0,0);
+  d.setDate(d.getDate()+((idx-d.getDay()+7)%7));
   return d.toISOString().slice(0,10);
 }
-
 function setIjtimaDateForDay(day){
   const el=$("ijtimaDate"); if(!el)return;
-  const allowed=String(day||"").trim();
   const names=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-  const wanted=names.findIndex(x=>x.toLowerCase()===allowed.toLowerCase());
+  const wanted=names.findIndex(x=>x.toLowerCase()===String(day||"").trim().toLowerCase());
 
-  if(wanted<0){
-    el.value=""; el.min=""; el.max=""; el.step="1";
-    el.disabled=true; el.dataset.allowedDay=""; return;
-  }
-
-  // Any month/year is allowed; only the Masjid's weekday is enforced.
-  el.disabled=false;
-  el.dataset.allowedDay=names[wanted];
   el.removeAttribute("min");
   el.removeAttribute("max");
-  el.step="1";
-  el.value="";
+  el.removeAttribute("step");
+  el.disabled=wanted<0;
+  el.dataset.allowedDay=wanted<0?"":names[wanted];
+
+  if(wanted<0){
+    el.value="";
+    el.onchange=null;
+    return;
+  }
+
+  // HTML date inputs cannot disable individual weekdays in the calendar.
+  // We validate the selected weekday, but NEVER reject a valid matching date
+  // because of min/max/step/year restrictions.
   el.title=`Only ${names[wanted]} ki dates allowed hain.`;
-
-  const validate=()=>{
-    if(!el.value)return true;
-    const d=new Date(el.value+"T00:00:00");
-    if(d.getDay()!==wanted){
+  el.onchange=()=>{
+    if(!el.value)return;
+    const p=el.value.split("-");
+    if(p.length!==3)return;
+    const d=new Date(Date.UTC(Number(p[0]),Number(p[1])-1,Number(p[2])));
+    if(names[d.getUTCDay()]!==names[wanted]){
       el.value="";
-      msg("reportMsg",`Sirf ${names[wanted]} ki date select karein. Kisi aur din ki date allowed nahi hai.`);
-      return false;
+      msg("reportMsg",`Sirf ${names[wanted]} ki date select karein.`);
+    }else{
+      msg("reportMsg","");
     }
-    msg("reportMsg","");
-    return true;
   };
-  el.onchange=validate;
-  el.oninput=validate;
 }
-
 function nextSaturday(){
   const d=new Date(),diff=(6-d.getDay()+7)%7;
   d.setDate(d.getDate()+diff);return d.toISOString().slice(0,10);
@@ -347,28 +343,24 @@ function setDateFieldForMasterDay(day){
 
 
 async function submitIjtima(status){
-  const r=filtered()[0];
-  if(!r)return msg("reportMsg","Please select a valid Masjid.");
+  const rows=filtered();
+  if(!rows.length)return msg("reportMsg","Please select a valid Masjid.");
+  const r=rows[0];
 
-  const date=$("ijtimaDate")?.value||"";
-  // Use the same visible Ijtima Day shown to the user. This avoids a mismatch
-  // when multiple master rows exist for the same location.
-  const allowedDay=String($("rDay")?.value||r.ijtimaDay||"").trim();
-
+  const date=String($("ijtimaDate")?.value||"").trim();
+  const allowedDay=String(r.ijtimaDay||"").trim();
   if(!date)return msg("reportMsg","Please select the report date.");
-  if(!allowedDay)return msg("reportMsg","Please select the Masjid first so its Ijtima Day can be determined.");
+  if(!allowedDay)return msg("reportMsg","Ijtima Day is not available for this Masjid.");
 
-  // HTML date input value is always YYYY-MM-DD. Calculate weekday in UTC
-  // so browser timezone/locale cannot change the result.
-  const parts=date.split("-");
-  if(parts.length!==3)return msg("reportMsg","Please select a valid report date.");
-  const d=new Date(Date.UTC(Number(parts[0]),Number(parts[1])-1,Number(parts[2])));
+  const pdate=date.split("-");
+  if(pdate.length!==3)return msg("reportMsg","Please select a valid report date.");
+  const d=new Date(Date.UTC(Number(pdate[0]),Number(pdate[1])-1,Number(pdate[2])));
   if(Number.isNaN(d.getTime()))return msg("reportMsg","Please select a valid report date.");
 
   const names=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-  const selectedDay=names[d.getUTCDay()]||"";
-  if(selectedDay.trim().toLowerCase()!==allowedDay.trim().toLowerCase()){
-    return msg("reportMsg",`Sirf ${allowedDay} ki date select karein. Selected date ${selectedDay} hai.`);
+  const selectedDay=names[d.getUTCDay()];
+  if(selectedDay.toLowerCase()!==allowedDay.toLowerCase()){
+    return msg("reportMsg",`Sirf ${allowedDay} ki date select karein.`);
   }
 
   const z=Number($("totalZimmedaran")?.value||0);
@@ -392,19 +384,16 @@ async function submitIjtima(status){
       sessionToken:session.token,
       type:"Ijtima",
       report:{
-        weekDate:date,...r,
-        ijtimaDay:allowedDay,
-        participants:p,
-        totalZimmedaran:z,
-        totalMadarisWale:m,
-        totalAwam:a,
-        totalRaatRukneWale:night,
-        totalGadiyanAyi:cars,
+        weekDate:date,
+        country:r.country,region:r.region,state:r.state,division:r.division,
+        district:r.district,area:r.area,locality:r.locality,
+        masjidName:r.masjidName,pincode:r.pincode,ijtimaDay:allowedDay,
+        participants:p,totalZimmedaran:z,totalMadarisWale:m,totalAwam:a,
+        totalRaatRukneWale:night,totalGadiyanAyi:cars,
         alakaiDaura:$("alakaiDaura")?.value||"",
         langareRazawiyyah:$("langareRazawiyyah")?.value||"",
         jadwalIshraq:$("jadwalIshraq")?.value||"",
-        volunteers:[],
-        status
+        volunteers:[],status
       }
     });
 
