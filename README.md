@@ -19,3 +19,10 @@ The Apps Script searches for that Sheet inside the exact folder above. It no lon
 3. Deploy the Apps Script as a Web App, executing as the owner, with access allowed for the users who need the dashboard.
 4. The frontend `app.js` already contains the supplied Web App URL.
 5. Vercel Root Directory should remain `frontend`, Framework Preset `Other`.
+
+
+## Roles
+Use exactly: `Admin`, `HOD`, `Region`, `State`, `Division`, `District`, `User`.
+For normal weekly report submitters use `User`.
+Default admin: `admin` / `Admin@2026!`.
+Run `setupSystem()` once after replacing `Code.gs`.
