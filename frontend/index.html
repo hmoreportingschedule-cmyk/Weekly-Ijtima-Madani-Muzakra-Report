@@ -53,7 +53,7 @@
       <button class="nav-item" data-page="volunteer">♟ <span>Volunteer Data</span></button>
       <button class="nav-item" data-page="progress">▥ <span>Progress Report</span></button>
     </nav>
-    <div class="sidebar-mosque">☾<br><span>◡◡◡</span></div>
+    <div class="sidebar-mosque" aria-hidden="true"></div>
     <div class="profile-mini">
       <div class="avatar">SA</div><div><b id="sideName">System Administrator</b><small id="sideRole">Admin</small></div>
       <button onclick="logout()" title="Logout">↪</button>
@@ -86,23 +86,11 @@
         <button class="quick" onclick="showPage('muzakra')"><span>▤</span>Add Weekly Madani Muzakra Report <b>›</b></button>
         <button class="quick" onclick="showPage('volunteer')"><span>♟</span>Volunteer Data <b>›</b></button>
       </div>
-      <div class="dashboard-ijtima card form-card">
-        <div class="section-title inner-title"><span class="round-icon">▤</span><h2>Weekly Ijtima Report</h2></div>
-        <div class="info">ⓘ <span>Select a Masjid to determine the Ijtima Day.</span></div>
-        <label>Report Date</label>
-        <div class="input-with-icon"><input type="date"><span>▣</span></div>
-        <div class="info">▣ <span>Report date will be limited to this Masjid's Ijtima Day.</span></div>
-        <div class="form-grid three">
-          <label>Country<select><option>Select</option><option>India</option></select></label>
-          <label>Region<select><option>Select</option></select></label>
-          <label>State<select><option>Select</option></select></label>
-          <label>Division<select><option>Select</option></select></label>
-          <label>District<select><option>Select</option></select></label>
-          <label>Area<select><option>Select</option></select></label>
-          <label>Pincode<select><option>Select</option></select></label>
-          <label>Locality<select><option>Select</option></select></label>
-          <label>Masjid<select><option>Select</option></select></label>
-        </div>
+      <div class="dashboard-grid">
+        <div class="stat card"><span>Total Ijtima</span><strong>0</strong><small>Current period</small></div>
+        <div class="stat card"><span>Madani Muzakra</span><strong>0</strong><small>Current period</small></div>
+        <div class="stat card"><span>Volunteers</span><strong>0</strong><small>Current period</small></div>
+        <div class="chart card"><h3>Ijtima & Madani Muzakra – Weekly Trend</h3><div class="bars"><i style="height:35%"></i><i style="height:52%"></i><i style="height:42%"></i><i style="height:70%"></i><i style="height:58%"></i><i style="height:78%"></i><i style="height:64%"></i><i style="height:86%"></i></div><div class="chart-labels"><span>W1</span><span>W2</span><span>W3</span><span>W4</span><span>W5</span><span>W6</span><span>W7</span><span>W8</span></div></div>
       </div>
     </section>
 
