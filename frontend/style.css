@@ -1524,3 +1524,69 @@ body{margin:0}
   .topbar-title small{font-size:17px!important}
   .topbar:after{display:none!important}
 }
+
+/* PREMIUM ISLAMIC HEADER */
+.topbar{
+  min-height:150px!important;
+  padding:18px 32px 16px 70px!important;
+  overflow:hidden!important;
+  border-bottom:3px solid #e4bd52!important;
+  background:
+    radial-gradient(circle at 14% 48%,rgba(244,205,104,.20) 0 2px,transparent 3px),
+    radial-gradient(circle at 74% 42%,rgba(246,213,120,.20) 0 1px,transparent 2px),
+    radial-gradient(ellipse at 82% 48%,rgba(245,208,112,.23) 0 4%,transparent 19%),
+    linear-gradient(100deg,#003e38 0%,#005a4e 34%,#007064 58%,#004e45 100%)!important;
+  box-shadow:0 8px 25px rgba(0,52,45,.22)!important;
+}
+.topbar:before{
+  content:"";
+  position:absolute!important;
+  inset:0!important;
+  background:
+    linear-gradient(135deg,transparent 0 42%,rgba(243,208,112,.08) 42.1% 42.3%,transparent 42.4% 100%),
+    repeating-linear-gradient(135deg,transparent 0 34px,rgba(244,210,119,.065) 35px 36px,transparent 37px 70px),
+    radial-gradient(circle at 88% 18%,rgba(255,255,255,.08),transparent 15%);
+  pointer-events:none!important;
+}
+.topbar:after{
+  content:"☾    ╭─╮  ╭─╮  ╭─╮    ☾";
+  position:absolute!important;
+  right:285px!important;
+  bottom:7px!important;
+  color:rgba(247,215,124,.72)!important;
+  font-size:42px!important;
+  letter-spacing:9px!important;
+  text-shadow:0 0 14px rgba(250,216,119,.24)!important;
+  pointer-events:none!important;
+}
+.topbar-title{position:relative!important;z-index:3!important}
+.topbar-title h1{
+  color:#fff!important;
+  font-family:Georgia,"Times New Roman",serif!important;
+  font-size:39px!important;
+  line-height:1.08!important;
+  font-weight:800!important;
+  text-shadow:0 2px 4px rgba(0,0,0,.18)!important;
+}
+.topbar-title small{
+  color:#f5d374!important;
+  font-family:Georgia,"Times New Roman",serif!important;
+  font-size:21px!important;
+  font-weight:700!important;
+}
+.topbar-actions{position:relative!important;z-index:5!important}
+.dashboard-clock{
+  background:rgba(0,49,44,.92)!important;
+  border:1px solid rgba(244,210,117,.30)!important;
+  box-shadow:0 5px 18px rgba(0,0,0,.16),inset 0 1px 0 rgba(255,255,255,.08)!important;
+}
+.notification-bell{
+  border:2px solid #e7bf57!important;
+  box-shadow:0 5px 17px rgba(0,0,0,.15)!important;
+}
+@media(max-width:850px){
+  .topbar{min-height:112px!important;padding:13px 18px!important}
+  .topbar-title h1{font-size:26px!important}
+  .topbar-title small{font-size:16px!important}
+  .topbar:after{display:none!important}
+}
