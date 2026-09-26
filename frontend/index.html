@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Weekly Ijtima Dashboard</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <header>
+    <div>
+      <h1>Weekly Ijtima Report</h1>
+      <p id="weekLabel">Loading current reporting week...</p>
+    </div>
+    <button id="refreshBtn">Refresh</button>
+  </header>
+
+  <section id="loginCard" class="card login">
+    <h2>Login</h2>
+    <input id="username" placeholder="Username" autocomplete="username">
+    <input id="password" type="password" placeholder="Password" autocomplete="current-password">
+    <button id="loginBtn">Login</button>
+    <p id="loginMsg" class="msg"></p>
+  </section>
+
+  <main id="dashboard" hidden>
+    <div class="topbar">
+      <div>
+        <b id="welcome"></b>
+        <span id="roleBadge" class="badge"></span>
+      </div>
+      <button id="logoutBtn" class="secondary">Logout</button>
+    </div>
+
+    <nav class="tabs">
+      <button data-tab="report">Weekly Report</button>
+      <button data-tab="progress">Progress Report</button>
+      <button data-tab="notifications">Notifications</button>
+      <button data-tab="admin" id="adminTab" hidden>Admin</button>
+    </nav>
+
+    <section id="report" class="tab active">
+      <div class="card">
+        <h2>Weekly Ijtima Report</h2>
+        <div class="grid">
+          <label>Region<select id="region"></select></label>
+          <label>State<select id="state"></select></label>
+          <label>Division<select id="division"></select></label>
+          <label>District<select id="district"></select></label>
+          <label>Area<select id="area"></select></label>
+          <label>Pincode<select id="pincode"></select></label>
+        </div>
+        <label>Participants
+          <input id="participants" type="number" min="0" step="1" inputmode="numeric" placeholder="Enter quantity">
+        </label>
+        <h3>Volunteer Details</h3>
+        <div id="volunteers"></div>
+        <button id="addVolunteer" class="secondary">+ Add Volunteer</button>
+        <div class="actions">
+          <button id="saveDraft" class="secondary">Save Draft</button>
+          <button id="submitReport">Submit Report</button>
+        </div>
+        <p id="reportMsg" class="msg"></p>
+      </div>
+    </section>
+
+    <section id="progress" class="tab" hidden>
+      <div class="card">
+        <h2>Progress Report</h2>
+        <div class="grid">
+          <label>From <input id="fromDate" type="date"></label>
+          <label>To <input id="toDate" type="date"></label>
+          <label>Level
+            <select id="progressLevel">
+              <option>Area</option><option>District</option><option>Division</option>
+              <option>State</option><option>Region</option><option>India</option>
+            </select>
+          </label>
+        </div>
+        <button id="loadProgress">Analyze</button>
+        <div id="progressResult" class="result"></div>
+      </div>
+    </section>
+
+    <section id="notifications" class="tab" hidden>
+      <div class="card">
+        <h2>Notifications</h2>
+        <button id="loadNotifications">Check Pending Reports</button>
+        <div id="notificationResult" class="result"></div>
+      </div>
+    </section>
+
+    <section id="admin" class="tab" hidden>
+      <div class="card">
+        <h2>Admin</h2>
+        <p>User assignment, Drive setup and CSV import are handled through the backend endpoints in this starter.</p>
+        <button id="setupInfo" class="secondary">Show System Info</button>
+        <pre id="adminResult"></pre>
+      </div>
+    </section>
+  </main>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
