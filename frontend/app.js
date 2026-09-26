@@ -1,4 +1,4 @@
-const APP_BUILD="FINAL6";
+const APP_BUILD="FINAL7";
 const API_URL="https://script.google.com/macros/s/AKfycbwbP22HW0lrV4vSjelbiiURjcn9E_MH1DphI5caVWMX8nwmcnkClw4kH_i9QxBXSOiqmA/exec";
 let session=null,locations=[],progressType="Ijtima",progressRows=[];
 
@@ -250,19 +250,14 @@ function setIjtimaDateForDay(day){
   const names=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
   const wanted=names.findIndex(x=>x.toLowerCase()===String(day||"").trim().toLowerCase());
 
-  // Use a weekday-specific 1970 anchor + 7-day step. This makes the native
-  // calendar accept only the selected weekday for every year from 1970 onward;
-  // there is no maximum-date restriction. The onchange check is the final safeguard.
+  // Keep the native calendar OPEN and show the complete month. Browser-native
+  // date pickers cannot reliably hide individual weekdays, so the selected
+  // Ijtima Day is enforced when a date is chosen. This avoids the date field
+  // becoming disabled while still allowing only the correct weekday to save.
+  el.disabled=false;
+  el.removeAttribute("min");
   el.removeAttribute("max");
-  if(wanted>=0){
-    const anchor=["1970-01-04","1970-01-05","1970-01-06","1970-01-07","1970-01-01","1970-01-02","1970-01-03"][wanted];
-    el.min=anchor;
-    el.setAttribute("step","7");
-  }else{
-    el.removeAttribute("min");
-    el.setAttribute("step","1");
-  }
-  el.disabled=wanted<0;
+  el.removeAttribute("step");
   el.dataset.allowedDay=wanted<0?"":names[wanted];
   el.required=wanted>=0;
 
@@ -272,21 +267,26 @@ function setIjtimaDateForDay(day){
     return;
   }
 
-  el.title=`Only ${names[wanted]} ki dates allowed hain.`;
+  el.title=`Only ${names[wanted]} ki date select karein.`;
   el.onchange=()=>{
     const value=String(el.value||"").trim();
-    if(!value){ msg("reportMsg","Please select the report date."); return; }
+    if(!value){ msg("reportMsg","Report Date select karna mandatory hai."); return; }
     const p=value.split("-");
-    if(p.length!==3){ el.value=""; return msg("reportMsg","Please select a valid report date."); }
-    const d=new Date(Date.UTC(Number(p[0]),Number(p[1])-1,Number(p[2])));
-    if(!Number.isFinite(d.getTime()) || d.getUTCFullYear()!==Number(p[0]) || d.getUTCMonth()!==Number(p[1])-1 || d.getUTCDate()!==Number(p[2]) || d.getUTCDay()!==wanted){
-      el.value="";
-      msg("reportMsg",`Sirf ${names[wanted]} ki date select karein.`);
-    }else{
-      msg("reportMsg","");
+    if(p.length!==3 || !/^\d{4}-\d{2}-\d{2}$/.test(value)){
+      el.value=""; return msg("reportMsg","Please select a valid report date.");
     }
+    const d=new Date(Date.UTC(Number(p[0]),Number(p[1])-1,Number(p[2])));
+    if(!Number.isFinite(d.getTime()) || d.getUTCFullYear()!==Number(p[0]) || d.getUTCMonth()!==Number(p[1])-1 || d.getUTCDate()!==Number(p[2])){
+      el.value=""; return msg("reportMsg","Please select a valid report date.");
+    }
+    if(d.getUTCDay()!==wanted){
+      el.value="";
+      return msg("reportMsg",`Sirf ${names[wanted]} ki date select karein.`);
+    }
+    msg("reportMsg","");
   };
 }
+
 function nextSaturday(){
   const d=new Date(),diff=(6-d.getDay()+7)%7;
   d.setDate(d.getDate()+diff);return d.toISOString().slice(0,10);
