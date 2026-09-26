@@ -1,4 +1,4 @@
-const APP_BUILD="FINAL10";
+const APP_BUILD="FINAL11";
 const API_URL="https://script.google.com/macros/s/AKfycbwbP22HW0lrV4vSjelbiiURjcn9E_MH1DphI5caVWMX8nwmcnkClw4kH_i9QxBXSOiqmA/exec";
 let session=null,locations=[],progressType="Ijtima",progressRows=[];
 
@@ -241,15 +241,17 @@ function updateReportCascade(changedIndex){
 
 let ijtimaCalendarMonth=new Date();
 function ijtimaDayIndex(day){
-  const map={sunday:0,monday:1,tuesday:2,wednesday:3,thursday:4,friday:5,saturday:6};
+  const names=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
   const key=String(day||"").trim().toLowerCase();
-  return Object.prototype.hasOwnProperty.call(map,key)?map[key]:-1;
+  return names.findIndex(n=>n.toLowerCase()===key);
 }
-function activeIjtimaDayIndex(){
-  const select=$("rDay"), input=$("ijtimaDate");
-  const day=String(select?.value||input?.dataset.allowedName||"").trim();
-  return ijtimaDayIndex(day);
+function activeIjtimaDayName(){
+  const select=$("rDay");
+  if(!select)return "";
+  const opt=select.options?.[select.selectedIndex];
+  return String(opt?.textContent||select.value||"").trim();
 }
+function activeIjtimaDayIndex(){ return ijtimaDayIndex(activeIjtimaDayName()); }
 function isoToDisplay(iso){
   const m=String(iso||"").match(/^(\d{4})-(\d{2})-(\d{2})$/);return m?`${m[3]}/${m[2]}/${m[1]}`:"";
 }
@@ -258,16 +260,20 @@ function displayToIso(v){
 }
 function setIjtimaDateValue(iso){
   const el=$("ijtimaDate");if(!el)return;
-  el.dataset.iso=iso||"";el.value=isoToDisplay(iso);renderIjtimaCalendar();
+  el.dataset.iso=iso||"";
+  el.value=isoToDisplay(iso);
+  renderIjtimaCalendar();
 }
 function renderIjtimaCalendar(){
   const box=$("ijtimaCalendar"),input=$("ijtimaDate");if(!box||!input)return;
-  // Always use the CURRENT Ijtima Day field; never reuse a stale weekday.
-  const wanted=activeIjtimaDayIndex();
-  const wantedName=String($("rDay")?.value||input.dataset.allowedName||"").trim();
-  if(!Number.isInteger(wanted)||wanted<0){box.hidden=true;return;}
+  // IMPORTANT: the calendar always follows the CURRENT visible Ijtima Day option.
+  // Do not use a cached/stale weekday value.
+  const wantedName=activeIjtimaDayName();
+  const wanted=ijtimaDayIndex(wantedName);
+  if(wanted<0){box.hidden=true;return;}
   input.dataset.allowedDay=String(wanted);
   input.dataset.allowedName=wantedName;
+
   const y=ijtimaCalendarMonth.getFullYear(),m=ijtimaCalendarMonth.getMonth();
   const monthName=ijtimaCalendarMonth.toLocaleDateString("en-IN",{month:"long",year:"numeric"});
   const first=new Date(y,m,1),days=new Date(y,m+1,0).getDate(),offset=first.getDay();
@@ -277,24 +283,35 @@ function renderIjtimaCalendar(){
   for(let i=0;i<offset;i++)html+='<span></span>';
   const today=new Date();
   for(let day=1;day<=days;day++){
-    // Use the same UTC weekday calculation everywhere (calendar + validation).
-    // This guarantees that Friday means Friday, Thursday means Thursday, etc.
-    const dow=new Date(Date.UTC(y,m,day)).getUTCDay();
+    const date=new Date(Date.UTC(y,m,day));
+    const dayName=new Intl.DateTimeFormat("en-US",{weekday:"long",timeZone:"UTC"}).format(date);
+    const allowed=dayName.toLowerCase()===wantedName.toLowerCase();
     const iso=`${y}-${String(m+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
-    const allowed=dow===wanted,sel=iso===selected,todayCls=(today.getFullYear()===y&&today.getMonth()===m&&today.getDate()===day)?" today":"";
-    html+=`<button type="button" class="ijtima-calendar-day${allowed?" allowed":""}${sel?" selected":""}${todayCls}" data-iso="${iso}" data-weekday="${dow}" ${allowed?"":"disabled"}>${day}</button>`;
+    const sel=iso===selected;
+    const todayCls=(today.getFullYear()===y&&today.getMonth()===m&&today.getDate()===day)?" today":"";
+    html+=`<button type="button" class="ijtima-calendar-day${allowed?" allowed":""}${sel?" selected":""}${todayCls}" data-iso="${iso}" data-weekday="${dayName}" ${allowed?"":"disabled"}>${day}</button>`;
   }
-  html+='</div><div class="ijtima-calendar-note">Sirf <b>'+["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][wanted]+'</b> ki dates select ki ja sakti hain.</div>';
+  html+='</div><div class="ijtima-calendar-note">Sirf <b>'+esc(wantedName)+'</b> ki dates select ki ja sakti hain.</div>';
   box.innerHTML=html;
-  box.querySelectorAll("[data-cal-nav]").forEach(b=>b.onclick=()=>{ijtimaCalendarMonth.setMonth(ijtimaCalendarMonth.getMonth()+Number(b.dataset.calNav));renderIjtimaCalendar()});
-  box.querySelectorAll(".ijtima-calendar-day.allowed").forEach(b=>b.onclick=()=>{setIjtimaDateValue(b.dataset.iso);box.hidden=true;input.setAttribute("aria-expanded","false");msg("reportMsg","")});
+  box.querySelectorAll("[data-cal-nav]").forEach(b=>b.onclick=()=>{
+    ijtimaCalendarMonth.setMonth(ijtimaCalendarMonth.getMonth()+Number(b.dataset.calNav));
+    renderIjtimaCalendar();
+  });
+  box.querySelectorAll(".ijtima-calendar-day.allowed").forEach(b=>b.onclick=()=>{
+    setIjtimaDateValue(b.dataset.iso);
+    box.hidden=true;
+    input.setAttribute("aria-expanded","false");
+    msg("reportMsg","");
+  });
 }
 function openIjtimaCalendar(){
   const input=$("ijtimaDate"),box=$("ijtimaCalendar");if(!input||!box)return;
   const existing=input.dataset.iso;
   if(existing){const p=existing.split("-");if(p.length===3)ijtimaCalendarMonth=new Date(Number(p[0]),Number(p[1])-1,1)}
   else ijtimaCalendarMonth=new Date();
-  renderIjtimaCalendar();box.hidden=false;input.setAttribute("aria-expanded","true");
+  renderIjtimaCalendar();
+  box.hidden=false;
+  input.setAttribute("aria-expanded","true");
 }
 function closeIjtimaCalendar(){const box=$("ijtimaCalendar"),input=$("ijtimaDate");if(box)box.hidden=true;if(input)input.setAttribute("aria-expanded","false")}
 function showIjtimaDate(day){
@@ -303,29 +320,32 @@ function showIjtimaDate(day){
   setIjtimaDateForDay(wanted);
 }
 function syncIjtimaCalendarToDayField(){
-  const day=String($("rDay")?.value||"").trim();
-  if(day) showIjtimaDate(day);
+  const day=activeIjtimaDayName();
+  if(day)showIjtimaDate(day);
 }
 function setIjtimaDateForDay(day){
   const el=$("ijtimaDate");if(!el)return;
-  const wanted=ijtimaDayIndex(day);
-  el.disabled=false;el.required=wanted>=0;
+  const wantedName=String(day||"").trim();
+  const wanted=ijtimaDayIndex(wantedName);
+  el.disabled=false;
+  el.required=wanted>=0;
   el.dataset.allowedDay=wanted>=0?String(wanted):"";
-  el.dataset.allowedName=wanted>=0?String(day).trim():"";
+  el.dataset.allowedName=wanted>=0?wantedName:"";
   if(wanted<0){setIjtimaDateValue("");closeIjtimaCalendar();return;}
   if(el.dataset.iso){
     const p=el.dataset.iso.split("-");
     const d=p.length===3?new Date(Date.UTC(Number(p[0]),Number(p[1])-1,Number(p[2]))):null;
-    if(!d || d.getUTCDay()!==wanted)setIjtimaDateValue("");
+    const currentName=d&&Number.isFinite(d.getTime())?new Intl.DateTimeFormat("en-US",{weekday:"long",timeZone:"UTC"}).format(d):"";
+    if(!d || currentName.toLowerCase()!==wantedName.toLowerCase())setIjtimaDateValue("");
   }
   renderIjtimaCalendar();
 }
 function setupIjtimaCalendar(){
   const input=$("ijtimaDate"),btn=$("ijtimaDateCalendarBtn");if(!input||!btn)return;
   input.onclick=openIjtimaCalendar;btn.onclick=openIjtimaCalendar;
-  document.addEventListener("click",e=>{if(!$('ijtimaDatePicker')?.contains(e.target))closeIjtimaCalendar()});
+  document.addEventListener("click",e=>{if(!$("ijtimaDatePicker")?.contains(e.target))closeIjtimaCalendar()});
   const dayField=$("rDay");
-  if(dayField) dayField.addEventListener("change",syncIjtimaCalendarToDayField);
+  if(dayField)dayField.addEventListener("change",syncIjtimaCalendarToDayField);
   setIjtimaDateValue(input.dataset.iso||"");
 }
 

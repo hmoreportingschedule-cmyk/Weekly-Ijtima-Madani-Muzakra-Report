@@ -1,0 +1,12 @@
+FINAL11 — Ijtima Day Exact Calendar Fix
+
+Only the Ijtima Report calendar logic was changed.
+
+- Calendar now reads the CURRENT visible Ijtima Day option directly.
+- It compares every calendar date by its actual weekday name in UTC.
+- Friday opens only Friday dates; Thursday only Thursday dates; Sunday only Sunday dates; etc.
+- The previous numeric weekday/stale cached value issue is removed.
+- Save/Submit validation uses the same weekday-name comparison.
+- The background image added in FINAL9 remains removed.
+- Google Apps Script URL remains unchanged.
+- Frontend cache version bumped to FINAL11.
