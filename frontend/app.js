@@ -11,7 +11,7 @@ async function api(action,payload={}){
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function clock(){const d=new Date();$("clock").textContent=d.toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})+" • "+d.toLocaleTimeString("en-IN",{hour12:true})}
 setInterval(clock,1000);clock();
-$("refreshBtn").onclick=$("loginRefreshBtn").onclick=()=>location.reload();
+
 
 async function login(){
   $("loginBtn").disabled=true;$("loginBtn").textContent="Logging in…";msg("loginMsg","Connecting…",true);

@@ -88,3 +88,12 @@ The script uses: My Drive / Dashboard Working / Dashboard Name / Weekly Ijtima &
 - Location master is never loaded during credential verification.
 - Login UI shows immediate progress and has a 15-second request timeout instead of hanging indefinitely.
 - User Create/Update and Excel import now write plaintext Password to the Password column.
+
+
+## V8 Login Repair
+- Admin User ID and Username are both `admin`.
+- Admin password is `Admin@2026!` and is written to the `Password` column.
+- Login accepts either User ID or Username.
+- Older Users sheets with Password Hash in column C are migrated by inserting Password after Username.
+- Exact Admin credentials automatically repair/create the Admin row on login.
+- User template includes Password as a visible column.
