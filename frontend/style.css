@@ -1102,3 +1102,214 @@ body{margin:0}
 @media(max-width:600px){
   .participant-grid{grid-template-columns:1fr!important}
 }
+
+
+/* =========================================================
+   REFERENCE IMAGE — FINAL WEEKLY IJTIMA FORM LAYOUT
+   Visual/layout only. Existing element IDs and JS behavior
+   are preserved.
+   ========================================================= */
+#userIjtima{
+  padding:18px 18px 12px!important;
+  border:2px solid #e0b84c!important;
+  border-radius:16px!important;
+  background:
+    radial-gradient(circle at 96% 0%,rgba(216,180,90,.07),transparent 18%),
+    linear-gradient(180deg,#fff,#fbfffd)!important;
+}
+#userIjtima > h2{
+  margin:0 0 12px!important;
+}
+.ijtima-layout{
+  display:grid;
+  grid-template-columns:minmax(0,2.15fr) minmax(360px,1fr);
+  gap:12px;
+  align-items:start;
+}
+.ijtima-left,.ijtima-right{
+  min-width:0;
+}
+.form-section{
+  border-radius:12px;
+  background:rgba(255,255,255,.72);
+}
+.form-section + .form-section{
+  margin-top:10px;
+}
+.section-title{
+  height:34px;
+  margin:0 0 8px!important;
+  padding:0 10px!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:8px!important;
+  border-radius:8px!important;
+  background:linear-gradient(90deg,#e3f4ef,#edf9f6)!important;
+  color:#12443e!important;
+  font-size:15px!important;
+  font-weight:800!important;
+}
+.section-icon{
+  width:30px;
+  height:30px;
+  margin-left:-2px;
+  margin-top:0;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  background:#087f73;
+  color:#fff;
+  font-size:16px;
+  box-shadow:0 0 0 4px #e5f2ef;
+}
+.location-grid{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:7px 14px!important;
+}
+.location-grid label,
+.schedule-section label,
+.participants-section label,
+.details-section label{
+  font-size:11px!important;
+  font-weight:800!important;
+  color:#16303b!important;
+}
+.location-grid select,
+.schedule-section select,
+.schedule-section input,
+.details-section select{
+  height:38px!important;
+  min-height:38px!important;
+  margin-top:4px!important;
+  border:1px solid #cadbd8!important;
+  border-radius:8px!important;
+  background:#fff!important;
+  box-sizing:border-box!important;
+}
+.schedule-section{
+  padding-bottom:0;
+}
+.date-day-row{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:12px!important;
+}
+#ijtimaDateHelp{
+  margin-top:9px!important;
+  min-height:38px;
+  box-sizing:border-box;
+  display:flex;
+  align-items:center;
+  padding:8px 10px!important;
+  border-radius:8px!important;
+  background:#e8f6f2!important;
+  color:#164f49!important;
+  font-size:11px!important;
+}
+.info-dot{
+  width:21px;
+  height:21px;
+  margin-right:8px;
+  display:inline-grid;
+  place-items:center;
+  border-radius:50%;
+  background:#087f73;
+  color:#fff;
+  font-weight:900;
+}
+.participants-section{
+  padding-top:0;
+}
+.participant-grid{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:9px!important;
+}
+.participant-grid label:nth-child(5),
+.participant-grid label:nth-child(6){
+  grid-column:auto;
+}
+.input-with-icon{
+  height:40px;
+  margin-top:4px;
+  display:flex;
+  align-items:center;
+  overflow:hidden;
+  border:1px solid #cbdad7;
+  border-radius:8px;
+  background:#fff;
+}
+.input-with-icon > span{
+  width:38px;
+  flex:0 0 38px;
+  display:grid;
+  place-items:center;
+  color:#123e3a;
+  font-size:15px;
+}
+.input-with-icon input{
+  width:100%!important;
+  height:100%!important;
+  border:0!important;
+  outline:0!important;
+  padding:0 9px!important;
+  background:#fff!important;
+  font-size:14px!important;
+  font-weight:700!important;
+}
+.total-participants-field .input-with-icon{
+  border-color:#0c806f;
+  background:#eef9f6;
+}
+.total-participants-field .input-with-icon input{
+  background:#eef9f6;
+  font-weight:900;
+  color:#123e3a;
+}
+.details-section{
+  margin-top:10px!important;
+}
+.details-section .yes-no-grid{
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  gap:7px!important;
+  margin:0!important;
+}
+.details-section .yes-no-grid label{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 195px;
+  gap:12px;
+  align-items:center;
+}
+.details-section .yes-no-grid select{
+  margin-top:0!important;
+}
+.ijtima-actions{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  padding:10px 0 2px;
+  border-top:1px solid #e9dfbf;
+  margin-top:10px;
+}
+.ijtima-actions button{
+  min-width:165px;
+  height:42px;
+  border-radius:8px!important;
+  font-weight:800!important;
+}
+@media(max-width:1100px){
+  .ijtima-layout{grid-template-columns:1fr}
+  .details-section .yes-no-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  .details-section .yes-no-grid label{display:block}
+  .details-section .yes-no-grid select{margin-top:4px!important}
+}
+@media(max-width:760px){
+  .location-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .participant-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .details-section .yes-no-grid{grid-template-columns:1fr!important}
+}
+@media(max-width:520px){
+  .location-grid,.participant-grid,.date-day-row{grid-template-columns:1fr!important}
+}
