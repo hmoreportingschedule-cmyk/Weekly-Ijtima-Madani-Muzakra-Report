@@ -1020,3 +1020,63 @@ body{margin:0}
 .user-buttons button{
   text-align:left!important;
 }
+
+
+/* ===== IJTIMA REPORT FIELD UPDATE ===== */
+#userIjtima .date-day-row{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:14px!important;
+  margin:8px 0 0!important;
+}
+#userIjtima .date-day-row label{
+  display:block!important;
+  font-size:13px!important;
+  font-weight:750!important;
+  color:#17333d!important;
+}
+#userIjtima .date-day-row select,
+#userIjtima .date-day-row input{
+  display:block!important;
+  width:100%!important;
+  margin-top:6px!important;
+}
+#userIjtima #rDay:disabled{
+  opacity:1!important;
+  color:#18313b!important;
+  background:#edf7f5!important;
+  cursor:not-allowed!important;
+}
+#userIjtima .participant-grid{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+}
+#userIjtima .participant-grid label{
+  font-weight:700!important;
+}
+#userIjtima .participant-grid input[readonly]{
+  background:#eef8f5!important;
+  border-color:#9fd4ca!important;
+  font-weight:800!important;
+  color:#006c60!important;
+}
+#userIjtima .three-yes-no{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:14px!important;
+  margin-top:8px!important;
+}
+#userIjtima .three-yes-no label{
+  font-size:13px!important;
+  font-weight:700!important;
+}
+#userIjtima .three-yes-no select{
+  display:block!important;
+  width:100%!important;
+  margin-top:6px!important;
+}
+@media(max-width:900px){
+  #userIjtima .participant-grid,#userIjtima .three-yes-no{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:600px){
+  #userIjtima .date-day-row,#userIjtima .participant-grid,#userIjtima .three-yes-no{grid-template-columns:1fr!important}
+}

@@ -251,14 +251,16 @@ function nextDateForDay(day){
 function setIjtimaDateForDay(day){
   const el=$("ijtimaDate"); if(!el)return;
   const date=nextDateForDay(day);
+  const allowed=String(day||"").trim();
   el.value=date;
-  el.dataset.allowedDay=String(day||"");
-  if(date) el.title=`Only ${day} dates are allowed for this Masjid.`;
-  else el.title="Select a Masjid first.";
+  el.dataset.allowedDay=allowed;
+  el.min=date||"";
+  el.max="";
+  el.step=date?"7":"1";
+  el.title=date?`Only ${allowed} dates are allowed for this Masjid.`:"Select a Masjid first.";
   el.onchange=()=>{
     if(!el.value)return;
-    const d=new Date(el.value+"T00:00:00"),allowed=String(el.dataset.allowedDay||"");
-    const names=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+    const d=new Date(el.value+"T00:00:00"),names=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
     if(!allowed || names[d.getDay()]!==allowed){
       msg("reportMsg",`Is Masjid ka Ijtima sirf ${allowed||"selected day"} ko hota hai.`);
       el.value=nextDateForDay(allowed);
@@ -279,18 +281,27 @@ function setupMuzakraDate(){
     else $("muzakraUserMsg").textContent="";
   };
 }
-function updateIjtimaParticipantTotal(){
-  const z=Number($("totalZimmedaran")?.value||0),m=Number($("totalMadarisWale")?.value||0);
-  if($("participants"))$("participants").value=z+m;
+function limitDigits(id,max){
+  const el=$(id); if(!el)return;
+  el.addEventListener("input",()=>{
+    const clean=String(el.value||"").replace(/\D/g,"").slice(0,max);
+    if(el.value!==clean)el.value=clean;
+    updateIjtimaParticipantTotal();
+  });
 }
-["totalZimmedaran","totalMadarisWale"].forEach(id=>$(id)?.addEventListener("input",updateIjtimaParticipantTotal));
+function updateIjtimaParticipantTotal(){
+  const z=Number($("totalZimmedaran")?.value||0),m=Number($("totalMadarisWale")?.value||0),a=Number($("totalAwam")?.value||0);
+  if($("participants"))$("participants").value=z+m+a;
+}
+["totalZimmedaran","totalMadarisWale","totalAwam","totalRaatRukneWale"].forEach(id=>limitDigits(id,4));
+limitDigits("totalGadiyanAyi",3);
 function setYesNoStyle(id){
   const el=$(id);if(!el)return;
   el.classList.remove("yes-choice","no-choice");
   if(el.value==="Yes")el.classList.add("yes-choice");
   if(el.value==="No")el.classList.add("no-choice");
 }
-["alakaiDaura","langareRazawiyyah"].forEach(id=>$(id)?.addEventListener("change",()=>setYesNoStyle(id)));
+["alakaiDaura","langareRazawiyyah","jadwalIshraq"].forEach(id=>$(id)?.addEventListener("change",()=>setYesNoStyle(id)));
 
 async function submitIjtima(status){
   const r=filtered()[0];
@@ -299,14 +310,14 @@ async function submitIjtima(status){
   if(!date)return msg("reportMsg","Please select the report date.");
   const d=new Date(date+"T00:00:00"),names=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
   if(!allowedDay || names[d.getDay()]!==allowedDay)return msg("reportMsg",`Is Masjid ka Ijtima sirf ${allowedDay||"selected day"} ko hota hai.`);
-  const z=Number($("totalZimmedaran")?.value||0),m=Number($("totalMadarisWale")?.value||0),p=z+m;
+  const z=Number($("totalZimmedaran")?.value||0),m=Number($("totalMadarisWale")?.value||0),a=Number($("totalAwam")?.value||0),p=z+m+a;
   const night=Number($("totalRaatRukneWale")?.value||0),cars=Number($("totalGadiyanAyi")?.value||0);
-  if(!Number.isInteger(z)||z<0||z>9999||!Number.isInteger(m)||m<0||m>9999)return msg("reportMsg","Zimmedaran aur Madaris Wale mein maximum 4 digits allowed hain.");
+  if(!Number.isInteger(z)||z<0||z>9999||!Number.isInteger(m)||m<0||m>9999||!Number.isInteger(a)||a<0||a>9999)return msg("reportMsg","Zimmedaran, Madaris Wale aur Total Awam mein maximum 4 digits allowed hain.");
   if(!Number.isInteger(night)||night<0||night>9999)return msg("reportMsg","Total Raat Rukne Wale mein maximum 4 digits allowed hain.");
   if(!Number.isInteger(cars)||cars<0||cars>999)return msg("reportMsg","Total Gadiyan Ayi mein maximum 3 digits allowed hain.");
   $("participants").value=p;
   try{
-    await api("saveReport",{sessionToken:session.token,type:"Ijtima",report:{weekDate:date,...r,participants:p,totalZimmedaran:z,totalMadarisWale:m,totalRaatRukneWale:night,totalGadiyanAyi:cars,alakaiDaura:$("alakaiDaura")?.value||"",langareRazawiyyah:$("langareRazawiyyah")?.value||"",volunteers:[],status}});
+    await api("saveReport",{sessionToken:session.token,type:"Ijtima",report:{weekDate:date,...r,participants:p,totalZimmedaran:z,totalMadarisWale:m,totalAwam:a,totalRaatRukneWale:night,totalGadiyanAyi:cars,alakaiDaura:$("alakaiDaura")?.value||"",langareRazawiyyah:$("langareRazawiyyah")?.value||"",jadwalIshraq:$("jadwalIshraq")?.value||"",volunteers:[],status}});
     msg("reportMsg",status==="Draft"?"Draft saved.":"Report submitted successfully.",true);
   }catch(e){msg("reportMsg",e.message)}
 }
