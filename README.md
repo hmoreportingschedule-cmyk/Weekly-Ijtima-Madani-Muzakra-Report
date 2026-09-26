@@ -26,3 +26,7 @@ Use exactly: `Admin`, `HOD`, `Region`, `State`, `Division`, `District`, `User`.
 For normal weekly report submitters use `User`.
 Default admin: `admin` / `Admin@2026!`.
 Run `setupSystem()` once after replacing `Code.gs`.
+
+
+## Current Google Drive setup
+The script uses: My Drive / Dashboard Working / Dashboard Name / Weekly Ijtima & Muzakra. The Google Sheet file must be named `Weekly Ijtima Users`. Run `setupSystem()` once. For normal reporters use Role=`User`.
