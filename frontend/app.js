@@ -58,9 +58,9 @@ $("profileBtn").onclick=async()=>{
   }catch(e){msg("profileMsg",e.message)}
 };
 
-$("showChangePassword").onclick=()=>{$("changePasswordBox").hidden=false;$("cpUserId").value=$("username").value.trim();$("cpOld").focus()};
-$("closeChangePassword").onclick=()=>{$("changePasswordBox").hidden=true;$("changePasswordMsg").textContent=""};
-$("changePasswordBtn").onclick=async()=>{
+if($("showChangePassword"))$("showChangePassword").onclick=()=>{$("changePasswordBox").hidden=false;$("cpUserId").value=$("username").value.trim();$("cpOld").focus()};
+if($("closeChangePassword"))$("closeChangePassword").onclick=()=>{$("changePasswordBox").hidden=true;$("changePasswordMsg").textContent=""};
+if($("changePasswordBtn"))$("changePasswordBtn").onclick=async()=>{
   try{
     const uid=$("cpUserId").value.trim(),oldp=$("cpOld").value,newp=$("cpNew").value,conf=$("cpConfirm").value;
     if(!uid||!oldp||!newp)throw Error("User ID, Old Password and New Password are required.");
@@ -205,6 +205,29 @@ async function importFile(input,msgId,type){
 $("importIjtima").onclick=()=>importFile($("ijtimaFile"),"ijtimaMsg","IjtimaMaster");
 $("importVolunteer").onclick=()=>importFile($("volunteerFile"),"volunteerMsg","Volunteer");
 
+function downloadTargetTemplate(){
+  const headers=["Type","Period Type","Period","Country","Region","State","Division","District","Area","Pincode","Locality","Masjid Name","Target","Notes"];
+  const sample=[
+    ["Ijtima","Weekly",new Date().toISOString().slice(0,10),"India","","","","","","","","Example Masjid",100,"Weekly Ijtima target"],
+    ["Muzakra","Monthly",new Date().toISOString().slice(0,7),"India","","","","","","","","",500,"Monthly Madani Muzakra target"],
+    ["Ijtima","Yearly",String(new Date().getFullYear()),"India","","","","","","","","",5000,"Yearly Ijtima target"]
+  ];
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([headers,...sample]),"Targets");
+  XLSX.writeFile(wb,"Weekly-Ijtima-Targets-Format.xlsx");
+}
+$("downloadTargetTemplate").onclick=downloadTargetTemplate;
+$("importTargets").onclick=async()=>{
+  try{
+    const f=$("targetFile").files[0];if(!f)throw Error("Select Target Excel/CSV file.");
+    const wb=XLSX.read(await f.arrayBuffer(),{type:"array"}),ws=wb.Sheets[wb.SheetNames[0]];
+    const rows=XLSX.utils.sheet_to_json(ws,{defval:""});
+    if(!rows.length)throw Error("Target file has no data.");
+    const d=await api("importTargets",{sessionToken:session.token,rows});
+    $("targetFile").value="";msg("targetMsg","Imported "+d.imported+" target rows for year(s): "+d.years.join(", "),true);
+  }catch(e){msg("targetMsg",e.message)}
+};
+
+
 const USER_LEVELS=[
   ["Country","country"],["Region","region"],["State","state"],["Division","division"],
   ["District","district"],["Area","area"],["Pincode","pincode"],["Locality","locality"],["Masjid","masjidName"]
@@ -325,17 +348,52 @@ $("submitVolunteer").onclick=async()=>{
   }catch(e){msg("volunteerUserMsg",e.message)}
 };
 
-function periodLabel(date,mode){const d=new Date(date);if(mode==="year")return d.getFullYear();if(mode==="month")return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");return date}
-function aggregate(rows,mode){const m={};rows.forEach(r=>{const k=periodLabel(r.date,mode);m[k]=(m[k]||0)+(Number(r.participants)||0)});return Object.entries(m).sort((a,b)=>String(a[0]).localeCompare(String(b[0]))).map(([label,value])=>({label,value}))}
-function drawChart(data){const c=$("progressChart"),ctx=c.getContext("2d"),w=c.width=c.clientWidth*devicePixelRatio,h=c.height=280*devicePixelRatio;ctx.clearRect(0,0,w,h);if(!data.length)return;const max=Math.max(...data.map(x=>x.value),1),pad=35*devicePixelRatio,bw=(w-pad*2)/data.length*.65;data.forEach((x,i)=>{const x0=pad+i*((w-pad*2)/data.length)+(((w-pad*2)/data.length)-bw)/2,y=h-pad-(x.value/max)*(h-pad*2);ctx.fillStyle="#0d766e";ctx.fillRect(x0,y,bw,h-pad-y);ctx.fillStyle="#23343a";ctx.font=`${11*devicePixelRatio}px Arial`;ctx.textAlign="center";ctx.fillText(String(x.value),x0+bw/2,y-6*devicePixelRatio);ctx.fillText(String(x.label),x0+bw/2,h-pad+16*devicePixelRatio)});ctx.strokeStyle="#d7e0e3";ctx.beginPath();ctx.moveTo(pad,h-pad);ctx.lineTo(w-pad,h-pad);ctx.stroke()}
+function periodLabel(date,mode){const d=new Date(date);if(mode==="year")return String(d.getFullYear());if(mode==="month")return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");return String(date).slice(0,10)}
+function fmt(n){return Number(n||0).toLocaleString("en-IN",{maximumFractionDigits:0})}
+function pct(n){return n==null?"—":Number(n).toLocaleString("en-IN",{maximumFractionDigits:1})+"%"}
+let charts={};
+function destroyChart(id){if(charts[id]){charts[id].destroy();charts[id]=null}}
+function makeProgressCharts(rows){
+  const labels=rows.map(x=>x.period);
+  destroyChart("progressChart");destroyChart("trendChart");destroyChart("achievementChart");
+  const common={responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"top"},tooltip:{mode:"index",intersect:false}},scales:{y:{beginAtZero:true,grid:{color:"#e8eeee"}}}};
+  charts.progressChart=new Chart($("progressChart"),{type:"bar",data:{labels,datasets:[
+    {label:"Actual",data:rows.map(x=>x.actual),borderRadius:7},
+    {label:"Target",data:rows.map(x=>x.target),borderRadius:7}
+  ]},options:common});
+  charts.trendChart=new Chart($("trendChart"),{type:"line",data:{labels,datasets:[
+    {label:"Actual",data:rows.map(x=>x.actual),tension:.35,borderWidth:3,pointRadius:3},
+    {label:"Target",data:rows.map(x=>x.target),tension:.35,borderWidth:3,pointRadius:3}
+  ]},options:common});
+  charts.achievementChart=new Chart($("achievementChart"),{type:"bar",data:{labels,datasets:[
+    {label:"Achievement %",data:rows.map(x=>x.achievement),borderRadius:7}
+  ]},options:{...common,scales:{y:{beginAtZero:true,max:100,ticks:{callback:v=>v+"%"},grid:{color:"#e8eeee"}}}}});
+}
 async function loadProgress(){
   try{
-    const d=await api("progress",{sessionToken:session.token,type:progressType,from:$("fromDate").value,to:$("toDate").value});
-    progressRows=d.rows||[];const mode=$("compareMode").value,data=aggregate(progressRows,mode);drawChart(data);
-    const previous=data.length>1?data[data.length-2].value:null,current=data.length?data[data.length-1].value:0,change=previous===null?"—":(current-previous);
-    $("progressSummary").innerHTML=`<div class="stat"><b>Total</b><strong>${Number(d.total||0).toLocaleString()}</strong></div><div class="stat"><b>Records</b><strong>${d.count}</strong></div><div class="stat"><b>Latest vs Previous</b><strong>${change==="—"?"—":(change>=0?"+":"")+change.toLocaleString()}</strong></div>`;
-    $("progressResult").innerHTML=`<h3>${progressType==="Ijtima"?"Weekly Ijtima":"Madani Muzakra"} — ${mode==="week"?"Week to Week":mode==="month"?"Month to Month":"Year to Year"}</h3><table><thead><tr><th>Period</th><th>Participants</th></tr></thead><tbody>${data.map(x=>`<tr><td>${esc(x.label)}</td><td>${Number(x.value).toLocaleString()}</td></tr>`).join("")}</tbody></table>`;
-  }catch(e){$("progressResult").textContent=e.message}
+    const mode=$("compareMode").value;
+    const d=await api("progress",{sessionToken:session.token,type:progressType,from:$("fromDate").value,to:$("toDate").value,mode});
+    const rows=d.rows||[];
+    const title=progressType==="Ijtima"?"Weekly Ijtima":"Madani Muzakra";
+    makeProgressCharts(rows);
+    const latest=rows.length?rows[rows.length-1]:null;
+    const prev=rows.length>1?rows[rows.length-2]:null;
+    const change=latest&&prev?latest.actual-prev.actual:null;
+    const avgTarget=d.averageTarget||0,avgActual=d.averageActual||0;
+    $("progressSummary").innerHTML=
+      `<div class="stat stat-primary"><b>Total Actual</b><strong>${fmt(d.total)}</strong><span>Participants</span></div>
+       <div class="stat"><b>Total Target</b><strong>${fmt(d.targetTotal)}</strong><span>Selected period</span></div>
+       <div class="stat"><b>Achievement</b><strong>${pct(d.targetTotal?d.total/d.targetTotal*100:null)}</strong><span>Actual vs target</span></div>
+       <div class="stat"><b>Average Actual</b><strong>${fmt(avgActual)}</strong><span>Average per ${mode}</span></div>
+       <div class="stat"><b>Average Target</b><strong>${fmt(avgTarget)}</strong><span>Average per ${mode}</span></div>
+       <div class="stat"><b>Average vs Average</b><strong>${pct(d.averageAchievement)}</strong><span>${change==null?"Latest comparison unavailable":(change>=0?"+":"")+fmt(change)+" vs previous"}</span></div>`;
+
+    const modeText=mode==="week"?"Week to Week":mode==="month"?"Month to Month":"Year to Year";
+    $("progressResult").innerHTML=
+      `<div class="result-head"><div><span class="eyebrow">REPORT ANALYSIS</span><h3>${title} — ${modeText}</h3></div><div class="result-badge">${rows.length} Periods</div></div>
+       <div class="table-wrap"><table class="progress-table"><thead><tr><th>Period</th><th>Actual</th><th>Target</th><th>Variance</th><th>Achievement</th></tr></thead>
+       <tbody>${rows.map(x=>`<tr><td><b>${esc(x.period)}</b></td><td>${fmt(x.actual)}</td><td>${fmt(x.target)}</td><td class="${x.variance<0?"negative":"positive"}">${x.variance>0?"+":""}${fmt(x.variance)}</td><td>${pct(x.achievement)}</td></tr>`).join("")}</tbody></table></div>`;
+  }catch(e){$("progressResult").innerHTML=`<div class="error-box">${esc(e.message)}</div>`}
 }
 $("loadProgress").onclick=loadProgress;
 $("progressIjtimaBtn").onclick=()=>{progressType="Ijtima";$("progressIjtimaBtn").classList.add("active");$("progressMuzakraBtn").classList.remove("active");loadProgress()};

@@ -6,6 +6,7 @@
 <title>Weekly Ijtima Report</title>
 <link rel="stylesheet" href="style.css">
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 </head>
 <body>
 <div class="app">
@@ -27,11 +28,20 @@
   </div>
   <input id="username" placeholder="User ID" autocomplete="username">
   <input id="password" type="password" placeholder="Password" autocomplete="current-password">
-  <div class="actions">
+  <div class="actions login-actions">
     <button id="loginBtn">Login</button>
-    
+    <button id="showChangePassword" class="secondary">Reset Password</button>
   </div>
   <p id="loginMsg" class="msg"></p>
+  <div id="changePasswordBox" class="change-password-box" hidden>
+    <div class="reset-head"><div><h3>Reset Password</h3><p>Old password enter karke naya password set karein.</p></div><button id="closeChangePassword" class="icon-close" type="button">×</button></div>
+    <input id="cpUserId" placeholder="User ID">
+    <input id="cpOld" type="password" placeholder="Old Password">
+    <input id="cpNew" type="password" placeholder="New Password">
+    <input id="cpConfirm" type="password" placeholder="Confirm New Password">
+    <button id="changePasswordBtn">Reset Password</button>
+    <p id="changePasswordMsg" class="msg"></p>
+  </div>
 </section>
 
 <main id="dashboard" hidden>
@@ -52,6 +62,7 @@
         <button data-panel="adminIjtima">Weekly Ijtima Report</button>
         <button data-panel="adminMuzakra">Weekly Madani Muzakra Report</button>
         <button data-panel="adminVolunteer">Volunteer Data</button>
+        <button data-panel="adminTargets">Targets</button>
       </div>
     </div>
     <div id="adminIjtima" class="card panel" hidden>
@@ -75,6 +86,22 @@
       <input id="volunteerFile" type="file" accept=".xlsx,.xls,.csv">
       <button id="importVolunteer">Import Volunteer Data</button>
       <p id="volunteerMsg" class="msg"></p>
+    </div>
+    <div id="adminTargets" class="card panel" hidden>
+      <div class="section-title-row">
+        <div><h2>Targets Management</h2><p class="small">Weekly Ijtima aur Madani Muzakra ke targets alag type ke saath upload karein.</p></div>
+        <span class="mini-badge">Admin Only</span>
+      </div>
+      <div class="template-actions">
+        <button id="downloadTargetTemplate" class="secondary">Download Target Excel Format</button>
+        <input id="targetFile" type="file" accept=".xlsx,.xls,.csv">
+        <button id="importTargets">Upload Targets</button>
+      </div>
+      <div class="target-format-box">
+        <b>Format:</b> Type, Period Type, Period, Country, Region, State, Division, District, Area, Pincode, Locality, Masjid Name, Target, Notes
+        <div class="small">Type: Ijtima / Muzakra • Period Type: Weekly / Monthly / Yearly • Target sirf whole number mein.</div>
+      </div>
+      <p id="targetMsg" class="msg"></p>
     </div>
     <div class="card">
       <h2>User Management</h2>
@@ -224,24 +251,30 @@
     </div>
   </section>
   <section id="progressTab" class="tab" hidden>
-    <div class="card">
-      <h2>Progress Report & Comparison</h2>
-      <div class="progress-switch">
-        <button id="progressIjtimaBtn" class="active">Weekly Ijtima</button>
-        <button id="progressMuzakraBtn" class="secondary">Madani Muzakra</button>
+    <div class="card progress-hero">
+      <div class="section-title-row">
+        <div><span class="eyebrow">ANALYTICS</span><h2>Progress Report & Target Comparison</h2><p class="small">Weekly, Monthly, Yearly aur Average-to-Average analysis ek hi view mein.</p></div>
+        <div class="progress-switch">
+          <button id="progressIjtimaBtn" class="active">Weekly Ijtima</button>
+          <button id="progressMuzakraBtn" class="secondary">Madani Muzakra</button>
+        </div>
       </div>
-      <div class="grid">
+      <div class="progress-filters">
         <label>From<input id="fromDate" type="date"></label>
         <label>To<input id="toDate" type="date"></label>
-        <label>Comparison
-          <select id="compareMode"><option value="week">Week to Week</option><option value="month">Month to Month</option><option value="year">Year to Year</option></select>
-        </label>
+        <label>Comparison<select id="compareMode"><option value="week">Week to Week</option><option value="month">Month to Month</option><option value="year">Year to Year</option></select></label>
+        <button id="loadProgress" class="analyze-btn">Analyze Report</button>
       </div>
-      <button id="loadProgress">Analyze</button>
       <div id="progressSummary" class="summary-grid"></div>
-      <div class="chart-wrap"><canvas id="progressChart" height="280"></canvas></div>
-      <div id="progressResult" class="result"></div>
     </div>
+
+    <div class="analytics-grid">
+      <div class="card chart-card"><div class="chart-heading"><h3>Actual vs Target</h3><span>Period comparison</span></div><div class="chart-wrap"><canvas id="progressChart"></canvas></div></div>
+      <div class="card chart-card"><div class="chart-heading"><h3>Progress Trend</h3><span>Actual & target movement</span></div><div class="chart-wrap"><canvas id="trendChart"></canvas></div></div>
+      <div class="card chart-card full"><div class="chart-heading"><h3>Achievement %</h3><span>Target completion by period</span></div><div class="chart-wrap short"><canvas id="achievementChart"></canvas></div></div>
+    </div>
+
+    <div id="progressResult" class="card result"></div>
   </section>
   <section id="notificationTab" class="tab" hidden>
     <div class="card notification-card">

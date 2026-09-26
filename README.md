@@ -123,3 +123,11 @@ User access schema also stores Locality and Masjid Name.
 - User Profile added with assigned location details and profile photo upload.
 - Password change available both before login (User ID + Old Password + New Password) and inside User Profile.
 - Admin user-location assignment remains hierarchical; once an upper location is assigned, its parent selectors are hidden and only lower-level selectors remain visible.
+
+
+## V.13 Progress & Targets
+- Added Admin Targets management with Excel/CSV upload and downloadable target format.
+- Targets are stored by year in `Targets YYYY` tabs inside the `Weekly Ijtima Users` spreadsheet.
+- Progress supports Weekly, Monthly and Yearly comparisons with Actual, Target, Variance, Achievement %, Average Actual, Average Target and Average-to-Average achievement.
+- Added polished bar, line and achievement charts to the Progress Report.
+- Added login-page Reset Password UI and preserved the existing User Profile password change flow.
