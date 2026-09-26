@@ -14,7 +14,7 @@
     <h1>Weekly Ijtima Report</h1>
     <p id="weekLabel">Weekly Ijtima / Madani Muzakra Dashboard</p><div id="clock" class="clock"></div>
   </div>
-  <button id="refreshBtn" class="secondary">Refresh</button>
+  
 </header>
 
 <section id="loginCard" class="card login">
@@ -25,7 +25,7 @@
   <input id="password" type="password" placeholder="Password" autocomplete="current-password">
   <div class="actions">
     <button id="loginBtn">Login</button>
-    <button id="loginRefreshBtn" class="secondary">Refresh</button>
+    
   </div>
   <p id="loginMsg" class="msg"></p>
 </section>
@@ -71,30 +71,39 @@
     </div>
     <div class="card">
       <h2>User Management</h2>
+      <div class="actions">
+        <button id="downloadUserTemplate" class="secondary">Download User Excel Format</button>
+        <input id="userFile" type="file" accept=".xlsx,.xls,.csv">
+        <button id="importUsers">Upload Users</button>
+      </div>
+      <p id="userImportMsg" class="msg"></p>
       <div class="grid">
         <input id="uId" placeholder="User ID">
         <input id="uUsername" placeholder="Username">
         <input id="uName" placeholder="Name">
         <select id="uRole">
-          <option>User</option><option>District</option><option>Division</option>
-          <option>State</option><option>Region</option><option>HOD</option><option>Admin</option>
+          <option value="User">User</option><option value="District">District</option>
+          <option value="Division">Division</option><option value="State">State</option>
+          <option value="Region">Region</option><option value="HOD">HOD</option><option value="Admin">Admin</option>
         </select>
-        <input id="uPassword" type="password" placeholder="Password (new user)">
+        <input id="uPassword" type="password" placeholder="Password">
         <select id="uActive"><option value="TRUE">Active</option><option value="FALSE">Inactive</option></select>
-        <input id="uRegion" placeholder="Region">
-        <input id="uState" placeholder="State">
-        <input id="uDivision" placeholder="Division">
-        <input id="uDistrict" placeholder="District">
-        <input id="uArea" placeholder="Area">
-        <input id="uPincode" placeholder="Pincode">
+      </div>
+      <h3>Access Location</h3>
+      <div class="grid">
+        <label>Country<select id="uCountry"></select></label>
+        <label>Region<select id="uRegion"></select></label>
+        <label>State<select id="uState"></select></label>
+        <label>Division<select id="uDivision"></select></label>
+        <label>District<select id="uDistrict"></select></label>
+        <label>Area<select id="uArea"></select></label>
+        <label>Pincode<select id="uPincode"></select></label>
       </div>
       <div class="actions">
         <button id="saveUser">Create / Update User</button>
-        <button id="loadUsers" class="secondary">Load Users</button>
       </div>
-      <div id="usersResult" class="result"></div>
       <p id="userMsg" class="msg"></p>
-    </div>
+    </div></div>
   </section>
 
   <section id="userTab" class="tab" hidden>

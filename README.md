@@ -52,3 +52,14 @@ The script uses: My Drive / Dashboard Working / Dashboard Name / Weekly Ijtima &
 - Live date/time with seconds on dashboard.
 - Login UI appears before location master loading; user cache reduces repeated login reads.
 - Master location filtering remains separate from yearly report sheets.
+
+
+## V.3 Feature Update
+- Removed Refresh buttons from header and login.
+- Centered the dashboard heading and top information.
+- Password entered in Create/Update User is hashed automatically and used for login.
+- User Excel upload added; uploaded plaintext Password is converted to SHA-256 in Google Sheet.
+- User Excel format download added.
+- User location fields are cascading from the Ijtima Master: Country -> Region -> State -> Division -> District -> Area -> Pincode.
+- User import validates assigned locations against the Ijtima Master.
+- Create/Update User remains available in Admin.
