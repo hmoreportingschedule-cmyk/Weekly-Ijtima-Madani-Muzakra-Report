@@ -1,4 +1,4 @@
-const APP_BUILD="FINAL11";
+const APP_BUILD="FINAL12";
 const API_URL="https://script.google.com/macros/s/AKfycbwbP22HW0lrV4vSjelbiiURjcn9E_MH1DphI5caVWMX8nwmcnkClw4kH_i9QxBXSOiqmA/exec";
 let session=null,locations=[],progressType="Ijtima",progressRows=[];
 
@@ -280,16 +280,16 @@ function renderIjtimaCalendar(){
   const selected=input.dataset.iso||"";
   let html=`<div class="ijtima-calendar-head"><button type="button" class="ijtima-calendar-nav" data-cal-nav="-1">‹</button><div class="ijtima-calendar-title">${monthName}</div><button type="button" class="ijtima-calendar-nav" data-cal-nav="1">›</button></div>`;
   html+='<div class="ijtima-calendar-week"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div><div class="ijtima-calendar-grid">';
-  for(let i=0;i<offset;i++)html+='<span></span>';
   const today=new Date();
   for(let day=1;day<=days;day++){
     const date=new Date(Date.UTC(y,m,day));
+    const weekdayIndex=date.getUTCDay();
     const dayName=new Intl.DateTimeFormat("en-US",{weekday:"long",timeZone:"UTC"}).format(date);
-    const allowed=dayName.toLowerCase()===wantedName.toLowerCase();
+    const allowed=weekdayIndex===wanted;
     const iso=`${y}-${String(m+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
     const sel=iso===selected;
     const todayCls=(today.getFullYear()===y&&today.getMonth()===m&&today.getDate()===day)?" today":"";
-    html+=`<button type="button" class="ijtima-calendar-day${allowed?" allowed":""}${sel?" selected":""}${todayCls}" data-iso="${iso}" data-weekday="${dayName}" ${allowed?"":"disabled"}>${day}</button>`;
+    html+=`<button type="button" class="ijtima-calendar-day${allowed?" allowed":""}${sel?" selected":""}${todayCls}" style="grid-column:${weekdayIndex+1}" data-iso="${iso}" data-weekday="${dayName}" ${allowed?"":"disabled"}>${day}</button>`;
   }
   html+='</div><div class="ijtima-calendar-note">Sirf <b>'+esc(wantedName)+'</b> ki dates select ki ja sakti hain.</div>';
   box.innerHTML=html;

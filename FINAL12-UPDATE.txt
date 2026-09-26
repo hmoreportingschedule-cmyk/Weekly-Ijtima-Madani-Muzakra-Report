@@ -1,0 +1,10 @@
+FINAL12 — Exact Ijtima Day Calendar Alignment Fix
+
+- Calendar dates are positioned using the actual UTC weekday column (Sun=1 ... Sat=7).
+- Friday in September 2026 now appears under Friday, not Saturday.
+- Thursday, Sunday, Monday, etc. likewise appear under their correct weekday columns.
+- Only the current Ijtima Day dates are clickable.
+- Save/Submit weekday validation remains unchanged.
+- No dashboard background image added.
+- Google Apps Script URL remains unchanged.
+- Frontend cache version bumped to FINAL12.
