@@ -69,38 +69,50 @@ document.addEventListener("click",e=>{const p=e.target.dataset.panel;if(!p)retur
 async function loadLocationsFast(){
   try{
     const d=await api("getLocations",{sessionToken:session.token});
-    locations=d.locations||[];
-    setupCascades();setupUserCascades();setupVolunteerCascades();applyAssignedLocationLocks();
-    if(session.role!=="Admin")document.querySelector('[data-panel="userIjtima"]')?.click();
-  }catch(e){msg("loginMsg",e.message)}
+    // IMPORTANT: locations always comes from the Google Sheet "Ijtima Master"
+    // returned by the backend, already restricted to the logged-in user's access.
+    locations=Array.isArray(d.locations)?d.locations:[];
+    setupCascades();
+    setupUserCascades();
+    setupVolunteerCascades();
+    applyAssignedLocationLocks();
+    if(session.role!=="Admin" && session.role!=="HOD") document.querySelector('[data-panel="userIjtima"]')?.click();
+  }catch(e){
+    // Login has already completed; show the backend error in the dashboard instead of
+    // putting the user back on the login card.
+    msg("reportMsg",e.message);
+  }
+}
+
+function assignedValue(header){
+  if(!session) return "";
+  const v=session[header] ?? session[header.toLowerCase()] ?? "";
+  return String(v).trim();
 }
 function applyAssignedLocationLocks(){
-  if(!session||session.role==="Admin"||session.role==="HOD")return;
-  lockSingleAccessValues("r");
-  lockSingleAccessValues("v");
-}
-function lockSingleAccessValues(prefix){
-  const levels=[
-    ["Country","country"],["Region","region"],["State","state"],["Division","division"],
-    ["District","district"],["Area","area"],["Pincode","pincode"],["Locality","locality"],["Masjid","masjidName"]
-  ];
-  let rows=locations;
-  for(let i=0;i<levels.length;i++){
-    const [id,key]=levels[i],el=$(prefix+id);
-    if(!el)continue;
-    const vals=valuesForLocation(rows,key);
-    const wrap=el.closest(".location-field");
-    if(vals.length===1){
-      el.value=vals[0];el.disabled=true;
-      if(wrap)wrap.classList.add("assigned-fixed");
-      rows=rows.filter(r=>String(r[key]??"")===vals[0]);
-    }else{
-      el.disabled=false;
-      if(wrap)wrap.classList.remove("assigned-fixed");
-    }
-  }
-  // Rebuild all lower dropdowns once the fixed assignment chain is applied.
-  if(prefix==="r")updateReportCascade(-1);
+  if(!session || session.role==="Admin" || session.role==="HOD") return;
+  ["r","v"].forEach(prefix=>{
+    const levels=[
+      ["Country","country"],["Region","region"],["State","state"],["Division","division"],
+      ["District","district"],["Area","area"],["Pincode","pincode"],["Locality","locality"],["Masjid","masjidName"]
+    ];
+    let rows=locations;
+    levels.forEach(([id,key])=>{
+      const el=$(prefix+id); if(!el) return;
+      const assigned=assignedValue(id);
+      if(assigned && assigned.toLowerCase()!=="all"){
+        el.value=assigned; el.disabled=true;
+        const wrap=el.closest(".location-field");
+        if(wrap) wrap.classList.add("assigned-fixed");
+        rows=rows.filter(r=>String(r[key]??"").trim()===assigned);
+      }else{
+        const wrap=el.closest(".location-field");
+        if(wrap) wrap.classList.remove("assigned-fixed");
+        el.disabled=false;
+      }
+    });
+  });
+  updateReportCascade(-1);
 }
 
 function uniq(rows,key){return [...new Set(rows.map(x=>x[key]).filter(Boolean))]}
@@ -132,25 +144,29 @@ function valuesForLocation(rows,key){
 function parentRows(levelIndex, source=locations){
   let rows=source;
   for(let i=0;i<levelIndex;i++){
-    const [id,key]=LOCATION_LEVELS[i],value=$("r"+id)?.value||"";
-    if(value)rows=rows.filter(r=>String(r[key]??"")===String(value));
+    const [id,key]=LOCATION_LEVELS[i];
+    const value=$("r"+id)?.value||"";
+    if(value) rows=rows.filter(r=>String(r[key]??"").trim()===String(value).trim());
   }
   return rows;
 }
 function resetLocationSelect(id,values,allLabel="All"){
-  const el=$(id);if(!el)return;
+  const el=$(id); if(!el) return;
   const old=el.value;
   el.innerHTML=`<option value="">${allLabel}</option>`+values.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("");
-  if(values.includes(old))el.value=old;
+  if(values.includes(old)) el.value=old;
 }
 function setupCascades(){
-  LOCATION_LEVELS.forEach(([id],i)=>{const el=$("r"+id);if(el)el.onchange=()=>updateReportCascade(i)});
-  resetLocationSelect("rCountry",valuesForLocation(locations,"country"));
+  LOCATION_LEVELS.forEach(([id],i)=>{
+    const el=$("r"+id);
+    if(el) el.onchange=()=>updateReportCascade(i);
+  });
+  resetLocationSelect("rCountry",valuesForLocation(locations,"country"),"Select");
   for(let i=1;i<LOCATION_LEVELS.length;i++){
     const [id,key]=LOCATION_LEVELS[i];
-    resetLocationSelect("r"+id,valuesForLocation(parentRows(i),key));
+    resetLocationSelect("r"+id,valuesForLocation(parentRows(i),key),"Select");
   }
-  if($("rDay"))$("rDay").innerHTML='<option value="">Select</option>';
+  if($("rDay")) $("rDay").innerHTML='<option value="">Select</option>';
 }
 function updateReportCascade(changedIndex){
   const start=Math.max(0,changedIndex+1);
@@ -161,11 +177,15 @@ function updateReportCascade(changedIndex){
   }
   const rows=filtered();
   if(rows.length){
-    const r=rows[0];
-    if(rows.every(x=>x.ijtimaDay===r.ijtimaDay)&&$("rDay"))$("rDay").value=r.ijtimaDay||"";
-    showIjtimaDate(r.ijtimaDay);
+    const dayValues=[...new Set(rows.map(x=>String(x.ijtimaDay||"").trim()).filter(Boolean))];
+    if($("rDay")){
+      $("rDay").innerHTML='<option value="">Select</option>'+dayValues.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("");
+      if(dayValues.length===1) $("rDay").value=dayValues[0];
+    }
+    showIjtimaDate(dayValues.length===1?dayValues[0]:"");
   }else if($("rDay")){
-    $("rDay").value="";showIjtimaDate("");
+    $("rDay").innerHTML='<option value="">Select</option>';
+    $("rDay").value=""; showIjtimaDate("");
   }
 }
 

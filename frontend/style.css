@@ -27,3 +27,6 @@ body{font-size:14px}.app{max-width:1280px;margin:auto;padding:18px}.site-head{di
 button:disabled{opacity:.6;cursor:not-allowed}
 @media(max-width:850px){.app-sidebar{width:220px;transform:translateX(-100%);transition:.2s}.app-sidebar.open{transform:translateX(0)}.app-main{margin-left:0}.mobile-menu{display:inline;font-size:20px;cursor:pointer}.grid{grid-template-columns:repeat(2,1fr)}.topbar{padding:0 13px}.dashboard-clock{display:none}}
 @media(max-width:600px){.app{padding:0}.site-head{display:none}.login-card-shell{margin:0;min-height:100vh;border-radius:0;grid-template-columns:1fr;box-shadow:none}.login-brand-side{display:none}.login-form-card{padding:28px 22px}.dashboard-content{padding:12px}.welcome-strip{padding:13px}.grid,.summary-grid{grid-template-columns:1fr}.card{padding:15px}.topbar-title h1{font-size:15px}.topbar{height:64px}.top-logout{padding:8px 11px!important}.user-buttons,.admin-buttons{display:grid;grid-template-columns:1fr}.user-buttons button,.admin-buttons button{width:100%}}
+
+/* V17 critical visibility fix: the HTML hidden attribute must always win over layout rules. */
+[hidden], .login-card-shell[hidden], #dashboard[hidden] { display:none !important; }
