@@ -59,8 +59,20 @@ $("resetPasswordBtn").onclick=async()=>{
 
 function buildNav(){
   $("nav").innerHTML="";
-  if(session.role==="Admin"){addNav("adminTab","Admin");addNav("progressTab","Progress Report");$("adminTab").hidden=false}
-  else{addNav("userTab","Reports");addNav("progressTab","Progress Report");$("userTab").hidden=false}
+  if(session.role==="Admin"){
+    addNav("adminTab","User Management");
+    addNav("userTab","Add Weekly Ijtima Report",()=>document.querySelector('[data-panel="userIjtima"]')?.click());
+    addNav("userTab","Add Weekly Madani Muzakra Report",()=>document.querySelector('[data-panel="userMuzakra"]')?.click());
+    addNav("userTab","Volunteer Data",()=>document.querySelector('[data-panel="userVolunteer"]')?.click());
+    addNav("progressTab","Progress Report");
+    $("adminTab").hidden=false;
+  }else{
+    addNav("userTab","Add Weekly Ijtima Report",()=>document.querySelector('[data-panel="userIjtima"]')?.click());
+    addNav("userTab","Add Weekly Madani Muzakra Report",()=>document.querySelector('[data-panel="userMuzakra"]')?.click());
+    addNav("userTab","Volunteer Data",()=>document.querySelector('[data-panel="userVolunteer"]')?.click());
+    addNav("progressTab","Progress Report");
+    $("userTab").hidden=false;
+  }
   $("nav").querySelector("button")?.click();
 }
 function addNav(id,label){const b=document.createElement("button");b.textContent=label;b.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.hidden=true);$(id).hidden=false;document.querySelectorAll(".tabs button").forEach(x=>x.classList.remove("active"));b.classList.add("active")};$("nav").appendChild(b)}
