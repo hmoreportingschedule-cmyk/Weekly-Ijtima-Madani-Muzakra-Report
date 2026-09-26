@@ -110,41 +110,11 @@ The script uses: My Drive / Dashboard Working / Dashboard Name / Weekly Ijtima &
 - Old volunteer Excel files containing only Name/Mobile/Details remain importable.
 
 
-## V.10 Location Cascade Fix
-Admin User Access Location now uses the exact hierarchy:
-Country -> Region -> State -> Division -> District -> Area -> Pincode -> Locality -> Masjid Name.
-Each dropdown is populated only from the rows matching all previous selections. Pincode never displays Region names.
-User access schema also stores Locality and Masjid Name.
-
-
-## V.11 Updates
-- Volunteer Data backend and Excel format now exactly use: Country, Region, State, Division, District, Area, Pincode, Masjid Name, Volunteer Name, Mobile, Whatsapp, Zimmedari Level.
-- Working logout now clears the server session and returns to Login.
-- User Profile added with assigned location details and profile photo upload.
-- Password change available both before login (User ID + Old Password + New Password) and inside User Profile.
-- Admin user-location assignment remains hierarchical; once an upper location is assigned, its parent selectors are hidden and only lower-level selectors remain visible.
-
-
-## V.13 Progress & Targets
-- Added Admin Targets management with Excel/CSV upload and downloadable target format.
-- Targets are stored by year in `Targets YYYY` tabs inside the `Weekly Ijtima Users` spreadsheet.
-- Progress supports Weekly, Monthly and Yearly comparisons with Actual, Target, Variance, Achievement %, Average Actual, Average Target and Average-to-Average achievement.
-- Added polished bar, line and achievement charts to the Progress Report.
-- Added login-page Reset Password UI and preserved the existing User Profile password change flow.
-
-
-## V.14 Update
-- Admin can view and edit all Ijtima/Muzakra reports from Reports management.
-- Users can edit their own reports up to 3 times; after 3 edits the Edit action is locked.
-- Profile is shown only when the single User Profile navigation button is clicked; it no longer opens automatically after login.
-- Duplicate top Profile button removed.
-- Login and dashboard UI refreshed for a more professional responsive layout.
-
-
-## V.15 Professional UI
-- Professional Islamic/teal dashboard visual system.
-- KPI cards, quick-action cards, analytics panels, trend/target visualizations and activity tables.
+## V.16 — Requested UI/UX Update
 - Report buttons renamed to Add Weekly Ijtima Report and Add Weekly Madani Muzakra Report.
-- Responsive mobile layout.
-- Login styling updated for a modern split-screen experience.
-- Existing backend/report workflows are preserved.
+- Professional operations-console dashboard layout inspired by the supplied reference.
+- Professional split login screen with Show Password and Reset Password (old/new password).
+- Cascading Add Report location controls remain filtered by the assigned location, with fixed assigned levels locked automatically so the next level (State/Division/District/Area/Pincode/Locality/Masjid) remains selectable.
+- Weekly/monthly/yearly progress comparison keeps the existing backend and adds a bar + trend-line visual.
+- Mobile responsive layout and a 15-second request timeout were added without changing the Google Sheet data model.
+- Google Apps Script includes the changePassword action for the login-page password reset.
