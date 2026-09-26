@@ -4,9 +4,14 @@ let session=null,locations=[],progressType="Ijtima",progressRows=[];
 const $=id=>document.getElementById(id);
 const msg=(id,t,ok=false)=>{if($(id)){ $(id).textContent=t;$(id).style.color=ok?"#087f5b":"#c92a2a"; }};
 async function api(action,payload={}){
-  if(!API_URL.startsWith("http"))throw Error("Set API_URL in frontend/app.js");
-  const r=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action,...payload})});
-  const d=await r.json();if(!d.ok)throw Error(d.error||"Request failed");return d;
+  if(!API_URL.startsWith("http"))throw Error("Google Apps Script URL is not configured.");
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),15000);
+  try{
+    const r=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action,...payload}),signal:controller.signal,cache:"no-store"});
+    if(!r.ok)throw Error("Server error: "+r.status);
+    const d=await r.json();if(!d.ok)throw Error(d.error||"Request failed");return d;
+  }catch(e){if(e.name==="AbortError")throw Error("Server response is taking too long.");throw e}
+  finally{clearTimeout(timer)}
 }
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function clock(){const d=new Date();$("clock").textContent=d.toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})+" • "+d.toLocaleTimeString("en-IN",{hour12:true})}
@@ -142,15 +147,52 @@ async function importFile(input,msgId,type){
 $("importIjtima").onclick=()=>importFile($("ijtimaFile"),"ijtimaMsg","IjtimaMaster");
 $("importVolunteer").onclick=()=>importFile($("volunteerFile"),"volunteerMsg","Volunteer");
 
-function setupUserCascades(){
- const fields=['Country','Region','State','Division','District','Area','Pincode'];
- function update(i){const chosen={};fields.slice(0,i+1).forEach(k=>chosen[k]=document.getElementById('u'+k).value);
-   const matching=locations.filter(r=>fields.slice(0,i+1).every(k=>!chosen[k]||String(r[k.toLowerCase()]||'')===chosen[k]));
-   for(let x=i+1;x<fields.length;x++){const el=document.getElementById('u'+fields[x]);if(!el)continue;const opts=[...new Set(matching.map(r=>String(r[fields[x].toLowerCase()]||'')).filter(Boolean))].sort();el.innerHTML='<option value="">All</option>'+opts.map(v=>'<option value="'+esc(v)+'">'+esc(v)+'</option>').join('')}}
- fields.forEach((k,i)=>{const el=document.getElementById('u'+k);if(el)el.onchange=()=>update(i)});
- const first=document.getElementById('uCountry');if(first){const opts=[...new Set(locations.map(r=>r.country).filter(Boolean))].sort();first.innerHTML='<option value="">All</option>'+opts.map(v=>'<option value="'+esc(v)+'">'+esc(v)+'</option>').join('');update(0)}
+const USER_LEVELS=[
+  ["Country","country"],["Region","region"],["State","state"],["Division","division"],
+  ["District","district"],["Area","area"],["Pincode","pincode"],["Locality","locality"],["Masjid","masjidName"]
+];
+
+function userRowsFor(levelIndex){
+  let rows=locations.slice();
+  for(let j=0;j<levelIndex;j++){
+    const [id,key]=USER_LEVELS[j];
+    const value=$( "u"+id )?.value||"";
+    if(value) rows=rows.filter(r=>String(r[key]??"").trim()===String(value).trim());
+  }
+  return rows;
 }
-$("saveUser").onclick=async()=>{try{const u={userId:$("uId").value.trim(),username:$("uUsername").value.trim(),name:$("uName").value.trim(),role:$("uRole").value,active:$("uActive").value,password:$("uPassword").value};['Country','Region','State','Division','District','Area','Pincode'].forEach(k=>u[k.toLowerCase()]=$("u"+k)?.value||'All');const d=await api('saveUser',{sessionToken:session.token,user:u});msg('userMsg',d.message,true)}catch(e){msg('userMsg',e.message)}};
+function userOptions(levelIndex){
+  const [,key]=USER_LEVELS[levelIndex];
+  return valuesForLocation(userRowsFor(levelIndex),key);
+}
+function resetUserSelect(id, values, label="All"){
+  const el=$(id); if(!el)return;
+  const old=el.value;
+  el.innerHTML='<option value="">'+label+'</option>'+values.map(v=>'<option value="'+esc(v)+'">'+esc(v)+'</option>').join("");
+  if(values.includes(old))el.value=old;
+}
+function clearUserBelow(index){
+  for(let j=index+1;j<USER_LEVELS.length;j++){
+    const [id]=USER_LEVELS[j];
+    resetUserSelect("u"+id,[],"All");
+  }
+}
+function updateUserCascade(changedIndex){
+  clearUserBelow(changedIndex);
+  for(let j=changedIndex+1;j<USER_LEVELS.length;j++){
+    const [id]=USER_LEVELS[j];
+    resetUserSelect("u"+id,userOptions(j),"All");
+  }
+}
+function setupUserCascades(){
+  USER_LEVELS.forEach(([id],i)=>{
+    const el=$("u"+id);
+    if(el) el.onchange=()=>updateUserCascade(i);
+  });
+  USER_LEVELS.forEach(([id],i)=>resetUserSelect("u"+id,userOptions(i),"All"));
+}
+
+$("saveUser").onclick=async()=>{try{const u={userId:$("uId").value.trim(),username:$("uUsername").value.trim(),name:$("uName").value.trim(),role:$("uRole").value,active:$("uActive").value,password:$("uPassword").value};USER_LEVELS.forEach(([id])=>u[id.toLowerCase()==="masjid"?"masjidName":id.toLowerCase()]=$("u"+id)?.value||"All");const d=await api("saveUser",{sessionToken:session.token,user:u});msg("userMsg",d.message,true)}catch(e){msg("userMsg",e.message)}};
 $("downloadUserTemplate").onclick=()=>{const headers=['User ID','Username','Password','Name','Role','Active','Country','Region','State','Division','District','Area','Pincode'];const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([headers]),'Users');XLSX.writeFile(wb,'Weekly-Ijtima-Users-Format.xlsx')};
 $("importUsers").onclick=async()=>{try{const f=$("userFile").files[0];if(!f)throw Error('Select Excel/CSV file.');const wb=XLSX.read(await f.arrayBuffer(),{type:'array'}),rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});const d=await api('importUsers',{sessionToken:session.token,rows});msg('userImportMsg','Imported '+d.imported+' users.',true);$("userFile").value=''}catch(e){msg('userImportMsg',e.message)}};
 

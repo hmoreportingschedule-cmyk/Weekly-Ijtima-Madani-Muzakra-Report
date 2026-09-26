@@ -108,3 +108,10 @@ The script uses: My Drive / Dashboard Working / Dashboard Name / Weekly Ijtima &
 - Volunteer Excel download format now includes all location fields plus Name, Mobile and Details.
 - Volunteer backend stores Pincode and validates non-admin users against their assigned location.
 - Old volunteer Excel files containing only Name/Mobile/Details remain importable.
+
+
+## V.10 Location Cascade Fix
+Admin User Access Location now uses the exact hierarchy:
+Country -> Region -> State -> Division -> District -> Area -> Pincode -> Locality -> Masjid Name.
+Each dropdown is populated only from the rows matching all previous selections. Pincode never displays Region names.
+User access schema also stores Locality and Masjid Name.
