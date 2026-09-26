@@ -1,0 +1,9 @@
+FINAL13 — EXACT IJTIMA DAY CALENDAR + CACHE FIX
+
+1. Calendar weekday is now based on the actual date's UTC weekday.
+2. Every date has an explicit weekday class and locked calendar column:
+   Sunday=1, Monday=2, Tuesday=3, Wednesday=4, Thursday=5, Friday=6, Saturday=7.
+3. Only the current Ijtima Day is clickable.
+4. Frontend JS and CSS now use ?v=FINAL13 to prevent stale Vercel/browser cache.
+5. Google Apps Script URL remains unchanged.
+6. No dashboard background image was added.

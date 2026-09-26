@@ -1,4 +1,4 @@
-const APP_BUILD="FINAL12";
+const APP_BUILD="FINAL13";
 const API_URL="https://script.google.com/macros/s/AKfycbwbP22HW0lrV4vSjelbiiURjcn9E_MH1DphI5caVWMX8nwmcnkClw4kH_i9QxBXSOiqmA/exec";
 let session=null,locations=[],progressType="Ijtima",progressRows=[];
 
@@ -248,8 +248,10 @@ function ijtimaDayIndex(day){
 function activeIjtimaDayName(){
   const select=$("rDay");
   if(!select)return "";
-  const opt=select.options?.[select.selectedIndex];
-  return String(opt?.textContent||select.value||"").trim();
+  const raw=String(select.value||select.options?.[select.selectedIndex]?.textContent||"").trim();
+  const key=raw.toLowerCase();
+  const map={sunday:"Sunday",monday:"Monday",tuesday:"Tuesday",wednesday:"Wednesday",thursday:"Thursday",friday:"Friday",saturday:"Saturday"};
+  return map[key]||String(select.options?.[select.selectedIndex]?.textContent||"").trim();
 }
 function activeIjtimaDayIndex(){ return ijtimaDayIndex(activeIjtimaDayName()); }
 function isoToDisplay(iso){
@@ -289,7 +291,8 @@ function renderIjtimaCalendar(){
     const iso=`${y}-${String(m+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
     const sel=iso===selected;
     const todayCls=(today.getFullYear()===y&&today.getMonth()===m&&today.getDate()===day)?" today":"";
-    html+=`<button type="button" class="ijtima-calendar-day${allowed?" allowed":""}${sel?" selected":""}${todayCls}" style="grid-column:${weekdayIndex+1}" data-iso="${iso}" data-weekday="${dayName}" ${allowed?"":"disabled"}>${day}</button>`;
+    const weekdayClass=["sun","mon","tue","wed","thu","fri","sat"][weekdayIndex];
+    html+=`<button type="button" class="ijtima-calendar-day wd-${weekdayClass}${allowed?" allowed":""}${sel?" selected":""}${todayCls}" data-iso="${iso}" data-weekday="${dayName}" data-weekday-index="${weekdayIndex}" ${allowed?"":"disabled"}>${day}</button>`;
   }
   html+='</div><div class="ijtima-calendar-note">Sirf <b>'+esc(wantedName)+'</b> ki dates select ki ja sakti hain.</div>';
   box.innerHTML=html;
