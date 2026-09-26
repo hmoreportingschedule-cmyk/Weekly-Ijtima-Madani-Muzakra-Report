@@ -72,3 +72,9 @@ The script uses: My Drive / Dashboard Working / Dashboard Name / Weekly Ijtima &
 - Notifications are based on each Masjid's assigned Ijtima Day and the current Monday-Sunday week.
 - Future scheduled Ijtima dates are not marked missing before their day arrives.
 - The notification list is filtered by the logged-in user's access.
+
+
+## V.5 Feature Update
+- Google Apps Script Web App URL is embedded in frontend/app.js.
+- Notification bell is hidden on the Login page.
+- Notification bell becomes visible only after successful login.

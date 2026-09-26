@@ -17,3 +17,5 @@
 .notification-due{white-space:nowrap}
 .notification-empty{padding:18px;background:#eef8f6;border-radius:10px;color:#087f5b;font-weight:600}
 @media(max-width:700px){.notification-head{flex-direction:column}.header-actions{position:absolute;right:14px;top:14px}.site-head{padding-right:55px}}
+
+.notification-bell[hidden]{display:none!important}
