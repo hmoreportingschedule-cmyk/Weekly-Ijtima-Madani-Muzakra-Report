@@ -134,7 +134,9 @@
 
     <div id="userIjtima" class="card panel" hidden>
       <h2>Weekly Ijtima Report</h2>
-      <p id="ijtimaDateInfo" class="notice"></p><div id="nextReportDate" class="date-box"></div>
+      <p id="ijtimaDateInfo" class="notice"></p>
+      <label>Report Date<input id="ijtimaDate" type="date" aria-describedby="ijtimaDateHelp"></label>
+      <div id="ijtimaDateHelp" class="date-box">Report date will be limited to this Masjid's Ijtima Day.</div>
       <div class="grid">
         <label class="location-field" data-location-field="rCountry">Country<select id="rCountry"></select></label>
         <label class="location-field" data-location-field="rRegion">Region<select id="rRegion"></select></label>
@@ -147,12 +149,32 @@
         <label class="location-field" data-location-field="rMasjid">Masjid<select id="rMasjid"></select></label>
         <label>Ijtima Day<select id="rDay"></select></label>
       </div>
-      <label>Participants
-        <input id="participants" type="number" min="0" step="1" inputmode="numeric" placeholder="Whole number only">
-      </label>
-      <h3>Volunteer Details</h3>
-      <div id="volunteers"></div>
-      <button id="addVolunteer" class="secondary">+ Add Volunteer</button>
+      <h3>Participants</h3>
+      <div class="grid participant-grid">
+        <label>Total Zimmedaran
+          <input id="totalZimmedaran" type="number" min="0" max="9999" step="1" inputmode="numeric" placeholder="Max 4 digits">
+        </label>
+        <label>Total Madaris Wale
+          <input id="totalMadarisWale" type="number" min="0" max="9999" step="1" inputmode="numeric" placeholder="Max 4 digits">
+        </label>
+        <label>Total Participants
+          <input id="participants" type="number" min="0" max="19998" step="1" readonly placeholder="Automatically calculated">
+        </label>
+        <label>Total Raat Rukne Wale
+          <input id="totalRaatRukneWale" type="number" min="0" max="9999" step="1" inputmode="numeric" placeholder="Max 4 digits">
+        </label>
+        <label>Total Gadiyan Ayi
+          <input id="totalGadiyanAyi" type="number" min="0" max="999" step="1" inputmode="numeric" placeholder="Max 3 digits">
+        </label>
+      </div>
+      <div class="yes-no-grid">
+        <label>Alakai Daura Baraye Haftawar Ijtima Hua?
+          <select id="alakaiDaura"><option value="">Select</option><option value="Yes">Yes</option><option value="No">No</option></select>
+        </label>
+        <label>Kya Langare Razawiyyah Ka Ehtimaam Hua ?
+          <select id="langareRazawiyyah"><option value="">Select</option><option value="Yes">Yes</option><option value="No">No</option></select>
+        </label>
+      </div>
       <div class="actions">
         <button id="saveIjtimaDraft" class="secondary">Save Draft</button>
         <button id="submitIjtima">Submit Report</button>
@@ -163,7 +185,11 @@
     <div id="userMuzakra" class="card panel" hidden>
       <h2>Weekly Madani Muzakra Report</h2>
       <label>Report Date<input id="mDate" type="date" aria-describedby="muzakraDateHelp"></label><div id="muzakraDateHelp" class="date-box">Weekly Madani Muzakra: Saturday only.</div>
-      <label>Participants<input id="mParticipants" type="number" min="0" step="1"></label>
+      <div class="grid participant-grid">
+        <label>Maqamat<input id="mMaqamat" type="number" min="0" max="9999" step="1" inputmode="numeric" placeholder="Max 4 digits"></label>
+        <label>Participants<input id="mParticipants" type="number" min="0" max="9999" step="1" inputmode="numeric" placeholder="Max 4 digits"></label>
+      </div>
+      <div class="date-box">Maqamat ki tadad Participants se zyada nahi ho sakti.</div>
       <button id="submitMuzakra">Submit Report</button>
       <p id="muzakraUserMsg" class="msg"></p>
     </div>

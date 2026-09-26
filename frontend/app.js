@@ -226,41 +226,77 @@ function updateReportCascade(changedIndex){
 }
 
 function showIjtimaDate(day){
-  const wanted=String(day||"Thursday");$("ijtimaDateInfo").textContent=`This Masjid's Ijtima Day: ${wanted}`;
-  $("nextReportDate").textContent="Next reporting date: "+nextDateForDay(wanted);
+  const wanted=String(day||"");
+  $("ijtimaDateInfo").textContent=wanted?`This Masjid's Ijtima Day: ${wanted}`:"Select a Masjid to determine the Ijtima Day.";
+  setIjtimaDateForDay(wanted);
 }
-function nextDateForDay(day){const names=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],idx=names.findIndex(x=>x.toLowerCase()===String(day).toLowerCase()),n=idx<0?4:idx,d=new Date(),diff=(n-d.getDay()+7)%7;d.setDate(d.getDate()+diff);return d.toISOString().slice(0,10)}
+function nextDateForDay(day){
+  const names=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],idx=names.findIndex(x=>x.toLowerCase()===String(day).toLowerCase());
+  if(idx<0)return "";
+  const n=idx,d=new Date(),diff=(n-d.getDay()+7)%7;
+  d.setDate(d.getDate()+diff);return d.toISOString().slice(0,10);
+}
+function setIjtimaDateForDay(day){
+  const el=$("ijtimaDate"); if(!el)return;
+  const date=nextDateForDay(day);
+  el.value=date;
+  el.dataset.allowedDay=String(day||"");
+  if(date) el.title=`Only ${day} dates are allowed for this Masjid.`;
+  else el.title="Select a Masjid first.";
+  el.onchange=()=>{
+    if(!el.value)return;
+    const d=new Date(el.value+"T00:00:00"),allowed=String(el.dataset.allowedDay||"");
+    const names=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+    if(!allowed || names[d.getDay()]!==allowed){
+      msg("reportMsg",`Is Masjid ka Ijtima sirf ${allowed||"selected day"} ko hota hai.`);
+      el.value=nextDateForDay(allowed);
+    }else msg("reportMsg","");
+  };
+}
 function nextSaturday(){
   const d=new Date(),diff=(6-d.getDay()+7)%7;
-  d.setDate(d.getDate()+diff);
-  return d.toISOString().slice(0,10);
+  d.setDate(d.getDate()+diff);return d.toISOString().slice(0,10);
 }
 function setupMuzakraDate(){
   const el=$("mDate"); if(!el)return;
-  const saturday=nextSaturday();
-  el.value=saturday;
-  el.min="2020-01-04"; // Saturday
-  el.step="7";
+  const saturday=nextSaturday();el.value=saturday;el.min="2020-01-04";el.step="7";
   el.onchange=()=>{
     if(!el.value)return;
     const d=new Date(el.value+"T00:00:00");
-    if(d.getDay()!==6){
-      msg("muzakraUserMsg","Weekly Madani Muzakra sirf Saturday ko hota hai. Please Saturday select karein.");
-      el.value=nextSaturday();
-    }else{
-      $("muzakraUserMsg").textContent="";
-    }
+    if(d.getDay()!==6){msg("muzakraUserMsg","Weekly Madani Muzakra sirf Saturday ko hota hai. Please Saturday select karein.");el.value=nextSaturday();}
+    else $("muzakraUserMsg").textContent="";
   };
 }
-
-function volRow(target){const d=document.createElement("div");d.className="vol";d.innerHTML='<input class="vname" placeholder="Volunteer Name"><input class="vmobile" placeholder="Mobile"><input class="vdetails" placeholder="Details"><button type="button" class="secondary">Remove</button>';d.querySelector("button").onclick=()=>d.remove();$(target).appendChild(d)}
-$("addVolunteer").onclick=()=>volRow("volunteers");$("addVolunteerOnly").onclick=()=>volRow("volunteerOnlyRows");
+function updateIjtimaParticipantTotal(){
+  const z=Number($("totalZimmedaran")?.value||0),m=Number($("totalMadarisWale")?.value||0);
+  if($("participants"))$("participants").value=z+m;
+}
+["totalZimmedaran","totalMadarisWale"].forEach(id=>$(id)?.addEventListener("input",updateIjtimaParticipantTotal));
+function setYesNoStyle(id){
+  const el=$(id);if(!el)return;
+  el.classList.remove("yes-choice","no-choice");
+  if(el.value==="Yes")el.classList.add("yes-choice");
+  if(el.value==="No")el.classList.add("no-choice");
+}
+["alakaiDaura","langareRazawiyyah"].forEach(id=>$(id)?.addEventListener("change",()=>setYesNoStyle(id)));
 
 async function submitIjtima(status){
-  const r=filtered()[0],p=$("participants").value;if(!r)return msg("reportMsg","Please select a valid Masjid.");
-  if(p===""||!Number.isInteger(Number(p))||Number(p)<0)return msg("reportMsg","Participants must be a whole number.");
-  const volunteers=[...document.querySelectorAll("#volunteers .vol")].map(x=>({name:x.querySelector(".vname").value.trim(),mobile:x.querySelector(".vmobile").value.trim(),details:x.querySelector(".vdetails").value.trim()}));
-  try{await api("saveReport",{sessionToken:session.token,type:"Ijtima",report:{weekDate:nextDateForDay(r.ijtimaDay),...r,participants:Number(p),volunteers,status}});msg("reportMsg",status==="Draft"?"Draft saved.":"Report submitted successfully.",true)}catch(e){msg("reportMsg",e.message)}
+  const r=filtered()[0];
+  if(!r)return msg("reportMsg","Please select a valid Masjid.");
+  const date=$("ijtimaDate")?.value||"",allowedDay=String(r.ijtimaDay||"");
+  if(!date)return msg("reportMsg","Please select the report date.");
+  const d=new Date(date+"T00:00:00"),names=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  if(!allowedDay || names[d.getDay()]!==allowedDay)return msg("reportMsg",`Is Masjid ka Ijtima sirf ${allowedDay||"selected day"} ko hota hai.`);
+  const z=Number($("totalZimmedaran")?.value||0),m=Number($("totalMadarisWale")?.value||0),p=z+m;
+  const night=Number($("totalRaatRukneWale")?.value||0),cars=Number($("totalGadiyanAyi")?.value||0);
+  if(!Number.isInteger(z)||z<0||z>9999||!Number.isInteger(m)||m<0||m>9999)return msg("reportMsg","Zimmedaran aur Madaris Wale mein maximum 4 digits allowed hain.");
+  if(!Number.isInteger(night)||night<0||night>9999)return msg("reportMsg","Total Raat Rukne Wale mein maximum 4 digits allowed hain.");
+  if(!Number.isInteger(cars)||cars<0||cars>999)return msg("reportMsg","Total Gadiyan Ayi mein maximum 3 digits allowed hain.");
+  $("participants").value=p;
+  try{
+    await api("saveReport",{sessionToken:session.token,type:"Ijtima",report:{weekDate:date,...r,participants:p,totalZimmedaran:z,totalMadarisWale:m,totalRaatRukneWale:night,totalGadiyanAyi:cars,alakaiDaura:$("alakaiDaura")?.value||"",langareRazawiyyah:$("langareRazawiyyah")?.value||"",volunteers:[],status}});
+    msg("reportMsg",status==="Draft"?"Draft saved.":"Report submitted successfully.",true);
+  }catch(e){msg("reportMsg",e.message)}
 }
 $("saveIjtimaDraft").onclick=()=>submitIjtima("Draft");$("submitIjtima").onclick=()=>submitIjtima("Submitted");
 
@@ -298,9 +334,11 @@ $("submitMuzakra").onclick=async()=>{
     if(!date)throw Error("Please select a Saturday.");
     const day=new Date(date+"T00:00:00").getDay();
     if(day!==6)throw Error("Weekly Madani Muzakra sirf Saturday ko submit kiya ja sakta hai.");
-    const p=$("mParticipants").value;
-    if(!Number.isInteger(Number(p))||Number(p)<0)throw Error("Participants must be a whole number.");
-    await api("saveReport",{sessionToken:session.token,type:"Muzakra",report:{weekDate:date,participants:Number(p),status:"Submitted"}});
+    const maq=Number($("mMaqamat").value||0),p=Number($("mParticipants").value||0);
+    if(!Number.isInteger(maq)||maq<0||maq>9999)throw Error("Maqamat mein maximum 4 digits allowed hain.");
+    if(!Number.isInteger(p)||p<0||p>9999)throw Error("Participants mein maximum 4 digits allowed hain.");
+    if(maq>p)throw Error("Maqamat ki tadad Participants se zyada nahi ho sakti.");
+    await api("saveReport",{sessionToken:session.token,type:"Muzakra",report:{weekDate:date,maqamat:maq,participants:p,status:"Submitted"}});
     msg("muzakraUserMsg","Madani Muzakra report submitted separately.",true);
   }catch(e){msg("muzakraUserMsg",e.message)}
 };
