@@ -15,9 +15,13 @@ Weekly Ijtima Dashboard/
 1. Create a Google Sheet named `Weekly Ijtima User Details`.
 2. Open Extensions -> Apps Script.
 3. Copy `apps-script/Code.gs` into the Apps Script project.
-4. Run `setupSystem()` once and authorize.
-5. Deploy as Web app.
-6. Put the Web App URL in `frontend/app.js` as `API_URL`.
-7. Deploy the frontend to Vercel.
+4. Run `setupSystem()` once and authorize. This creates the default Admin user if it does not already exist.
+5. Default Admin credentials:
+   - User ID: `admin`
+   - Password: `Admin@2026!`
+   Change the password in the Users sheet/backend before production use.
+6. Deploy as Web app.
+7. Put the Web App URL in `frontend/app.js` as `API_URL`.
+8. Deploy the frontend to Vercel.
 
 This is a clean starter package. To update an existing dashboard without changing its design, provide the current project ZIP.

@@ -1,5 +1,5 @@
 // Set this to your deployed Google Apps Script Web App URL.
-const API_URL = "https://script.google.com/macros/s/AKfycbwbP22HW0lrV4vSjelbiiURjcn9E_MH1DphI5caVWMX8nwmcnkClw4kH_i9QxBXSOiqmA/exec";
+const API_URL = "PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
 let session = null, locations = [];
 
 const $ = id => document.getElementById(id);

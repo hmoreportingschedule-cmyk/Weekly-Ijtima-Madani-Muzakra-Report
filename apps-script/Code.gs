@@ -36,12 +36,32 @@ function sheet_(name){return ss_().getSheetByName(name)}
 
 function setupSystem(){
   const ss=ss_();
-  ensureSheet_(CONFIG.USER_SHEET,['User ID','Username','Password Hash','Name','Role','Active','Photo URL']);
+  const users=ensureSheet_(CONFIG.USER_SHEET,['User ID','Username','Password Hash','Name','Role','Active','Photo URL','Region','State','Division','District','Area','Pincode']);
   ensureSheet_(CONFIG.LOCATION_SHEET,['Region','State','Division','District','Area','Pincode']);
   ensureSheet_(CONFIG.LOG_SHEET,['Timestamp','User ID','Action','Details']);
   ensureSheet_(CONFIG.NOTIFY_SHEET,['Timestamp','Week Date','Location','User ID','Status']);
   ensureDrive_();
-  return {ok:true,message:'System initialized',year:new Date().getFullYear()};
+  createDefaultAdmin_(users);
+  return {ok:true,message:'System initialized',year:new Date().getFullYear(),adminUsername:'admin',adminPassword:'Admin@2026!'};
+}
+
+function createDefaultAdmin_(users){
+  const values=users.getDataRange().getValues();
+  const headers=values[0]||[];
+  const ui=Object.fromEntries(headers.map((x,i)=>[x,i]));
+  const exists=values.slice(1).some(r=>String(r[ui['Username']]||'').toLowerCase()==='admin');
+  if(!exists){
+    users.appendRow([
+      'ADMIN-001',
+      'admin',
+      hash_('Admin@2026!'),
+      'System Administrator',
+      'Admin',
+      true,
+      '',
+      '','','','','',''
+    ]);
+  }
 }
 
 function ensureSheet_(name,headers){

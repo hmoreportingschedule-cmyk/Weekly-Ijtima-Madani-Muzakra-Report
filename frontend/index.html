@@ -8,19 +8,20 @@
 </head>
 <body>
 <div class="app">
-  <header>
-    <div>
+  <header></header>
+
+  <section id="loginCard" class="card login">
+    <div class="login-heading">
       <h1>Weekly Ijtima Report</h1>
       <p id="weekLabel">Loading current reporting week...</p>
     </div>
-    <button id="refreshBtn">Refresh</button>
-  </header>
-
-  <section id="loginCard" class="card login">
     <h2>Login</h2>
     <input id="username" placeholder="Username" autocomplete="username">
     <input id="password" type="password" placeholder="Password" autocomplete="current-password">
-    <button id="loginBtn">Login</button>
+    <div class="login-actions">
+      <button id="loginBtn">Login</button>
+      <button id="refreshBtn" class="secondary" type="button">Refresh</button>
+    </div>
     <p id="loginMsg" class="msg"></p>
   </section>
 
