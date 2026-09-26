@@ -78,3 +78,13 @@ The script uses: My Drive / Dashboard Working / Dashboard Name / Weekly Ijtima &
 - Google Apps Script Web App URL is embedded in frontend/app.js.
 - Notification bell is hidden on the Login page.
 - Notification bell becomes visible only after successful login.
+
+
+## V.6 Feature Update
+- Password is now stored in the `Password` column exactly as entered by Admin; `Password Hash` is no longer used for new users.
+- Login compares the exact Password value from the Users sheet.
+- Existing hash-only users can still login once using their old password and are automatically migrated to the Password column.
+- Login cache is isolated under `users_fast_v6`.
+- Location master is never loaded during credential verification.
+- Login UI shows immediate progress and has a 15-second request timeout instead of hanging indefinitely.
+- User Create/Update and Excel import now write plaintext Password to the Password column.

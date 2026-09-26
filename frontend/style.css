@@ -19,3 +19,5 @@
 @media(max-width:700px){.notification-head{flex-direction:column}.header-actions{position:absolute;right:14px;top:14px}.site-head{padding-right:55px}}
 
 .notification-bell[hidden]{display:none!important}
+
+button:disabled{opacity:.65;cursor:wait}
