@@ -40,3 +40,15 @@ The script uses: My Drive / Dashboard Working / Dashboard Name / Weekly Ijtima &
 - User: same three report buttons with submission forms.
 - Roles: Admin, HOD, Region, State, Division, District, User.
 - Login is optimized with a cached user index; location master is loaded after login.
+
+
+## V.2 Feature Update
+- Download Excel Format for Weekly Ijtima Master.
+- Download Excel Format for Volunteer Data.
+- Weekly Madani Muzakra has no master upload option and remains separate from Weekly Ijtima.
+- Progress Report has separate Weekly Ijtima / Madani Muzakra buttons.
+- Progress supports Week-to-Week, Month-to-Month and Year-to-Year comparison.
+- Progress includes chart + table.
+- Live date/time with seconds on dashboard.
+- Login UI appears before location master loading; user cache reduces repeated login reads.
+- Master location filtering remains separate from yearly report sheets.
