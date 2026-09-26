@@ -1,152 +1,259 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Weekly Ijtima & Madani Muzakra</title>
-  <link rel="stylesheet" href="styles.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Weekly Ijtima Report</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 </head>
 <body>
-<div id="loginView" class="login-view">
-  <div class="login-shell">
-    <div class="login-brand">
-      <div class="brand-mark">◇</div>
-      <div>
-        <div class="brand-title">Weekly Ijtima &<br>Madani Muzakra</div>
-        <div class="brand-sub">REPORTING SYSTEM</div>
-      </div>
-      <div class="login-mosque">☾</div>
-    </div>
-    <div class="login-card">
-      <div class="login-icon">🔐</div>
-      <h1>Welcome Back</h1>
-      <p>Sign in to continue your reporting dashboard</p>
-      <form id="loginForm">
-        <label>User ID</label>
-        <input id="userId" autocomplete="username" placeholder="Enter User ID" required>
-        <label>Password</label>
-        <div class="password-wrap">
-          <input id="password" type="password" autocomplete="current-password" placeholder="Enter Password" required>
-          <button type="button" class="eye" onclick="togglePassword()">◉</button>
-        </div>
-        <label class="check"><input id="showPass" type="checkbox" onchange="document.getElementById('password').type=this.checked?'text':'password'"> Show Password</label>
-        <button class="primary full" type="submit">SIGN IN</button>
-        <button type="button" class="link-btn" onclick="showReset()">Reset Password</button>
-        <div id="loginMsg" class="msg"></div>
-      </form>
+<div class="app">
+<section id="loginCard" class="login-card-shell">
+  <div class="login-brand-side">
+    <div class="brand-mark-large">◈</div>
+    <div class="login-brand-title">Weekly Ijtima &amp; Madani Muzakra</div>
+    <div class="login-brand-sub">Ijtima • Madani Muzakra • Volunteer Reporting</div>
+    <div class="login-brand-note">Fast, secure & location-based reporting dashboard</div>
+  </div>
+  <div class="login-form-card">
+    <div class="login-icon">🔐</div>
+    <h2>Welcome Back</h2>
+    <p class="login-subtitle">Sign in to continue to your reporting dashboard</p>
+    <label>User ID</label>
+    <input id="username" placeholder="Enter User ID" autocomplete="username">
+    <label>Password</label>
+    <input id="password" type="password" placeholder="Enter password" autocomplete="current-password">
+    <label class="check-row"><input id="showPassword" type="checkbox"> <span>Show Password</span></label>
+    <button id="loginBtn" class="login-primary">SIGN IN</button>
+    <button id="resetPasswordOpen" class="login-reset-link" type="button">Reset Password</button>
+    <p id="loginMsg" class="msg"></p>
+    <div id="resetPasswordPanel" class="reset-panel" hidden>
+      <div class="reset-title">Reset Password</div>
+      <input id="resetUserId" placeholder="User ID">
+      <input id="resetOldPassword" type="password" placeholder="Old Password">
+      <input id="resetNewPassword" type="password" placeholder="New Password">
+      <input id="resetConfirmPassword" type="password" placeholder="Confirm New Password">
+      <div class="reset-actions"><button id="resetPasswordBtn" type="button">Update Password</button><button id="resetCancel" type="button" class="secondary">Cancel</button></div>
+      <p id="resetMsg" class="msg"></p>
     </div>
   </div>
-</div>
+</section>
 
-<div id="appView" class="app hidden">
-  <aside class="sidebar">
-    <div class="sidebar-brand">
-      <div class="brand-mark small">◇</div>
-      <div><div class="brand-title">Weekly Ijtima &<br>Madani Muzakra</div><div class="brand-sub">REPORTING SYSTEM</div></div>
-    </div>
-    <div class="console">OPERATIONS CONSOLE</div>
-    <nav id="sideNav">
-      <button class="nav-item active" data-page="dashboard">▣ <span>Dashboard</span></button>
-      <button class="nav-item" data-page="users">♟ <span>User Management</span></button>
-      <button class="nav-item" data-page="ijtima">▤ <span>Add Weekly Ijtima Report</span></button>
-      <button class="nav-item" data-page="muzakra">▤ <span>Add Weekly Madani Muzakra Report</span></button>
-      <button class="nav-item" data-page="volunteer">♟ <span>Volunteer Data</span></button>
-      <button class="nav-item" data-page="progress">▥ <span>Progress Report</span></button>
-    </nav>
-    <div class="sidebar-mosque">☾<br><span>◡◡◡</span></div>
-    <div class="profile-mini">
-      <div class="avatar">SA</div><div><b id="sideName">System Administrator</b><small id="sideRole">Admin</small></div>
-      <button onclick="logout()" title="Logout">↪</button>
-    </div>
+<main id="dashboard" hidden>
+  <aside class="app-sidebar">
+    <div class="sidebar-brand"><div class="sidebar-logo">◇</div><div><strong>Weekly Ijtima &amp; Madani Muzakra</strong><small>REPORTING SYSTEM</small></div></div><div class="sidebar-motif" aria-hidden="true"><span class="motif-moon">☾</span><span class="motif-dome dome-a"></span><span class="motif-dome dome-b"></span><span class="motif-minaret min-a"></span><span class="motif-minaret min-b"></span><span class="motif-lantern l-a">♜</span><span class="motif-lantern l-b">♜</span></div>
+    <div class="sidebar-caption">OPERATIONS CONSOLE</div>
+    <nav id="nav" class="side-nav"></nav>
+    <div class="sidebar-footer"><div class="side-user"><span id="sideAvatar">U</span><div><b id="sideUserName">User</b><small id="sideUserRole">User</small></div></div></div>
   </aside>
-
-  <main class="main">
-    <header class="topbar">
-      <div class="hero-title">
-        <div>Weekly Ijtima & Madani Muzakra</div>
-        <small>Reporting Dashboard</small>
+  <div class="app-main">
+    <div class="topbar">
+      <div class="topbar-title"><span class="mobile-menu" id="mobileMenu">☰</span><span class="header-lantern" aria-hidden="true">♜</span><div><h1>Weekly Ijtima &amp; Madani Muzakra</h1><small id="topSubtitle">Reporting Dashboard</small></div></div>
+      <div class="topbar-actions"><div id="dashboardClock" class="dashboard-clock"></div><button id="notificationBell" class="notification-bell" hidden title="Notifications" aria-label="Notifications"><span class="bell-symbol">🔔</span><span id="notificationBadge" class="notification-badge" hidden>0</span></button><button id="logoutBtn" class="secondary top-logout">Logout</button></div>
+    </div>
+    <div class="dashboard-content">
+      <div class="welcome-strip"><div class="welcome-icon" aria-hidden="true">♜</div><div class="welcome-copy"><span class="eyebrow">WELCOME</span><h2 id="welcome"></h2><span id="roleBadge" class="badge"></span></div><div class="welcome-mosque" aria-hidden="true">☾</div><div class="live-pill"><span>●</span> LIVE SYSTEM</div></div>
+      <section id="adminTab" class="tab" hidden>
+    <div class="card">
+      <h2>Admin</h2>
+      <div class="admin-buttons">
+        <button data-panel="adminIjtima">Add Weekly Ijtima Report</button>
+        <button data-panel="adminMuzakra">Add Weekly Madani Muzakra Report</button>
+        <button data-panel="adminVolunteer">Volunteer Data</button>
       </div>
-      <div class="top-actions">
-        <span id="clock">26 Sept 2026 • 7:06:08 pm</span>
-        <button class="icon-btn" title="Notifications">🔔</button>
-        <button class="logout" onclick="logout()">↪ Logout</button>
+    </div>
+    <div id="adminIjtima" class="card panel" hidden>
+      <h2>Weekly Ijtima Report — Master Import</h2>
+      <p>Masjid/location master file. This file is used <b>only</b> for Weekly Ijtima.</p>
+      <div class="template-actions">
+        <button id="downloadIjtimaTemplate" class="secondary">Download Excel Format</button>
+        <input id="ijtimaFile" type="file" accept=".xlsx,.xls,.csv">
+        <button id="importIjtima">Import Master File</button>
+      <p id="ijtimaMsg" class="msg"></p></div>
+      <div class="small">Expected columns: Country, Region, State, Division, District, Area, Locality, Masjid Name, Pincode, Ijtima Day.</div>
+    </div>
+    <div id="adminMuzakra" class="card panel" hidden>
+      <h2>Weekly Madani Muzakra Report</h2>
+      <p>Weekly Madani Muzakra is a <b>separate report</b>. There is no master Excel upload here.</p>
+      <p class="notice">Users submit Madani Muzakra reports separately. Its progress is shown separately from Weekly Ijtima.</p>
+    </div>
+    <div id="adminVolunteer" class="card panel" hidden>
+      <h2>Volunteer Data</h2>
+      <button id="downloadVolunteerTemplate" class="secondary">Download Excel Format</button>
+      <input id="volunteerFile" type="file" accept=".xlsx,.xls,.csv">
+      <button id="importVolunteer">Import Volunteer Data</button>
+      <p id="volunteerMsg" class="msg"></p>
+    </div>
+    <div class="card">
+      <h2>User Management</h2>
+      <div class="actions">
+        <button id="downloadUserTemplate" class="secondary">Download User Excel Format</button>
+        <input id="userFile" type="file" accept=".xlsx,.xls,.csv">
+        <button id="importUsers">Upload Users</button>
       </div>
-    </header>
-
-    <section class="welcome card">
-      <div class="lantern">🪔</div>
-      <div><span class="eyebrow">WELCOME</span><h2 id="welcomeText">Welcome, System Administrator</h2><span class="pill">Admin</span></div>
-      <span class="live">● LIVE SYSTEM</span>
-    </section>
-
-    <section id="dashboard" class="page">
-      <div class="section-title"><span class="round-icon">▣</span><h2>Reports</h2></div>
-      <div class="quick-grid">
-        <button class="quick" onclick="showPage('ijtima')"><span>▤</span>Add Weekly Ijtima Report <b>›</b></button>
-        <button class="quick" onclick="showPage('muzakra')"><span>▤</span>Add Weekly Madani Muzakra Report <b>›</b></button>
-        <button class="quick" onclick="showPage('volunteer')"><span>♟</span>Volunteer Data <b>›</b></button>
+      <p id="userImportMsg" class="msg"></p>
+      <div class="grid">
+        <input id="uId" placeholder="User ID">
+        <input id="uUsername" placeholder="Username">
+        <input id="uName" placeholder="Name">
+        <select id="uRole">
+          <option value="User">User</option><option value="District">District</option>
+          <option value="Division">Division</option><option value="State">State</option>
+          <option value="Region">Region</option><option value="HOD">HOD</option><option value="Admin">Admin</option>
+        </select>
+        <input id="uPassword" type="password" placeholder="Password">
+        <select id="uActive"><option value="TRUE">Active</option><option value="FALSE">Inactive</option></select>
       </div>
-      <div class="dashboard-grid">
-        <div class="stat card"><span>Total Ijtima</span><strong>0</strong><small>Current period</small></div>
-        <div class="stat card"><span>Madani Muzakra</span><strong>0</strong><small>Current period</small></div>
-        <div class="stat card"><span>Volunteers</span><strong>0</strong><small>Current period</small></div>
-        <div class="chart card"><h3>Ijtima & Madani Muzakra – Weekly Trend</h3><div class="bars"><i style="height:35%"></i><i style="height:52%"></i><i style="height:42%"></i><i style="height:70%"></i><i style="height:58%"></i><i style="height:78%"></i><i style="height:64%"></i><i style="height:86%"></i></div><div class="chart-labels"><span>W1</span><span>W2</span><span>W3</span><span>W4</span><span>W5</span><span>W6</span><span>W7</span><span>W8</span></div></div>
+      <h3>Access Location</h3>
+      <div class="grid">
+        <label class="location-field" data-location-field="uCountry">Country<select id="uCountry"></select></label>
+        <label class="location-field" data-location-field="uRegion">Region<select id="uRegion"></select></label>
+        <label class="location-field" data-location-field="uState">State<select id="uState"></select></label>
+        <label class="location-field" data-location-field="uDivision">Division<select id="uDivision"></select></label>
+        <label class="location-field" data-location-field="uDistrict">District<select id="uDistrict"></select></label>
+        <label class="location-field" data-location-field="uArea">Area<select id="uArea"></select></label>
+        <label class="location-field" data-location-field="uPincode">Pincode<select id="uPincode"></select></label>
       </div>
-    </section>
+      <div class="actions">
+        <button id="saveUser">Create / Update User</button>
+      </div>
+      <p id="userMsg" class="msg"></p>
+    </div></div>
+  </section>
 
-    <section id="users" class="page hidden">
-      <div class="card"><h2>User Management</h2><p class="muted">Create/update users and assign location access.</p>
-        <div class="form-grid">
-          <input placeholder="User ID"><input placeholder="Username"><input placeholder="Name">
-          <select><option>Role</option><option>Admin</option><option>User</option></select><input placeholder="Password"><select><option>Active</option><option>Inactive</option></select>
+  <section id="userTab" class="tab" hidden>
+    <div class="card">
+      <div class="section-heading"><span class="section-icon">▤</span><h2>Reports</h2></div>
+      <div class="user-buttons">
+        <button data-panel="userIjtima">Add Weekly Ijtima Report</button>
+        <button data-panel="userMuzakra">Add Weekly Madani Muzakra Report</button>
+        <button data-panel="userVolunteer">Volunteer Data</button>
+      </div>
+    </div>
+
+    <div id="userIjtima" class="card panel" hidden>
+      <h2>Weekly Ijtima Report</h2>
+      <p id="ijtimaDateInfo" class="notice"></p>
+      <label>Report Date<input id="ijtimaDate" type="date" aria-describedby="ijtimaDateHelp"></label>
+      <div id="ijtimaDateHelp" class="date-box">Report date will be limited to this Masjid's Ijtima Day.</div>
+      <div class="grid">
+        <label class="location-field" data-location-field="rCountry">Country<select id="rCountry"></select></label>
+        <label class="location-field" data-location-field="rRegion">Region<select id="rRegion"></select></label>
+        <label class="location-field" data-location-field="rState">State<select id="rState"></select></label>
+        <label class="location-field" data-location-field="rDivision">Division<select id="rDivision"></select></label>
+        <label class="location-field" data-location-field="rDistrict">District<select id="rDistrict"></select></label>
+        <label class="location-field" data-location-field="rArea">Area<select id="rArea"></select></label>
+        <label class="location-field" data-location-field="rPincode">Pincode<select id="rPincode"></select></label>
+        <label class="location-field" data-location-field="rLocality">Locality<select id="rLocality"></select></label>
+        <label class="location-field" data-location-field="rMasjid">Masjid<select id="rMasjid"></select></label>
+        <label>Ijtima Day<select id="rDay"></select></label>
+      </div>
+      <h3>Participants</h3>
+      <div class="grid participant-grid">
+        <label>Total Zimmedaran
+          <input id="totalZimmedaran" type="number" min="0" max="9999" step="1" inputmode="numeric" placeholder="Max 4 digits">
+        </label>
+        <label>Total Madaris Wale
+          <input id="totalMadarisWale" type="number" min="0" max="9999" step="1" inputmode="numeric" placeholder="Max 4 digits">
+        </label>
+        <label>Total Participants
+          <input id="participants" type="number" min="0" max="19998" step="1" readonly placeholder="Automatically calculated">
+        </label>
+        <label>Total Raat Rukne Wale
+          <input id="totalRaatRukneWale" type="number" min="0" max="9999" step="1" inputmode="numeric" placeholder="Max 4 digits">
+        </label>
+        <label>Total Gadiyan Ayi
+          <input id="totalGadiyanAyi" type="number" min="0" max="999" step="1" inputmode="numeric" placeholder="Max 3 digits">
+        </label>
+      </div>
+      <div class="yes-no-grid">
+        <label>Alakai Daura Baraye Haftawar Ijtima Hua?
+          <select id="alakaiDaura"><option value="">Select</option><option value="Yes">Yes</option><option value="No">No</option></select>
+        </label>
+        <label>Kya Langare Razawiyyah Ka Ehtimaam Hua ?
+          <select id="langareRazawiyyah"><option value="">Select</option><option value="Yes">Yes</option><option value="No">No</option></select>
+        </label>
+      </div>
+      <div class="actions">
+        <button id="saveIjtimaDraft" class="secondary">Save Draft</button>
+        <button id="submitIjtima">Submit Report</button>
+      </div>
+      <p id="reportMsg" class="msg"></p>
+    </div>
+
+    <div id="userMuzakra" class="card panel" hidden>
+      <h2>Weekly Madani Muzakra Report</h2>
+      <label>Report Date<input id="mDate" type="date" aria-describedby="muzakraDateHelp"></label><div id="muzakraDateHelp" class="date-box">Weekly Madani Muzakra: Saturday only.</div>
+      <div class="grid participant-grid">
+        <label>Maqamat<input id="mMaqamat" type="number" min="0" max="9999" step="1" inputmode="numeric" placeholder="Max 4 digits"></label>
+        <label>Participants<input id="mParticipants" type="number" min="0" max="9999" step="1" inputmode="numeric" placeholder="Max 4 digits"></label>
+      </div>
+      <div class="date-box">Maqamat ki tadad Participants se zyada nahi ho sakti.</div>
+      <button id="submitMuzakra">Submit Report</button>
+      <p id="muzakraUserMsg" class="msg"></p>
+    </div>
+
+    <div id="userVolunteer" class="card panel" hidden>
+      <h2>Volunteer Data</h2>
+      <p class="small">Volunteer report ke liye location bhi select karein. Har dropdown sirf selected parent location ka data dikhayega.</p>
+      <div class="grid">
+        <label class="location-field" data-location-field="vCountry">Country<select id="vCountry"></select></label>
+        <label class="location-field" data-location-field="vRegion">Region<select id="vRegion"></select></label>
+        <label class="location-field" data-location-field="vState">State<select id="vState"></select></label>
+        <label class="location-field" data-location-field="vDivision">Division<select id="vDivision"></select></label>
+        <label class="location-field" data-location-field="vDistrict">District<select id="vDistrict"></select></label>
+        <label class="location-field" data-location-field="vArea">Area<select id="vArea"></select></label>
+        <label class="location-field" data-location-field="vPincode">Pincode<select id="vPincode"></select></label>
+        <label class="location-field" data-location-field="vMasjid">Masjid<select id="vMasjid"></select></label>
+      </div>
+      <div class="actions">
+        <button id="downloadVolunteerTemplate" class="secondary">Download Excel Format</button>
+      </div>
+      <div id="volunteerOnlyRows"></div>
+      <button id="addVolunteerOnly" class="secondary">+ Add Volunteer</button>
+      <button id="submitVolunteer">Save Volunteer Data</button>
+      <p id="volunteerUserMsg" class="msg"></p>
+    </div>
+  </section>
+
+  <section id="progressTab" class="tab" hidden>
+    <div class="card">
+      <h2>Progress Report & Comparison</h2>
+      <div class="progress-switch">
+        <button id="progressIjtimaBtn" class="active">Weekly Ijtima</button>
+        <button id="progressMuzakraBtn" class="secondary">Madani Muzakra</button>
+      </div>
+      <div class="grid">
+        <label>From<input id="fromDate" type="date"></label>
+        <label>To<input id="toDate" type="date"></label>
+        <label>Comparison
+          <select id="compareMode"><option value="week">Week to Week</option><option value="month">Month to Month</option><option value="year">Year to Year</option></select>
+        </label>
+      </div>
+      <button id="loadProgress">Analyze</button>
+      <div id="progressSummary" class="summary-grid"></div>
+      <div class="chart-wrap"><canvas id="progressChart" height="280"></canvas></div>
+      <div id="progressResult" class="result"></div>
+    </div>
+  </section>
+  <section id="notificationTab" class="tab" hidden>
+    <div class="card notification-card">
+      <div class="notification-head">
+        <div>
+          <h2>Pending Report Notifications</h2>
+          <p class="small">Sirf aapke assigned Ijtima ki missing reports yahan show hongi.</p>
         </div>
-        <h3>Access Location</h3>
-        <div class="form-grid three">
-          <select><option>Country</option><option>India</option></select><select><option>Region</option><option>Mumbai Region</option><option>Ajmer Region</option></select><select><option>State</option></select>
-          <select><option>Division</option></select><select><option>District</option></select><select><option>Area</option></select>
-          <select><option>Pincode</option></select><select><option>Locality</option></select><select><option>Masjid</option></select>
-        </div>
-        <button class="primary">Create / Update User</button>
+        <button id="closeNotifications" class="secondary">Close</button>
       </div>
-    </section>
+      <div id="notificationResult" class="result"></div>
+    </div>
+  </section>
 
-    <section id="ijtima" class="page hidden">
-      <div class="card form-card"><h2>Weekly Ijtima Report</h2><div class="info">ⓘ Select a Masjid to determine the Ijtima Day.</div>
-        <label>Report Date</label><input type="date">
-        <div class="info">▣ Report date will be limited to this Masjid's Ijtima Day.</div>
-        <div class="form-grid three">
-          <select><option>Country</option></select><select><option>Region</option></select><select><option>State</option></select>
-          <select><option>Division</option></select><select><option>District</option></select><select><option>Area</option></select>
-          <select><option>Pincode</option></select><select><option>Locality</option></select><select><option>Masjid</option></select>
-        </div>
-        <h3>Participants</h3>
-        <div class="form-grid">
-          <input type="number" min="0" max="9999" placeholder="Total Zimmedaran (4 digits)">
-          <input type="number" min="0" max="9999" placeholder="Total Madaris Wale (4 digits)">
-          <input type="number" value="0" readonly placeholder="Total Participants">
-          <input type="number" min="0" max="9999" placeholder="Total Raat Rukne Wale (4 digits)">
-          <input type="number" min="0" max="999" placeholder="Total Gadiyan Ayi (3 digits)">
-        </div>
-        <div class="yesno-grid"><label>Alakai Daura Baraye Haftawar Ijtima Hua?</label><select><option>Yes</option><option>No</option></select><label>Kya Langare Razawiyyah Ka Ehtimaam Hua?</label><select><option>Yes</option><option>No</option></select></div>
-        <button class="primary">Submit Report</button>
-      </div>
-    </section>
-
-    <section id="muzakra" class="page hidden">
-      <div class="card form-card"><h2>Weekly Madani Muzakra Report</h2><label>Report Date — Saturday Only</label><input type="date" id="satDate"><div class="info">Weekly Madani Muzakra is Saturday only.</div>
-        <div class="form-grid"><input type="number" min="0" max="9999" placeholder="Maqamat (4 digits)"><input type="number" min="0" max="9999" placeholder="Participants (4 digits)"></div>
-        <small class="muted">Maqamat quantity cannot be greater than Participants.</small><br><br>
-        <button class="primary">Submit Report</button>
-      </div>
-    </section>
-
-    <section id="volunteer" class="page hidden"><div class="card"><h2>Volunteer Data</h2><div class="form-grid three"><select><option>Country</option></select><select><option>Region</option></select><select><option>State</option></select><select><option>Division</option></select><select><option>District</option></select><select><option>Area</option></select><select><option>Pincode</option></select></div><button class="primary">Save Volunteer</button></div></section>
-
-    <section id="progress" class="page hidden"><div class="card"><h2>Progress Report & Comparison</h2><div class="tabs"><button class="tab active">Weekly Ijtima</button><button class="tab">Madani Muzakra</button></div><div class="form-grid three"><input type="date"><input type="date"><select><option>Week to Week</option><option>Month to Month</option><option>Year to Year</option></select></div><button class="primary">Analyze</button><div class="progress-empty">No report data found for the selected period.</div></div></section>
-  </main>
+    </div>
+  </div>
+</main>
 </div>
-
-<div id="resetModal" class="modal hidden"><div class="modal-card"><button class="close" onclick="hideReset()">×</button><h2>Reset Password</h2><p>Old password verify karke new password set karein.</p><input type="password" placeholder="Old Password"><input type="password" placeholder="New Password"><input type="password" placeholder="Confirm New Password"><button class="primary full">Change Password</button></div></div>
 <script src="app.js"></script>
 </body>
 </html>

@@ -259,3 +259,209 @@ body{
   .welcome-strip:after{font-size:80px;right:12px}
   .card{padding:16px}
 }
+
+/* =========================================================
+   V24 — Reference Screenshot Visual Match
+   Visual-only layer. Existing forms/backend behavior retained.
+   ========================================================= */
+:root{
+  --ref-deep:#043a33;
+  --ref-deeper:#022f2a;
+  --ref-green:#087e70;
+  --ref-green2:#0a9483;
+  --ref-gold:#d9ad3f;
+  --ref-gold2:#f1cf72;
+  --ref-cream:#fffdf7;
+  --ref-border:#e4e8e4;
+}
+html,body{font-family:Arial,"Segoe UI",sans-serif;background:#f5f7f5}
+#dashboard{margin:0;min-height:100vh}
+
+/* LEFT SIDEBAR */
+.app-sidebar{
+  width:302px;
+  padding:27px 17px 18px;
+  background:
+    radial-gradient(circle at 12% 18%,rgba(242,201,92,.08),transparent 20%),
+    radial-gradient(circle at 88% 75%,rgba(242,201,92,.08),transparent 24%),
+    linear-gradient(180deg,#043b34 0%,#05332e 58%,#022e29 100%);
+  border-right:1px solid rgba(241,207,114,.16);
+}
+.sidebar-brand{padding:8px 10px 25px;gap:14px;border-bottom:1px solid rgba(241,207,114,.32)}
+.sidebar-logo{
+  width:52px;height:52px;border-radius:14px;background:#fff;color:#0a776c;
+  box-shadow:0 3px 0 rgba(217,173,63,.2);font-size:35px;flex:0 0 auto
+}
+.sidebar-brand strong{font-family:Arial,"Segoe UI",sans-serif;font-size:20px;line-height:1.14;max-width:205px}
+.sidebar-brand small{font-size:10px;letter-spacing:1.25px;color:#f2ca5f;margin-top:5px;font-weight:800}
+.sidebar-caption{font-size:11px;letter-spacing:2px;padding:21px 7px 10px;color:#6ee1d0}
+.side-nav{gap:9px}
+.side-nav button{
+  min-height:51px;padding:11px 13px;border-radius:12px;border:1px solid rgba(52,207,184,.24);
+  background:linear-gradient(90deg,rgba(6,107,94,.88),rgba(4,91,82,.72));
+  color:#fff;font-size:15px;font-weight:700;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05)
+}
+.side-nav button:hover,.side-nav button.active{
+  background:linear-gradient(90deg,#0b8979,#05695e);
+  box-shadow:inset 3px 0 0 #e7bd4e,0 5px 15px rgba(0,0,0,.14)
+}
+.side-nav button::after{content:"›";float:right;font-size:26px;line-height:18px;color:#e9c96c;font-weight:400}
+.sidebar-footer{padding-top:15px;border-top:1px solid rgba(241,207,114,.24)}
+.side-user{padding:10px 11px;border-radius:13px;background:rgba(5,91,80,.68);border:1px solid rgba(61,211,190,.22)}
+.side-user>span{width:42px;height:42px;font-size:15px;border:2px solid #dcb74d}
+.side-user b{font-size:13px}.side-user small{font-size:11px}
+
+/* Decorative mosque area in lower sidebar */
+.sidebar-motif{position:absolute;left:0;right:0;bottom:82px;height:255px;overflow:hidden;opacity:.9;pointer-events:none}
+.sidebar-motif:after{
+  content:"";position:absolute;left:-8%;right:-8%;bottom:-24px;height:95px;
+  background:linear-gradient(to top,rgba(1,39,35,.98),rgba(1,39,35,.25));
+  border-radius:50% 50% 0 0/30% 30% 0 0
+}
+.motif-moon{position:absolute;right:70px;top:26px;color:#eac85c;font-size:34px}
+.motif-dome{position:absolute;bottom:48px;background:linear-gradient(145deg,#0b8c7c,#064c45);border:1px solid rgba(240,202,99,.32);border-radius:90px 90px 8px 8px}
+.dome-a{left:47px;width:124px;height:100px}.dome-b{left:142px;width:94px;height:76px}
+.motif-dome:before{content:"";position:absolute;left:50%;top:-16px;transform:translateX(-50%);width:5px;height:20px;background:#d8b85c}
+.motif-dome:after{content:"";position:absolute;left:50%;top:-25px;transform:translateX(-50%);width:20px;height:20px;border-radius:50%;border:3px solid #e6c85e;border-bottom-color:transparent}
+.motif-minaret{position:absolute;bottom:41px;width:17px;height:132px;background:linear-gradient(90deg,#087d70,#06463f);border:1px solid rgba(232,197,90,.35)}
+.motif-minaret:before{content:"";position:absolute;left:-7px;top:-12px;width:29px;height:17px;border-radius:50% 50% 0 0;background:#087d70;border:1px solid rgba(232,197,90,.35)}
+.motif-minaret:after{content:"";position:absolute;left:50%;top:-31px;transform:translateX(-50%);width:4px;height:23px;background:#e2c15c}
+.min-a{left:23px}.min-b{right:29px;height:152px}
+.motif-lantern{position:absolute;color:#e9c65a;font-size:27px;text-shadow:0 0 13px rgba(255,206,72,.55)}
+.l-a{left:62px;top:18px}.l-b{right:24px;top:91px}
+
+/* MAIN / HEADER */
+.app-main{margin-left:302px;background:#f4f7f5}
+.topbar{
+  min-height:126px;height:126px;padding:18px 30px;
+  background:
+    radial-gradient(circle at 82% 30%,rgba(240,200,88,.13),transparent 22%),
+    repeating-linear-gradient(45deg,rgba(255,255,255,.025) 0 2px,transparent 2px 17px),
+    linear-gradient(115deg,#063f37,#08796d 62%,#07594f);
+  border-bottom:3px solid #d7ad3d;
+  box-shadow:0 4px 18px rgba(0,55,48,.14);
+  position:relative;overflow:hidden
+}
+.topbar:after{
+  content:"";position:absolute;right:-55px;top:-125px;width:380px;height:270px;
+  border:1px solid rgba(239,201,92,.28);border-radius:50%;transform:rotate(-16deg);pointer-events:none
+}
+.topbar-title{gap:16px;position:relative;z-index:1}
+.header-lantern{
+  width:52px;height:70px;display:grid;place-items:center;color:#f4cf6b;font-size:47px;
+  filter:drop-shadow(0 3px 5px rgba(0,0,0,.2))
+}
+.topbar-title h1{
+  font-family:Arial,"Segoe UI",sans-serif;font-weight:900;font-size:37px;line-height:1.05;
+  letter-spacing:-.7px;text-shadow:0 2px 2px rgba(0,0,0,.12)
+}
+.topbar-title small{font-size:20px;letter-spacing:.2px}
+.topbar-actions{position:relative;z-index:2;gap:12px}
+.dashboard-clock{
+  background:rgba(2,47,42,.78);border:1px solid rgba(244,208,102,.24);
+  border-radius:12px;padding:13px 16px;font-size:13px;color:#fff;white-space:nowrap
+}
+.notification-bell{
+  width:48px;height:48px;border-radius:50%;border:1px solid #ead38b!important;
+  color:#a87600!important;background:#fff!important;font-size:21px
+}
+.top-logout{height:48px;border-radius:11px!important;padding:0 19px!important;font-size:15px;background:#fff!important;color:#073b34!important;border:1px solid #e7d48e!important}
+
+/* CONTENT */
+.dashboard-content{padding:22px 22px 40px;max-width:none}
+.welcome-strip{
+  min-height:138px;margin-bottom:20px;padding:21px 28px;border-radius:16px;
+  border:2px solid #e6bd4e;border-left:4px solid #e6bd4e;
+  background:
+    radial-gradient(circle at 88% 70%,rgba(6,119,105,.07),transparent 30%),
+    linear-gradient(90deg,#fffefa,#fff);
+  box-shadow:0 4px 14px rgba(5,56,49,.07);
+  display:flex;align-items:center;justify-content:flex-start;gap:20px
+}
+.welcome-icon{
+  width:90px;height:90px;border-radius:50%;background:linear-gradient(145deg,#fff9e8,#f3ddb0);
+  color:#b98212;display:grid;place-items:center;font-size:53px;flex:0 0 auto;
+  box-shadow:inset 0 0 0 1px rgba(209,165,54,.12)
+}
+.welcome-copy{min-width:0}
+.welcome-strip h2{font-size:25px;margin:8px 0 7px;color:#10203b;letter-spacing:-.3px}
+.eyebrow{font-size:13px;letter-spacing:3px;color:#0a7b6e}
+.badge{margin-left:0;padding:8px 15px;border-radius:18px;background:#eaf7f4;color:#087d70;font-weight:800}
+.welcome-mosque{position:absolute;right:270px;bottom:-15px;font-size:125px;color:rgba(11,116,104,.045);font-weight:900}
+.live-pill{margin-left:auto;padding:11px 18px;border-radius:22px;background:#dcf7ed;color:#087b5e;font-size:12px;font-weight:900;white-space:nowrap}
+.live-pill span{font-size:14px}
+
+/* CARDS / REPORTS */
+.card{
+  padding:21px 23px;border-radius:16px;border:1px solid #e2e7e3;
+  box-shadow:0 4px 14px rgba(7,57,51,.065);margin:0 0 20px;background:#fff
+}
+.section-heading{display:flex;align-items:center;gap:15px;margin-bottom:14px}
+.section-heading h2{margin:0;font-size:27px;color:#10213c}
+.section-icon{
+  width:50px;height:50px;border-radius:50%;background:#087b6e;color:#fff;
+  display:grid;place-items:center;font-size:27px;border:4px solid #eaf7f4
+}
+.user-buttons,.admin-buttons{grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;margin:0}
+.user-buttons button,.admin-buttons button{
+  min-height:79px;padding:15px 20px;border-radius:14px;
+  display:flex;align-items:center;justify-content:flex-start;gap:15px;
+  font-size:17px;text-align:left;
+  background:
+    radial-gradient(circle at 50% 40%,rgba(241,205,104,.08),transparent 25%),
+    linear-gradient(115deg,#067d70,#045d53);
+  border:2px solid #e1b846;
+  box-shadow:0 4px 10px rgba(3,66,59,.12)
+}
+.user-buttons button:before,.admin-buttons button:before{
+  content:"▤";width:48px;height:48px;border-radius:50%;display:grid;place-items:center;
+  flex:0 0 48px;background:#ffe6a4;color:#0b6b61;font-size:27px;border:1px solid #e3bd59
+}
+.user-buttons button:nth-child(3):before,.admin-buttons button:nth-child(3):before{content:"♟";font-size:30px}
+.user-buttons button:after,.admin-buttons button:after{content:"›";margin-left:auto;font-size:33px;font-weight:300;color:#fff}
+.user-buttons button:hover,.admin-buttons button:hover{transform:none;filter:brightness(1.04)}
+
+/* FORM */
+.panel{border-left:4px solid #d9ad3f}
+.panel > h2{font-size:27px;color:#10213c;margin-bottom:17px}
+.notice,.date-box{
+  padding:12px 15px;border-radius:9px;background:#eaf7f5;border-left:0;color:#263c47;font-size:14px
+}
+.card input,.card select{
+  height:44px;border:1px solid #cbd7d9;border-radius:9px;margin:6px 0 12px;font-size:14px;
+  background:#fff
+}
+.card label{font-size:14px;color:#203543}
+.grid{gap:8px 14px}
+.panel .grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.actions{gap:10px}
+button{border-radius:9px}
+.secondary{background:#edf3f2!important}
+
+/* Keep hidden panels hidden */
+[hidden]{display:none!important}
+
+@media(max-width:1100px){
+  .app-sidebar{width:260px}.app-main{margin-left:260px}
+  .topbar-title h1{font-size:29px}.topbar-title small{font-size:16px}
+  .user-buttons,.admin-buttons{grid-template-columns:1fr}
+  .welcome-strip{min-height:120px}.welcome-mosque{right:160px}
+}
+@media(max-width:850px){
+  .app-sidebar{width:235px}.app-main{margin-left:0}
+  .topbar{height:88px;min-height:88px;padding:10px 14px}
+  .header-lantern{display:none}.topbar-title h1{font-size:21px}.topbar-title small{font-size:13px}
+  .dashboard-clock{display:none}
+  .dashboard-content{padding:14px}
+  .panel .grid,.grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:600px){
+  .topbar{min-height:72px;height:72px}.topbar-title h1{font-size:17px}.topbar-title small{font-size:11px}
+  .top-logout{height:40px;padding:0 11px!important;font-size:12px}.notification-bell{width:40px;height:40px}
+  .dashboard-content{padding:10px}.welcome-strip{min-height:100px;padding:14px;gap:10px}
+  .welcome-icon{width:58px;height:58px;font-size:33px}.welcome-strip h2{font-size:17px}.live-pill{display:none}
+  .welcome-mosque{right:10px;font-size:80px}
+  .card{padding:15px}.section-heading h2{font-size:21px}.section-icon{width:42px;height:42px;font-size:21px}
+  .user-buttons,.admin-buttons{grid-template-columns:1fr}.user-buttons button,.admin-buttons button{min-height:62px;font-size:14px}
+}
