@@ -291,7 +291,7 @@ function setIjtimaDateForDay(day){
     if(!el.value)return;
     const d=new Date(el.value+"T00:00:00");
     const names=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-    if(names[d.getDay()]!==allowed){
+    if(names[d.getDay()].toLowerCase()!==allowed.toLowerCase()){
       msg("reportMsg",`Is Masjid ka Ijtima sirf ${allowed} ko hota hai. Please ${allowed} ki date select karein.`);
       el.value="";
       return;
@@ -356,10 +356,11 @@ function setDateFieldForMasterDay(day){
 async function submitIjtima(status){
   const r=filtered()[0];
   if(!r)return msg("reportMsg","Please select a valid Masjid.");
-  const date=$("ijtimaDate")?.value||"",allowedDay=String(r.ijtimaDay||"");
+  const date=$("ijtimaDate")?.value||"",allowedDay=String(r.ijtimaDay||"").trim();
   if(!date)return msg("reportMsg","Please select the report date.");
   const d=new Date(date+"T00:00:00"),names=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-  if(!allowedDay || names[d.getDay()]!==allowedDay)return msg("reportMsg",`Is Masjid ka Ijtima sirf ${allowedDay||"selected day"} ko hota hai. Please ${allowedDay||"selected day"} ki date select karein.`);
+  const selectedDay=names[d.getDay()]||"";
+  if(!allowedDay || selectedDay.toLowerCase()!==allowedDay.toLowerCase())return msg("reportMsg",`Is Masjid ka Ijtima sirf ${allowedDay||"selected day"} ko hota hai. Please ${allowedDay||"selected day"} ki date select karein.`);
   if($("ijtimaDate").validity && !$("ijtimaDate").validity.valid)return msg("reportMsg","Please select a valid date for this Masjid's Ijtima Day.");
   const z=Number($("totalZimmedaran")?.value||0),m=Number($("totalMadarisWale")?.value||0),a=Number($("totalAwam")?.value||0),p=z+m+a;
   const night=Number($("totalRaatRukneWale")?.value||0),cars=Number($("totalGadiyanAyi")?.value||0);
