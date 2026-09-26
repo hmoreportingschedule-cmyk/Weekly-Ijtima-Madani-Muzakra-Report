@@ -1313,3 +1313,151 @@ body{margin:0}
 @media(max-width:520px){
   .location-grid,.participant-grid,.date-day-row{grid-template-columns:1fr!important}
 }
+
+
+/* =========================================================
+   FINAL ISLAMIC DASHBOARD POLISH
+   ========================================================= */
+.topbar{
+  min-height:124px!important;
+  box-sizing:border-box!important;
+  padding:14px 30px 12px 64px!important;
+  position:relative!important;
+  overflow:hidden!important;
+  background:
+    radial-gradient(circle at 82% 38%,rgba(246,214,118,.24),transparent 16%),
+    linear-gradient(105deg,#00564c 0%,#006e60 52%,#004d45 100%)!important;
+  border-bottom:3px solid #e0b84c!important;
+  box-shadow:0 5px 16px rgba(0,57,49,.20)!important;
+}
+.topbar:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    repeating-linear-gradient(55deg,transparent 0 32px,rgba(226,190,83,.09) 33px,transparent 35px),
+    radial-gradient(circle at 25% 30%,rgba(255,255,255,.07),transparent 24%);
+  pointer-events:none;
+}
+.topbar:after{
+  content:"☾   ▴  ▴  ▴  ▴  ▴";
+  position:absolute;
+  right:220px;
+  bottom:5px;
+  color:rgba(244,210,116,.72);
+  font-size:38px;
+  letter-spacing:10px;
+  white-space:nowrap;
+  pointer-events:none;
+}
+.topbar-title{
+  position:relative!important;
+  z-index:2!important;
+}
+.topbar-title h1{
+  color:#fff!important;
+  font-size:34px!important;
+  font-weight:900!important;
+  letter-spacing:-.5px!important;
+}
+.topbar-title small{
+  color:#f2cf72!important;
+  font-size:19px!important;
+  font-weight:800!important;
+}
+.topbar-actions{
+  position:relative!important;
+  z-index:4!important;
+}
+.dashboard-clock{
+  padding:10px 13px!important;
+  border-radius:10px!important;
+  background:#063d38!important;
+  color:#fff!important;
+  font-size:12px!important;
+  border:1px solid rgba(255,255,255,.15)!important;
+}
+.top-logout{
+  min-height:45px!important;
+  padding:10px 17px!important;
+  background:#fff!important;
+  color:#123d39!important;
+  font-weight:900!important;
+}
+.notification-bell{
+  width:46px!important;
+  height:46px!important;
+  border-radius:50%!important;
+  color:#a9760b!important;
+}
+
+#userIjtima{
+  padding:16px 18px 12px!important;
+}
+.ijtima-layout{
+  grid-template-columns:minmax(0,2.05fr) minmax(380px,1fr)!important;
+  gap:10px!important;
+}
+.details-section .section-title{
+  margin-bottom:8px!important;
+}
+.detail-rows{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:5px!important;
+}
+.detail-rows label{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 175px!important;
+  align-items:center!important;
+  gap:12px!important;
+  min-height:42px!important;
+  font-size:12px!important;
+  font-weight:750!important;
+}
+.detail-rows select{
+  margin:0!important;
+  height:38px!important;
+  font-weight:700!important;
+}
+.detail-rows select.yes-choice{
+  color:#087f5b!important;
+  background:#e7f8ee!important;
+  border:1px solid #55c98b!important;
+}
+.detail-rows select.no-choice{
+  color:#d22d2d!important;
+  background:#fff0f0!important;
+  border:1px solid #ef7777!important;
+}
+#saveIjtimaDraft{
+  background:#fff8e7!important;
+  color:#6f5310!important;
+  border:1px solid #e3bd57!important;
+}
+#submitIjtima{
+  background:linear-gradient(135deg,#087f70,#005b51)!important;
+  color:#fff!important;
+  border:1px solid #0b6d61!important;
+}
+#saveIjtimaDraft:disabled,#submitIjtima:disabled{
+  opacity:.55!important;
+  cursor:not-allowed!important;
+}
+#userIjtima input:disabled,#userIjtima select:disabled{
+  opacity:.78!important;
+  cursor:not-allowed!important;
+}
+@media(max-width:1100px){
+  .topbar{padding-left:25px!important}
+  .topbar-title h1{font-size:28px!important}
+  .ijtima-layout{grid-template-columns:1fr!important}
+  .detail-rows{display:grid!important;grid-template-columns:1fr!important}
+}
+@media(max-width:650px){
+  .topbar{min-height:100px!important;padding:14px 16px!important}
+  .topbar-title h1{font-size:22px!important}
+  .topbar-title small{font-size:15px!important}
+  .topbar:after{display:none}
+  .detail-rows label{grid-template-columns:1fr!important}
+}

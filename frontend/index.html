@@ -140,15 +140,15 @@
           <section class="form-section masjid-section">
             <h3 class="section-title"><span class="section-icon">⌂</span> Masjid Information</h3>
             <div class="grid location-grid">
-              <label class="location-field" data-location-field="rCountry">Country<select id="rCountry"></select></label>
-              <label class="location-field" data-location-field="rRegion">Region<select id="rRegion"></select></label>
-              <label class="location-field" data-location-field="rState">State<select id="rState"></select></label>
-              <label class="location-field" data-location-field="rDivision">Division<select id="rDivision"></select></label>
-              <label class="location-field" data-location-field="rDistrict">District<select id="rDistrict"></select></label>
-              <label class="location-field" data-location-field="rArea">Area<select id="rArea"></select></label>
-              <label class="location-field" data-location-field="rPincode">Pincode<select id="rPincode"></select></label>
-              <label class="location-field" data-location-field="rLocality">Locality<select id="rLocality"></select></label>
-              <label class="location-field" data-location-field="rMasjid">Masjid<select id="rMasjid"></select></label>
+              <label>Country<select id="rCountry"></select></label>
+              <label>Region<select id="rRegion"></select></label>
+              <label>State<select id="rState"></select></label>
+              <label>Division<select id="rDivision"></select></label>
+              <label>District<select id="rDistrict"></select></label>
+              <label>Area<select id="rArea"></select></label>
+              <label>Pincode<select id="rPincode"></select></label>
+              <label>Locality<select id="rLocality"></select></label>
+              <label>Masjid<select id="rMasjid"></select></label>
             </div>
           </section>
 
@@ -168,7 +168,7 @@
                 <div class="input-with-icon"><span>♟♟</span><input id="participants" type="number" min="0" max="29997" step="1" readonly placeholder="0000"></div>
               </label>
               <label>Total Raat Rukne Wale
-                <div class="input-with-icon"><span>♟</span><input id="totalRaatRukneWale" type="number" min="0" max="9999" step="1" inputmode="numeric" maxlength="4" placeholder="0000"></div>
+                <div class="input-with-icon"><span>▣</span><input id="totalRaatRukneWale" type="number" min="0" max="9999" step="1" inputmode="numeric" maxlength="4" placeholder="0000"></div>
               </label>
               <label>Total Gadiyan Ayi
                 <div class="input-with-icon"><span>▣</span><input id="totalGadiyanAyi" type="number" min="0" max="999" step="1" inputmode="numeric" maxlength="3" placeholder="000"></div>
@@ -188,12 +188,12 @@
           </section>
 
           <section class="form-section details-section">
-            <h3 class="section-title"><span class="section-icon">✓</span> Other Details</h3>
-            <div class="yes-no-grid three-yes-no">
+            <h3 class="section-title"><span class="section-icon">✓</span> Ijtima Details</h3>
+            <div class="detail-rows">
               <label>Alakai Daura Baraye Haftawar Ijtima Hua?
                 <select id="alakaiDaura"><option value="">Select</option><option value="Yes">Yes</option><option value="No">No</option></select>
               </label>
-              <label>Kya Langare Razawiyyah Ka Ehtimaam Hua ?
+              <label>Kya Langare Razawiyyah Ka Ehtimaam Hua?
                 <select id="langareRazawiyyah"><option value="">Select</option><option value="Yes">Yes</option><option value="No">No</option></select>
               </label>
               <label>Kya Jadwal Ishraq Tak Chala?
@@ -205,7 +205,7 @@
       </div>
 
       <div class="ijtima-actions">
-        <button id="saveIjtimaDraft" class="secondary">↻ Reset</button>
+        <button id="saveIjtimaDraft" class="secondary">▣ Save Draft</button>
         <button id="submitIjtima">▣ Save Report</button>
       </div>
       <p id="reportMsg" class="msg"></p>

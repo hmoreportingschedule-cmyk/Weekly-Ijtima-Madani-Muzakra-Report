@@ -334,6 +334,24 @@ function setYesNoStyle(id){
   if(el.value==="No")el.classList.add("no-choice");
 }
 ["alakaiDaura","langareRazawiyyah","jadwalIshraq"].forEach(id=>$(id)?.addEventListener("change",()=>setYesNoStyle(id)));
+function setDateFieldForMasterDay(day){
+  const el=$("ijtimaDate"); if(!el||!day)return;
+  const names=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  const wanted=names.findIndex(x=>x.toLowerCase()===String(day).trim().toLowerCase());
+  if(wanted<0)return;
+  const d=new Date(); let delta=(wanted-d.getDay()+7)%7; d.setDate(d.getDate()+delta);
+  const iso=d.toISOString().slice(0,10);
+  el.step="7"; el.min=iso; el.value=iso;
+  el.onchange=()=>{
+    if(!el.value)return;
+    const chosen=new Date(el.value+"T00:00:00");
+    if(chosen.getDay()!==wanted){
+      el.value="";
+      msg("reportMsg",`Only ${day} ki dates select ki ja sakti hain.`);
+    }
+  };
+}
+
 
 async function submitIjtima(status){
   const r=filtered()[0];
@@ -350,9 +368,24 @@ async function submitIjtima(status){
   if(!Number.isInteger(cars)||cars<0||cars>999)return msg("reportMsg","Total Gadiyan Ayi mein maximum 3 digits allowed hain.");
   $("participants").value=p;
   try{
-    await api("saveReport",{sessionToken:session.token,type:"Ijtima",report:{weekDate:date,...r,participants:p,totalZimmedaran:z,totalMadarisWale:m,totalAwam:a,totalRaatRukneWale:night,totalGadiyanAyi:cars,alakaiDaura:$("alakaiDaura")?.value||"",langareRazawiyyah:$("langareRazawiyyah")?.value||"",jadwalIshraq:$("jadwalIshraq")?.value||"",volunteers:[],status}});
-    msg("reportMsg",status==="Draft"?"Draft saved.":"Report submitted successfully.",true);
+    const result=await api("saveReport",{sessionToken:session.token,type:"Ijtima",report:{weekDate:date,...r,participants:p,totalZimmedaran:z,totalMadarisWale:m,totalAwam:a,totalRaatRukneWale:night,totalGadiyanAyi:cars,alakaiDaura:$("alakaiDaura")?.value||"",langareRazawiyyah:$("langareRazawiyyah")?.value||"",jadwalIshraq:$("jadwalIshraq")?.value||"",volunteers:[],status}});
+    if(status==="Submitted" && session.role!=="Admin"){
+      lockSubmittedIjtima();
+      msg("reportMsg","Report saved successfully. Submitted reports cannot be edited by User.",true);
+    }else{
+      msg("reportMsg",status==="Draft"?"Draft saved.":"Report saved successfully.",true);
+    }
+    if(result.reportId)window._lastIjtimaReportId=result.reportId;
   }catch(e){msg("reportMsg",e.message)}
+}
+function lockSubmittedIjtima(){
+  const box=$("userIjtima"); if(!box)return;
+  box.dataset.submittedLocked="1";
+  box.querySelectorAll("input,select,button").forEach(el=>{
+    if(el.id!=="saveIjtimaDraft" && el.id!=="submitIjtima") el.disabled=true;
+  });
+  $("saveIjtimaDraft").disabled=true;
+  $("submitIjtima").disabled=true;
 }
 $("saveIjtimaDraft").onclick=()=>submitIjtima("Draft");$("submitIjtima").onclick=()=>submitIjtima("Submitted");
 
