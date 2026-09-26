@@ -30,3 +30,13 @@ Run `setupSystem()` once after replacing `Code.gs`.
 
 ## Current Google Drive setup
 The script uses: My Drive / Dashboard Working / Dashboard Name / Weekly Ijtima & Muzakra. The Google Sheet file must be named `Weekly Ijtima Users`. Run `setupSystem()` once. For normal reporters use Role=`User`.
+
+
+## V.1 Feature Update
+- Separate Ijtima Master and Weekly Ijtima Report data.
+- Weekly Ijtima master import accepts Excel/CSV in browser and writes rows to Google Sheets without retaining the upload.
+- Ijtima date is calculated from each Masjid's `Ijtima Day`.
+- Admin: Weekly Ijtima Report, Weekly Madani Muzakra Report, Volunteer Data, Create/Update User, password update and access assignment.
+- User: same three report buttons with submission forms.
+- Roles: Admin, HOD, Region, State, Division, District, User.
+- Login is optimized with a cached user index; location master is loaded after login.
