@@ -26,7 +26,7 @@ async function login(){
     $("welcome").textContent="Welcome, "+session.name;$("roleBadge").textContent=session.role;
     buildNav();
     // Do not block login on the large master dataset. Load it after UI is visible.
-    setTimeout(loadLocationsFast,30);
+    setTimeout(loadLocationsFast,30);setTimeout(loadMyReports,120);
   }catch(e){msg("loginMsg",e.message)}finally{$("loginBtn").disabled=false;$("loginBtn").textContent="Login"}
 }
 $("loginBtn").onclick=login;$("password").onkeydown=e=>{if(e.key==="Enter")login()};
@@ -38,24 +38,6 @@ $("logoutBtn").onclick=async()=>{
   $("username").value="";$("password").value="";$("loginMsg").textContent="";
   document.querySelectorAll(".tab").forEach(x=>x.hidden=true);
   window.scrollTo({top:0,behavior:"smooth"});
-};
-
-$("profileBtn").onclick=async()=>{
-  document.querySelectorAll(".tab").forEach(x=>x.hidden=true);
-  $("profileTab").hidden=false;
-  document.querySelectorAll(".tabs button").forEach(x=>x.classList.remove("active"));
-  const btn=[...document.querySelectorAll(".tabs button")].find(x=>x.textContent==="User Profile");if(btn)btn.classList.add("active");
-  try{
-    const d=await api("profile",{sessionToken:session.token});
-    const p=d.profile;
-    ["UserId","Username","Name","Role","Country","Region","State","Division","District","Area","Pincode","Locality","Masjid"].forEach(k=>{
-      const el=$("profile"+k);if(el)el.textContent=p[k.charAt(0).toLowerCase()+k.slice(1)]||"All";
-    });
-    const initials=(p.name||p.username||"U").split(/\s+/).map(x=>x[0]).join("").slice(0,2).toUpperCase();
-    $("profileInitials").textContent=initials;
-    if(p.photoUrl){$("profilePhoto").src=p.photoUrl;$("profilePhoto").hidden=false;$("profileInitials").hidden=true}
-    else{$("profilePhoto").hidden=true;$("profileInitials").hidden=false}
-  }catch(e){msg("profileMsg",e.message)}
 };
 
 if($("showChangePassword"))$("showChangePassword").onclick=()=>{$("changePasswordBox").hidden=false;$("cpUserId").value=$("username").value.trim();$("cpOld").focus()};
@@ -87,11 +69,11 @@ $("changePasswordInside").onclick=async()=>{
 function buildNav(){
   $("nav").innerHTML="";
   addNav("profileTab","User Profile");
-  if(session.role==="Admin"){addNav("adminTab","Admin");addNav("progressTab","Progress Report");$("adminTab").hidden=false}
-  else{addNav("userTab","Reports");addNav("progressTab","Progress Report");$("userTab").hidden=false}
-  $("nav").querySelector("button")?.click();
+  if(session.role==="Admin"){addNav("adminTab","Admin");addNav("adminReportsTab","Reports");addNav("progressTab","Progress Report");$("adminTab").hidden=false;$("adminReportsTab").hidden=false;setTimeout(()=>document.querySelector('#nav button:nth-child(2)')?.click(),0)}
+  else{addNav("userTab","Reports");addNav("progressTab","Progress Report");$("userTab").hidden=false;setTimeout(()=>document.querySelector('#nav button:nth-child(2)')?.click(),0)}
 }
-function addNav(id,label){const b=document.createElement("button");b.textContent=label;b.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.hidden=true);$(id).hidden=false;document.querySelectorAll(".tabs button").forEach(x=>x.classList.remove("active"));b.classList.add("active")};$("nav").appendChild(b)}
+function addNav(id,label){const b=document.createElement("button");b.textContent=label;b.onclick=async()=>{document.querySelectorAll(".tab").forEach(x=>x.hidden=true);$(id).hidden=false;document.querySelectorAll(".tabs button").forEach(x=>x.classList.remove("active"));b.classList.add("active");if(id==="profileTab")await loadProfileView();};$("nav").appendChild(b)}
+async function loadProfileView(){try{const d=await api("profile",{sessionToken:session.token}),p=d.profile;["UserId","Username","Name","Role","Country","Region","State","Division","District","Area","Pincode","Locality","Masjid"].forEach(k=>{const el=$("profile"+k);if(el)el.textContent=p[k.charAt(0).toLowerCase()+k.slice(1)]||"All"});const initials=(p.name||p.username||"U").split(/\s+/).map(x=>x[0]).join("").slice(0,2).toUpperCase();$("profileInitials").textContent=initials;if(p.photoUrl){$("profilePhoto").src=p.photoUrl;$("profilePhoto").hidden=false;$("profileInitials").hidden=true}else{$("profilePhoto").hidden=true;$("profileInitials").hidden=false}}catch(e){msg("profileMsg",e.message)}}
 document.addEventListener("click",e=>{const p=e.target.dataset.panel;if(!p)return;document.querySelectorAll(".panel").forEach(x=>x.hidden=true);$(p).hidden=false});
 
 async function loadLocationsFast(){try{const d=await api("getLocations",{sessionToken:session.token});locations=d.locations||[];setupCascades();setupUserCascades();setupVolunteerCascades();if(session.role!=="Admin")document.querySelector('[data-panel="userIjtima"]')?.click()}catch(e){msg("loginMsg",e.message)}}
@@ -347,6 +329,38 @@ $("submitVolunteer").onclick=async()=>{
     msg("volunteerUserMsg","Volunteer data saved successfully.",true);
   }catch(e){msg("volunteerUserMsg",e.message)}
 };
+
+
+let editingReportId=null,editingReportType='Ijtima';
+function reportEditButton(r,type,admin=false){
+  const allowed=admin||Number(r.editCount||0)<3;
+  return allowed?`<button class="secondary report-edit-btn" data-report-id="${esc(r.reportId)}" data-report-type="${type}">Edit</button>`:`<span class="edit-limit">3/3 edits used</span>`;
+}
+function reportTable(rows,type,admin=false){
+  if(!rows.length)return '<div class="notification-empty">No reports found for the selected period.</div>';
+  return `<div class="table-wrap"><table class="progress-table"><thead><tr><th>Date</th><th>Masjid</th><th>Participants</th><th>Status</th><th>Edits</th><th>Action</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.masjidName||'Madani Muzakra')}</td><td>${fmt(r.participants)}</td><td>${esc(r.status)}</td><td>${admin?'Unlimited':String(r.editCount)+'/3'}</td><td>${reportEditButton(r,type,admin)}</td></tr>`).join('')}</tbody></table></div>`;
+}
+async function loadMyReports(){
+  try{const from=$('myFromDate')?.value||'1900-01-01',to=$('myToDate')?.value||'2999-12-31';const d=await api('listReports',{sessionToken:session.token,type:'Ijtima',from,to});$('myReportsResult').innerHTML=reportTable(d.reports,'Ijtima',false);bindReportEditors();}catch(e){$('myReportsResult').innerHTML=`<div class="error-box">${esc(e.message)}</div>`}
+}
+function bindReportEditors(){document.querySelectorAll('.report-edit-btn').forEach(b=>b.onclick=()=>openReportEditor(b.dataset.reportId,b.dataset.reportType));}
+async function openReportEditor(id,type){
+  try{const d=await api('listReports',{sessionToken:session.token,type,from:'1900-01-01',to:'2999-12-31'});const r=(d.reports||[]).find(x=>x.reportId===id);if(!r)throw Error('Report not found.');
+    editingReportId=id;editingReportType=type;
+    if(type==='Ijtima'){
+      $('editReportDate').value=r.date;$('editParticipants').value=r.participants;$('editMasjid').value=r.masjidName||'';$('editReportId').value=id;$('editReportType').value=type;
+    }else{$('editReportDate').value=r.date;$('editParticipants').value=r.participants;$('editMasjid').value='Madani Muzakra';$('editReportId').value=id;$('editReportType').value=type;}
+    $('reportEditModal').hidden=false;
+  }catch(e){alert(e.message)}
+}
+$('closeReportEditor').onclick=()=>{$('reportEditModal').hidden=true};$('closeReportEditor2').onclick=()=>{$('reportEditModal').hidden=true};
+$('saveReportEdit').onclick=async()=>{try{const type=$('editReportType').value,id=$('editReportId').value,date=$('editReportDate').value,p=Number($('editParticipants').value);if(!date||!Number.isInteger(p)||p<0)throw Error('Valid date and whole-number participants required.');const payload={reportId:id,weekDate:date,participants:p,status:'Submitted'};if(type==='Ijtima'){const d=await api('listReports',{sessionToken:session.token,type,from:'1900-01-01',to:'2999-12-31'});const r=(d.reports||[]).find(x=>x.reportId===id);Object.assign(payload,{country:r.country,region:r.region,state:r.state,division:r.division,district:r.district,area:r.area,locality:r.locality,masjidName:r.masjidName,pincode:r.pincode,ijtimaDay:r.ijtimaDay,volunteers:JSON.parse(r.volunteers||'[]')});}const d=await api('updateReport',{sessionToken:session.token,type,report:payload});msg('editReportMsg',d.message,true);setTimeout(()=>{$('reportEditModal').hidden=true;loadMyReports();loadAdminReports()},500)}catch(e){msg('editReportMsg',e.message)}};
+async function loadAdminReports(){try{const type=adminReportType,from=$('adminFromDate').value||'1900-01-01',to=$('adminToDate').value||'2999-12-31';const d=await api('listReports',{sessionToken:session.token,type,from,to});$('adminReportsResult').innerHTML=reportTable(d.reports,type,true);bindReportEditors();}catch(e){$('adminReportsResult').innerHTML=`<div class="error-box">${esc(e.message)}</div>`}}
+let adminReportType='Ijtima';
+$('loadAdminReports').onclick=loadAdminReports;
+$('adminReportIjtimaBtn').onclick=()=>{adminReportType='Ijtima';$('adminReportIjtimaBtn').classList.add('active');$('adminReportMuzakraBtn').classList.remove('active');loadAdminReports()};
+$('adminReportMuzakraBtn').onclick=()=>{adminReportType='Muzakra';$('adminReportMuzakraBtn').classList.add('active');$('adminReportIjtimaBtn').classList.remove('active');loadAdminReports()};
+$('loadMyReports').onclick=loadMyReports;
 
 function periodLabel(date,mode){const d=new Date(date);if(mode==="year")return String(d.getFullYear());if(mode==="month")return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");return String(date).slice(0,10)}
 function fmt(n){return Number(n||0).toLocaleString("en-IN",{maximumFractionDigits:0})}

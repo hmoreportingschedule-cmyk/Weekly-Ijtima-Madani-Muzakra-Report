@@ -48,13 +48,20 @@
   <div class="topbar">
     <div><b id="welcome"></b><span id="roleBadge" class="badge"></span></div>
     <div class="top-actions">
-      <button id="profileBtn" class="secondary">User Profile</button>
       <button id="logoutBtn" class="secondary">Logout</button>
     </div>
   </div>
 
   <nav id="nav" class="tabs"></nav>
 
+
+  <section id="adminReportsTab" class="tab" hidden>
+    <div class="card report-manager-card">
+      <div class="section-title-row"><div><span class="eyebrow">REPORT CONTROL</span><h2>Report View & Edit</h2><p class="small">Admin all reports view/edit kar sakta hai.</p></div><div class="progress-switch"><button id="adminReportIjtimaBtn" class="active">Weekly Ijtima</button><button id="adminReportMuzakraBtn" class="secondary">Madani Muzakra</button></div></div>
+      <div class="progress-filters"><label>From<input id="adminFromDate" type="date"></label><label>To<input id="adminToDate" type="date"></label><button id="loadAdminReports" class="analyze-btn">Load Reports</button></div>
+      <div id="adminReportsResult" class="result"></div>
+    </div>
+  </section>
   <section id="adminTab" class="tab" hidden>
     <div class="card">
       <h2>Admin</h2>
@@ -152,6 +159,10 @@
         <button data-panel="userMuzakra">Weekly Madani Muzakra Report</button>
         <button data-panel="userVolunteer">Volunteer Data</button>
       </div>
+    </div>
+    <div class="card submitted-card">
+      <div class="section-title-row"><div><span class="eyebrow">MY REPORTS</span><h3>Submitted Reports</h3><p class="small">User report maximum 3 edits. Admin can edit without this limit.</p></div><button id="loadMyReports" class="secondary">Load My Reports</button></div>
+      <div id="myReportsResult" class="result"></div>
     </div>
 
     <div id="userIjtima" class="card panel" hidden>
@@ -288,6 +299,18 @@
       <div id="notificationResult" class="result"></div>
     </div>
   </section>
+
+<div id="reportEditModal" class="modal" hidden>
+  <div class="modal-box">
+    <div class="section-title-row"><div><span class="eyebrow">REPORT EDIT</span><h2>Edit Report</h2><p class="small">User: maximum 3 edits. Admin: unlimited.</p></div><button id="closeReportEditor" class="icon-close" type="button">×</button></div>
+    <input id="editReportId" type="hidden"><input id="editReportType" type="hidden">
+    <label>Report Date<input id="editReportDate" type="date"></label>
+    <label>Masjid / Report<input id="editMasjid" disabled></label>
+    <label>Participants<input id="editParticipants" type="number" min="0" step="1"></label>
+    <div class="actions"><button id="saveReportEdit">Save Changes</button><button id="closeReportEditor2" class="secondary" type="button">Cancel</button></div>
+    <p id="editReportMsg" class="msg"></p>
+  </div>
+</div>
 </main>
 </div>
 <script src="app.js"></script>

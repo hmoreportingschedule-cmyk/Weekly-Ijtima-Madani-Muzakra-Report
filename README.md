@@ -131,3 +131,11 @@ User access schema also stores Locality and Masjid Name.
 - Progress supports Weekly, Monthly and Yearly comparisons with Actual, Target, Variance, Achievement %, Average Actual, Average Target and Average-to-Average achievement.
 - Added polished bar, line and achievement charts to the Progress Report.
 - Added login-page Reset Password UI and preserved the existing User Profile password change flow.
+
+
+## V.14 Update
+- Admin can view and edit all Ijtima/Muzakra reports from Reports management.
+- Users can edit their own reports up to 3 times; after 3 edits the Edit action is locked.
+- Profile is shown only when the single User Profile navigation button is clicked; it no longer opens automatically after login.
+- Duplicate top Profile button removed.
+- Login and dashboard UI refreshed for a more professional responsive layout.
