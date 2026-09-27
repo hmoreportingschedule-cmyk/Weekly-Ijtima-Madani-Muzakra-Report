@@ -1,0 +1,4 @@
+FINAL37 UPDATE
+- Added the user-supplied Islamic mosque/mihrab icon above Welcome Back on the login page.
+- No other login/dashboard functionality was changed.
+- Version/cache updated to FINAL37.
