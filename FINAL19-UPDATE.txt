@@ -1,0 +1,8 @@
+FINAL19 UPDATE
+
+Only requested visual fixes:
+1. Removed the right-side blank gap by correcting .app-main width from calc(100%-302px) to calc(100%-260px), matching the FINAL18 sidebar width.
+2. Kept the supplied custom-top-header.png design and made the header fill the available right edge.
+3. Kept header title/subtitle positioned inside the artwork and prevented overflow.
+4. Responsive/mobile behavior preserved.
+5. No reporting/backend/functionality changes.
