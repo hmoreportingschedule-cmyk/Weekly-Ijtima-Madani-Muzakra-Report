@@ -1,0 +1,11 @@
+FINAL15 - Masjid Unique Link + Existing Report Auto Load + 3 Edit Limit
+
+This update adds:
+- Unique secure Report Token per Ijtima Master Masjid row.
+- Admin Masjid Links panel with copyable direct links.
+- Public direct-link mode: opens the Ijtima form without login and auto-fills the linked Masjid.
+- Existing report for the selected/current Ijtima date is loaded automatically.
+- New submit creates the report; later public updates overwrite the same row.
+- Submitted report can be edited up to 3 times; after 3 updates it is locked.
+- Draft saves do not consume the 3-edit allowance.
+- Existing background remains unchanged.
