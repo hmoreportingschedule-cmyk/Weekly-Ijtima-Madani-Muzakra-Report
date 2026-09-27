@@ -2162,3 +2162,35 @@ body{margin:0}
   .login-subtitle{white-space:normal!important}
   .login-feature-row{display:none!important}
 }
+
+
+/* FINAL31 - Login left-image heading smaller and centered only. */
+.login-brand-overlay{
+  left:6%;
+  top:12.5%;
+  width:48%;
+  max-width:520px;
+  text-align:center;
+}
+.login-brand-overlay h1{
+  font-size:clamp(27px,2.45vw,38px);
+  line-height:1.08;
+  letter-spacing:0;
+  white-space:normal;
+  margin:0 auto;
+}
+.login-brand-sub{
+  margin-top:10px;
+  font-size:clamp(11px,.95vw,15px);
+  letter-spacing:3px;
+  text-align:center;
+}
+@media(max-width:1000px){
+  .login-brand-overlay{left:8%;top:14%;width:50%;}
+  .login-brand-overlay h1{font-size:29px;}
+}
+@media(max-width:600px){
+  .login-brand-overlay{left:7%;top:16%;width:55%;}
+  .login-brand-overlay h1{font-size:25px;}
+  .login-brand-sub{font-size:11px;letter-spacing:2px;}
+}

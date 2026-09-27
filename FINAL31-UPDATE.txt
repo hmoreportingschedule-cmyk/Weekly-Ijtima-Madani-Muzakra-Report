@@ -1,0 +1,1 @@
+FINAL31: Login page left-side heading made smaller and centered within the Islamic image area. No other functionality or layout changes requested.
