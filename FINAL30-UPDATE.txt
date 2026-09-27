@@ -1,0 +1,26 @@
+FINAL30 — LOGIN PAGE BACKGROUND + CONTENT POSITION FIX
+
+1. User-supplied blank Islamic background image is now the login page background:
+   frontend/assets/login-background-final30.png
+
+2. Previous login background/overlay design is removed from the login composition.
+
+3. Login content is built as HTML/CSS from the reference image, not as an image:
+   LEFT MIHRAB:
+   - Weekly Ijtima & Madani Muzakra
+   - REPORTING DASHBOARD
+
+   RIGHT MIHRAB:
+   - Welcome Back
+   - Login to access your reporting dashboard
+   - User ID
+   - Password
+   - Remember / Show Password
+   - Login
+   - Reset Password
+   - Track Progress / Manage Teams / Generate Reports
+
+4. Right login form is centered inside the right white Mihrab area.
+5. Left heading is centered inside the left large Mihrab area.
+6. Existing login JavaScript/backend functionality is preserved.
+7. Cache-busting version changed to FINAL30.
