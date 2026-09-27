@@ -1,0 +1,6 @@
+FINAL35 UPDATE
+
+Only requested change:
+- Login page left heading “Weekly Ijtima & Madani Muzakra” + “REPORTING DASHBOARD” moved another 0.5 inch to the right.
+- Right-side login panel is unchanged from FINAL34.
+- No other dashboard/login functionality or design changed.

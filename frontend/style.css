@@ -2283,3 +2283,10 @@ body{margin:0}
     top:calc(12% + 0.5in)!important;
   }
 }
+
+/* FINAL35 — Move only the login heading another 0.5in to the right. */
+@media(min-width:1001px){
+  .login-brand-overlay{
+    left:calc(11% + 1in)!important;
+  }
+}
