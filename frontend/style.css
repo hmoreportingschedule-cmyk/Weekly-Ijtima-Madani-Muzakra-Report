@@ -2369,3 +2369,12 @@ body{margin:0}
   .login-brand-sub{font-size:calc(11px + 1pt)!important;}
   .login-feature-row{margin-top:-26px!important;}
 }
+
+/* FINAL42 — Login page heading only: reduce Weekly Ijtima & Madani Muzakra by 1pt. */
+.login-brand-overlay h1,
+.login-brand-title{
+  font-size:calc(clamp(38px,3.4vw,56px) - 2pt)!important;
+}
+@media(max-width:600px){
+  .login-brand-overlay h1{font-size:calc(26px)!important;}
+}
