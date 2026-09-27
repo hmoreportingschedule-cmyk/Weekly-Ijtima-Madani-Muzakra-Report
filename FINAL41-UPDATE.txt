@@ -1,0 +1,8 @@
+FINAL41 — Login Page Minor Typography & Gap Update
+
+Only requested changes:
+1. "Weekly Ijtima & Madani Muzakra" heading reduced by 1 point.
+2. "REPORTING DASHBOARD" sub-heading increased by 1 point.
+3. Reset Password ke neeche feature line/box ka gap 0.3 inch kam kiya gaya.
+4. Existing dashboard/login functionality and design otherwise unchanged.
+5. Frontend cache version updated to FINAL41.

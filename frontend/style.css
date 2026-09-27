@@ -2352,3 +2352,20 @@ body{margin:0}
   .login-form-card .login-icon img{width:120px!important;height:120px!important;}
   .login-feature-row{margin-top:3px!important;}
 }
+
+/* FINAL41 — Login typography and Reset Password/feature gap adjustment only. */
+.login-brand-overlay h1,
+.login-brand-title{
+  font-size:calc(clamp(38px,3.4vw,56px) - 1pt)!important;
+}
+.login-brand-sub{
+  font-size:calc(clamp(11px,.95vw,15px) + 1pt)!important;
+}
+.login-feature-row{
+  margin-top:-26px!important;
+}
+@media(max-width:600px){
+  .login-brand-overlay h1{font-size:calc(26px + 1pt)!important;}
+  .login-brand-sub{font-size:calc(11px + 1pt)!important;}
+  .login-feature-row{margin-top:-26px!important;}
+}
