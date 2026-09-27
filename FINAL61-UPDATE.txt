@@ -1,0 +1,1 @@
+FINAL61: For a non-Admin/HOD login whose access resolves to exactly one Masjid in Ijtima Master, Country, Region, State, Division, District, Area, Pincode, Locality and Masjid are auto-filled and locked. Ijtima Day is also auto-filled/locked. No other feature changed.
