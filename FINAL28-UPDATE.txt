@@ -1,0 +1,8 @@
+FINAL28 – Login Mihrab Heading Center Fix
+
+Only the login page left-side heading alignment was updated.
+- Weekly Ijtima & Madani Muzakra is centered inside the large left Mihrab.
+- Reporting Dashboard is centered below the heading.
+- Heading width/line wrapping adjusted to avoid the 3-line unwanted wrap.
+- Right login panel, dashboard, backend, calendar, and other functionality are unchanged.
+- Cache versions updated to FINAL28.
