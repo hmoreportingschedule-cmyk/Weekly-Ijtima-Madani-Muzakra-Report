@@ -1,0 +1,3 @@
+FINAL44 UPDATE
+- Login page: Weekly Ijtima & Madani Muzakra heading reduced by 2 points from FINAL43.
+- No other layout, login, dashboard, or functionality changes.

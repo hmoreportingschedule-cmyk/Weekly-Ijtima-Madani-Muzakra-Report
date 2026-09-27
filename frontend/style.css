@@ -2387,3 +2387,13 @@ body{margin:0}
 @media(max-width:600px){
   .login-brand-overlay h1{font-size:calc(26px - 2.5pt)!important;}
 }
+
+
+/* FINAL44 — Login page heading only: 2pt smaller than FINAL43. */
+.login-brand-overlay h1,
+.login-brand-title{
+  font-size:calc(clamp(38px,3.4vw,56px) - 6.5pt)!important;
+}
+@media(max-width:600px){
+  .login-brand-overlay h1{font-size:calc(26px - 4.5pt)!important;}
+}
