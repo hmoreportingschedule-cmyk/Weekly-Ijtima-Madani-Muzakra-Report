@@ -1,0 +1,7 @@
+FINAL57 – THURSDAY CALENDAR CACHE + NORMALIZATION FIX
+
+Fixed the Weekly Ijtima Report Thursday calendar issue.
+- Forced a new app.js cache version (FINAL57) so browsers do not continue loading the older FINAL41 JavaScript.
+- Added additional Thursday spelling/abbreviation variants to the Ijtima Day normalizer.
+- Existing Friday, Sunday and other weekday behavior remains unchanged.
+- No backend/reporting functionality changed.

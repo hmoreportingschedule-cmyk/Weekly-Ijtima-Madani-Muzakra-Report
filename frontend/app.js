@@ -329,7 +329,7 @@ function normalizeIjtimaDay(day){
     monday:"Monday",mon:"Monday",
     tuesday:"Tuesday",tue:"Tuesday",tues:"Tuesday",
     wednesday:"Wednesday",wed:"Wednesday",
-    thursday:"Thursday",thu:"Thursday",thurs:"Thursday",thursdays:"Thursday",
+    thursday:"Thursday",thu:"Thursday",thurs:"Thursday",thursdays:"Thursday",thur:"Thursday",thurday:"Thursday",thrusday:"Thursday",thursdy:"Thursday",thursady:"Thursday",
     friday:"Friday",fri:"Friday",
     saturday:"Saturday",sat:"Saturday"
   };
