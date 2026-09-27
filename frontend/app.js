@@ -506,10 +506,15 @@ async function submitIjtima(status){
   const missingLocation=requiredLocations.find(([_,v])=>!String(v??"").trim());
   if(missingLocation)return msg("reportMsg",`${missingLocation[0]} select karna mandatory hai.`);
 
-  const allowedDay=String(r.ijtimaDay||"").trim();
-  if(!allowedDay)return msg("reportMsg","Ijtima Day is not available for this Masjid.");
-  const dayValue=String($("rDay")?.value||"").trim();
-  if(!dayValue)return msg("reportMsg","Ijtima Day select hona mandatory hai.");
+  // Normalize both the master-data day and the selected day before validating.
+  // Thursday may arrive from older/master data as Thu/Thurs/Jumerat (or with
+  // minor spelling variations), while the calendar uses the normalized name.
+  const allowedDayRaw=String(r.ijtimaDay||"").trim();
+  const allowedDay=normalizeIjtimaDay(allowedDayRaw);
+  if(!allowedDay || ijtimaDayIndex(allowedDay)<0)return msg("reportMsg","Ijtima Day is not available for this Masjid.");
+  const dayValueRaw=String($("rDay")?.value||"").trim();
+  const dayValue=normalizeIjtimaDay(dayValueRaw);
+  if(!dayValue || ijtimaDayIndex(dayValue)<0)return msg("reportMsg","Ijtima Day select hona mandatory hai.");
   if(dayValue.toLowerCase()!==allowedDay.toLowerCase())return msg("reportMsg",`Sirf ${allowedDay} ka Ijtima allowed hai.`);
 
   const date=String($("ijtimaDate")?.dataset.iso||displayToIso($("ijtimaDate")?.value)||"").trim();

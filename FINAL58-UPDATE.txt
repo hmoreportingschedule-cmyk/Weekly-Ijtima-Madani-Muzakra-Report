@@ -1,0 +1,1 @@
+FINAL58 – Fixed Weekly Ijtima Thursday validation so the selected Thursday date is accepted by both Save Draft and Submit. Master Ijtima Day and selected day are normalized before validation. No other functionality changed.
