@@ -2322,3 +2322,33 @@ body{margin:0}
   .login-form-card .login-icon{height:72px!important;}
   .login-form-card .login-icon img{width:72px!important;height:72px!important;}
 }
+
+/* FINAL39 — login heading +2pt from FINAL38 only */
+.login-brand-overlay h1,
+.login-brand-title{
+  font-size:clamp(38px,3.4vw,56px)!important;
+}
+
+/* FINAL40 — Login welcome icon +0.5in, move login box content 0.5in up, reduce Reset/feature gap 0.2in. */
+@media(min-width:1001px){
+  .login-form-card{
+    top:12%!important;
+  }
+}
+.login-form-card .login-icon{
+  height:144px!important;
+  margin:0 0 5px!important;
+}
+.login-form-card .login-icon img{
+  width:144px!important;
+  height:144px!important;
+  object-fit:contain!important;
+}
+.login-feature-row{
+  margin-top:3px!important;
+}
+@media(max-width:600px){
+  .login-form-card .login-icon{height:120px!important;}
+  .login-form-card .login-icon img{width:120px!important;height:120px!important;}
+  .login-feature-row{margin-top:3px!important;}
+}

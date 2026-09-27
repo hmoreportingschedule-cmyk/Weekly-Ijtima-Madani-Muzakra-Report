@@ -1,0 +1,4 @@
+FINAL39 UPDATE
+- Login Page left-side heading “Weekly Ijtima & Madani Muzakra” increased slightly by approximately 2 points from FINAL38.
+- Reporting Dashboard remains directly below the heading.
+- No other functionality, layout, login logic, background, icon, or dashboard changes were made.

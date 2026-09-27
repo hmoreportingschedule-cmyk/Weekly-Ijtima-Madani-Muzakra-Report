@@ -1,0 +1,8 @@
+FINAL40 UPDATE
+
+Only requested login-page spacing changes were made:
+1. Welcome Back Islamic icon increased by approximately 0.5 inch (96px -> 144px on desktop).
+2. Right-side login content/card moved upward by approximately 0.5 inch on desktop.
+3. Gap between Reset Password and the lower divider/features reduced by approximately 0.2 inch.
+4. Existing login/dashboard/backend functionality preserved.
+5. Frontend cache version updated to FINAL40.
