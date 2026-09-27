@@ -1,0 +1,4 @@
+FINAL52 – Welcome Box Background Replacement
+
+Replaced the previous Welcome dashboard background asset with the user-provided Image 2 background.
+No other dashboard functionality or welcome text was intentionally changed.
