@@ -1642,3 +1642,21 @@ body{margin:0}
 
 /* FINAL14: real calendar placement; no weekday-column forcing */
 .ijtima-calendar-grid .ijtima-calendar-day{grid-column:auto!important;grid-row:auto!important}
+
+/* FINAL16 — User supplied header + left sidebar artwork. Visual-only. */
+.topbar{
+  background-image:url("assets/custom-top-header.png")!important;
+  background-repeat:no-repeat!important;
+  background-position:center center!important;
+  background-size:100% 100%!important;
+  background-color:#063b34!important;
+}
+.topbar:before,.topbar:after{display:none!important}
+.app-sidebar{
+  background-image:url("assets/custom-left-sidebar.png")!important;
+  background-repeat:no-repeat!important;
+  background-position:center top!important;
+  background-size:100% 100%!important;
+  background-color:#003c35!important;
+}
+.app-sidebar:before,.app-sidebar:after{display:none!important}

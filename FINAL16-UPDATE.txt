@@ -1,0 +1,6 @@
+FINAL16 UPDATE
+- Added the user-supplied Image 1 as the dashboard top header artwork.
+- Added the user-supplied Image 2 as the left sidebar artwork.
+- Existing dashboard/reporting logic is unchanged.
+- Removed the previous CSS decorative pseudo-artwork so the supplied images are used directly.
+- Frontend cache version bumped to FINAL16.
