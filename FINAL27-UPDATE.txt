@@ -1,0 +1,4 @@
+FINAL27
+- Login page heading centered within the left mosque dome/mihrab area.
+- Right-side login form content centered inside the cream mihrab panel.
+- Only login visual alignment updated; existing login/dashboard/reporting functionality preserved.
