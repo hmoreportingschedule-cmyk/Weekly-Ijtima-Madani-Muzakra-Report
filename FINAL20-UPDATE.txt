@@ -1,0 +1,6 @@
+FINAL20 UPDATE
+
+1. Replaced the lower mosque artwork in the left sidebar with the supplied mosque image. The thin screenshot/menu strip at the top of the supplied image was removed before placement.
+2. Public Masjid report links now explicitly initialise the Ijtima Day field and calendar after the direct-link flow loads, so Thursday/Friday/Sunday/etc. calendar dates render and the calendar button works without relying on the normal location cascade.
+3. Calendar overlay overflow/z-index was hardened so the public calendar is not clipped by the report card/panel.
+4. Google Apps Script URL and all other reporting functionality remain unchanged.

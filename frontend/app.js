@@ -1,5 +1,4 @@
-const APP_BUILD="FINAL19";
-const APP_BUILD="FINAL15";
+const APP_BUILD="FINAL20";
 const API_URL="https://script.google.com/macros/s/AKfycbwbP22HW0lrV4vSjelbiiURjcn9E_MH1DphI5caVWMX8nwmcnkClw4kH_i9QxBXSOiqmA/exec";
 let session=null,locations=[],progressType="Ijtima",progressRows=[],publicReportToken="",publicReportMeta=null;
 
@@ -57,8 +56,27 @@ async function openPublicIjtimaLink(token){
     $('sideAvatar').textContent='IJ';
     buildNav(); document.querySelector('[data-panel="userIjtima"]')?.click();
     ['rCountry','rRegion','rState','rDivision','rDistrict','rArea','rPincode','rLocality','rMasjid'].forEach((id,i)=>{const keys=['country','region','state','division','district','area','pincode','locality','masjidName'];if($(id)){$(id).value=info.master[keys[i]]||'';$(id).disabled=true;}});
-    if($('rDay')){$('rDay').innerHTML='<option value="'+esc(info.master.ijtimaDay)+'">'+esc(info.master.ijtimaDay)+'</option>';$('rDay').value=info.master.ijtimaDay;}
-    const date=info.report?.date||info.date; setIjtimaDateValue(date||''); renderIjtimaCalendar(); fillPublicReport(info.report);
+
+    // Public Masjid link: lock the Ijtima Day to the Master value and
+    // initialise the calendar explicitly. This is important because a
+    // direct report link bypasses the normal location-cascade flow.
+    const masterDay=String(info.master.ijtimaDay||'').trim();
+    if($('rDay')){
+      $('rDay').innerHTML='<option value="'+esc(masterDay)+'">'+esc(masterDay)+'</option>';
+      $('rDay').value=masterDay;
+      $('rDay').disabled=true;
+    }
+    setupIjtimaCalendar();
+    const date=String(info.report?.date||info.date||'').trim();
+    if(date){
+      const p=date.split('-');
+      if(p.length===3) ijtimaCalendarMonth=new Date(Number(p[0]),Number(p[1])-1,1);
+      setIjtimaDateValue(date);
+    }else{
+      showIjtimaDate(masterDay);
+    }
+    showIjtimaDate(masterDay);
+    renderIjtimaCalendar();
     const locked=info.report?.status==='Submitted' && Number(info.report?.editCount||0)>=3;
     const save=$('saveIjtimaDraft'),sub=$('submitIjtima');
     if(locked){lockSubmittedIjtima(); msg('reportMsg','This report has reached the maximum 3 edits and is locked.');}
@@ -358,6 +376,8 @@ function renderIjtimaCalendar(){
 }
 function openIjtimaCalendar(){
   const input=$("ijtimaDate"),box=$("ijtimaCalendar");if(!input||!box)return;
+  const day=activeIjtimaDayName();
+  if(!day || ijtimaDayIndex(day)<0){msg("reportMsg","Ijtima Day pehle select/confirm hona zaroori hai.");return;}
   const existing=input.dataset.iso;
   if(existing){const p=existing.split("-");if(p.length===3)ijtimaCalendarMonth=new Date(Number(p[0]),Number(p[1])-1,1)}
   else ijtimaCalendarMonth=new Date();
