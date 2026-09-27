@@ -2233,3 +2233,42 @@ body{margin:0}
   .login-brand-overlay h1{font-size:25px!important;}
   .login-brand-sub{font-size:11px!important;letter-spacing:2px!important;}
 }
+
+/* FINAL33 — Slightly larger left heading + right shift; move right login panel down */
+.login-brand-overlay{
+  left:11%!important;
+  top:13%!important;
+  width:62%!important;
+  max-width:none!important;
+  text-align:center!important;
+}
+.login-brand-overlay h1{
+  font-size:clamp(30px,2.30vw,36px)!important;
+  line-height:1.10!important;
+  letter-spacing:0!important;
+  white-space:normal!important;
+  text-align:center!important;
+  margin:0 auto!important;
+}
+.login-brand-sub{
+  margin-top:10px!important;
+  font-size:clamp(11px,.95vw,15px)!important;
+  letter-spacing:2.8px!important;
+  text-align:center!important;
+  white-space:nowrap!important;
+}
+.login-form-card{
+  top:12%!important;
+  height:83%!important;
+}
+@media(max-width:1000px){
+  .login-brand-overlay{left:9%!important;top:14%!important;width:70%!important;}
+  .login-brand-overlay h1{font-size:31px!important;}
+  .login-brand-sub{font-size:12px!important;}
+  .login-form-card{top:auto!important;height:auto!important;}
+}
+@media(max-width:600px){
+  .login-brand-overlay{left:8%!important;top:16%!important;width:74%!important;}
+  .login-brand-overlay h1{font-size:26px!important;}
+  .login-brand-sub{font-size:11px!important;letter-spacing:2px!important;}
+}

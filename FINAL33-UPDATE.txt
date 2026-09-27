@@ -1,0 +1,6 @@
+FINAL33 — Login Page Small Layout Update
+
+1. Left Mihrab heading “Weekly Ijtima & Madani Muzakra” increased slightly (about 2 points) and shifted a little to the right.
+2. “REPORTING DASHBOARD” remains directly below the heading and centered with it.
+3. Right login panel/content moved slightly downward inside the right Mihrab.
+4. No other dashboard, login functionality, backend, or design changes.
