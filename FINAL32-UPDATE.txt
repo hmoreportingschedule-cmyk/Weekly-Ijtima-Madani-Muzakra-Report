@@ -1,0 +1,5 @@
+FINAL32
+- Left login heading made slightly smaller and centered inside the left Mihrab.
+- Reporting Dashboard centered directly below the heading.
+- Right login form moved slightly downward inside the white Mihrab.
+- No other functionality or dashboard content changed.
