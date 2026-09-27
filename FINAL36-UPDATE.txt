@@ -1,0 +1,8 @@
+FINAL36 UPDATE
+
+Only requested change:
+- Login page left heading “Weekly Ijtima & Madani Muzakra” font increased by approximately 1 point.
+- “REPORTING DASHBOARD” remains with the existing positioning and styling.
+- Heading position remains exactly as FINAL35.
+- Right-side login panel remains unchanged.
+- No other dashboard/login functionality or design changed.

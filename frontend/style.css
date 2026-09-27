@@ -2290,3 +2290,14 @@ body{margin:0}
     left:calc(11% + 1in)!important;
   }
 }
+
+/* FINAL36 — Increase login heading font by approximately 1 point only. */
+.login-brand-overlay h1{
+  font-size:calc(clamp(30px,2.30vw,36px) + 1pt)!important;
+}
+@media(max-width:1000px){
+  .login-brand-overlay h1{font-size:calc(31px + 1pt)!important;}
+}
+@media(max-width:600px){
+  .login-brand-overlay h1{font-size:calc(26px + 1pt)!important;}
+}
