@@ -2431,3 +2431,7 @@ body{margin:0}
 @media(max-width:600px){
   .welcome-strip{min-height:110px!important;padding:14px!important;background-size:cover!important}
 }
+
+/* FINAL47 — Remove the Welcome box circle and icon only. Keep Image 2 background/look unchanged. */
+.welcome-strip > div:first-child{padding-left:0!important}
+.welcome-strip > div:first-child:before{display:none!important;content:none!important}

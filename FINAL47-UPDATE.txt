@@ -1,0 +1,4 @@
+FINAL47 — Welcome Box Circle & Symbol Removed
+
+Only the circular icon area and its symbol were removed from the dashboard Welcome box.
+The Image 2 Islamic background/look and all other dashboard functionality remain unchanged.
