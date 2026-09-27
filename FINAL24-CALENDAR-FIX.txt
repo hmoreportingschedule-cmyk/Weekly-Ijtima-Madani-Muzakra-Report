@@ -1,0 +1,13 @@
+FINAL24 – COMPLETE IJTIMA CALENDAR FIX
+
+Root cause fixed:
+- frontend/index.html was loading app.js twice: FINAL23 (defer) and an old FINAL12 script.
+- Because APP_BUILD was declared twice, the newer script could fail with a duplicate const declaration, preventing the FINAL23 calendar code from running.
+
+Changes:
+- Removed duplicate old app.js include.
+- Frontend now loads only app.js?v=FINAL24.
+- Calendar initialization made idempotent.
+- Direct Masjid report links explicitly initialize the Ijtima calendar after the Master Ijtima Day is loaded.
+- Existing weekday logic remains: Thursday -> Thursday only, Friday -> Friday only, Sunday -> Sunday only, etc.
+- No dashboard/reporting backend changes.

@@ -1,6 +1,6 @@
-const APP_BUILD="FINAL23";
+const APP_BUILD="FINAL24";
 const API_URL="https://script.google.com/macros/s/AKfycbwbP22HW0lrV4vSjelbiiURjcn9E_MH1DphI5caVWMX8nwmcnkClw4kH_i9QxBXSOiqmA/exec";
-let session=null,locations=[],progressType="Ijtima",progressRows=[],publicReportToken="",publicReportMeta=null;
+let session=null,locations=[],progressType="Ijtima",progressRows=[],publicReportToken="",publicReportMeta=null,ijtimaCalendarReady=false;
 
 const $=id=>document.getElementById(id);
 const msg=(id,t,ok=false)=>{if($(id)){ $(id).textContent=t;$(id).style.color=ok?"#087f5b":"#c92a2a"; }};
@@ -92,6 +92,7 @@ async function openPublicIjtimaLink(token){
       showIjtimaDate(masterDay);
     }
     showIjtimaDate(masterDay);
+    setupIjtimaCalendar();
     renderIjtimaCalendar();
     const locked=info.report?.status==='Submitted' && Number(info.report?.editCount||0)>=3;
     const save=$('saveIjtimaDraft'),sub=$('submitIjtima');
@@ -435,6 +436,8 @@ function setIjtimaDateForDay(day){
 function setupIjtimaCalendar(){
   const input=$("ijtimaDate"),btn=$("ijtimaDateCalendarBtn");if(!input||!btn)return;
   input.onclick=openIjtimaCalendar;btn.onclick=openIjtimaCalendar;
+  if(ijtimaCalendarReady)return;
+  ijtimaCalendarReady=true;
   document.addEventListener("click",e=>{if(!$("ijtimaDatePicker")?.contains(e.target))closeIjtimaCalendar()});
   const dayField=$("rDay");
   if(dayField)dayField.addEventListener("change",syncIjtimaCalendarToDayField);
