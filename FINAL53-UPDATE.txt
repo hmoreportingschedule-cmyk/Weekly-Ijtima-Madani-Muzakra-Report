@@ -1,0 +1,1 @@
+FINAL53 — Removed the left-side circle/visual from the dashboard Welcome box only. Existing background, Welcome text, Admin badge, Live System badge, and all functionality remain unchanged.

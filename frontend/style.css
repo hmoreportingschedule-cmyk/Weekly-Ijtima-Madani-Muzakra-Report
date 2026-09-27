@@ -2527,3 +2527,14 @@ body{margin:0}
   .welcome-strip #roleBadge{font-size:11px!important;padding:5px 12px!important}
   .welcome-strip .live-pill{font-size:9px!important;padding:6px 9px!important}
 }
+
+/* FINAL53 — Remove the left-side circle/visual from the Welcome box only. */
+.welcome-strip:before,
+.welcome-strip > div:first-child:before{
+  display:none!important;
+  content:none!important;
+  width:0!important;
+  height:0!important;
+  background:none!important;
+  box-shadow:none!important;
+}
