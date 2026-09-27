@@ -1,0 +1,12 @@
+FINAL26 - LOGIN ALIGNMENT UPDATE
+
+Only the login page text/panel alignment was adjusted. Existing login/backend/dashboard functionality is preserved.
+
+Changes:
+- Left title is kept on the intended two-line layout and moved into the upper-left Islamic arch so it does not overlap the mosque artwork.
+- Reporting Dashboard subtitle is aligned directly under the title.
+- Right login content is aligned inside the white/gold Mihrab panel with balanced padding and width.
+- Username/password controls stay inside the panel without overflow.
+- Cache-busting version changed to FINAL26.
+
+No other dashboard/report functionality was intentionally changed.
