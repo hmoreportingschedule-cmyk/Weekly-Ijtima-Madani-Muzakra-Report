@@ -1,0 +1,3 @@
+FINAL51 — Dashboard Welcome Box updated to use the Image 2 Islamic background/design.
+Restored the welcome content over the background: dynamic “Welcome, System Administrator” (via existing session name), Admin badge, and LIVE SYSTEM status.
+No other dashboard functionality changed.

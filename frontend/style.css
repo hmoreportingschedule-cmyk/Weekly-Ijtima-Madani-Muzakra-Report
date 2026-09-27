@@ -2460,20 +2460,70 @@ body{margin:0}
   display:none!important;
 }
 
-/* FINAL50 — Welcome box: remove decorative/background artwork only; keep text/content unchanged */
+/* FINAL51 — Restore welcome text over the Image 2 Islamic welcome background. */
 .welcome-strip{
-  background:#fff!important;
-  background-image:none!important;
-  border:2px solid #e2b94f!important;
-}
-.welcome-strip:before,
-.welcome-strip:after,
-.welcome-strip > div:first-child:before{
-  display:none!important;
-  content:none!important;
-  background:none!important;
+  min-height:110px!important;
+  padding:18px 28px!important;
+  background-color:transparent!important;
+  background-image:url("assets/welcome-strip-bg-final46.png")!important;
+  background-size:100% 100%!important;
+  background-position:center!important;
+  background-repeat:no-repeat!important;
+  border:0!important;
+  border-radius:0!important;
   box-shadow:none!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
 }
 .welcome-strip > div:first-child{
-  padding-left:0!important;
+  display:block!important;
+  padding-left:23%!important;
+  position:relative!important;
+  z-index:2!important;
+}
+.welcome-strip .eyebrow{
+  display:block!important;
+  font-size:13px!important;
+  letter-spacing:3px!important;
+  color:#007f70!important;
+  font-weight:900!important;
+  margin-bottom:2px!important;
+}
+.welcome-strip #welcome{
+  display:block!important;
+  color:#102a54!important;
+  font-family:"Arial Black",Arial,sans-serif!important;
+  font-size:29px!important;
+  line-height:1.08!important;
+  margin:2px 0 8px!important;
+}
+.welcome-strip #roleBadge{
+  display:inline-block!important;
+  background:#e2f7ed!important;
+  color:#167b70!important;
+  border-radius:22px!important;
+  padding:7px 18px!important;
+  font-size:14px!important;
+  font-weight:800!important;
+}
+.welcome-strip .live-pill{
+  position:relative!important;
+  z-index:2!important;
+  background:#e2f7ed!important;
+  color:#087c5f!important;
+  border-radius:22px!important;
+  padding:8px 15px!important;
+  font-size:13px!important;
+  font-weight:800!important;
+  white-space:nowrap!important;
+  margin-right:2px!important;
+}
+@media(max-width:600px){
+  .welcome-strip{min-height:96px!important;padding:12px!important;background-size:cover!important}
+  .welcome-strip > div:first-child{padding-left:23%!important}
+  .welcome-strip .eyebrow{font-size:9px!important;letter-spacing:2px!important}
+  .welcome-strip #welcome{font-size:18px!important;margin:2px 0 5px!important}
+  .welcome-strip #roleBadge{font-size:11px!important;padding:5px 12px!important}
+  .welcome-strip .live-pill{font-size:9px!important;padding:6px 9px!important}
 }
