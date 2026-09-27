@@ -1,4 +1,4 @@
-const APP_BUILD="FINAL60";
+const APP_BUILD="FINAL62";
 const API_URL="https://script.google.com/macros/s/AKfycbwbP22HW0lrV4vSjelbiiURjcn9E_MH1DphI5caVWMX8nwmcnkClw4kH_i9QxBXSOiqmA/exec";
 let session=null,locations=[],progressType="Ijtima",progressRows=[],publicReportToken="",publicSessionToken="",publicReportMeta=null,ijtimaCalendarReady=false;
 
@@ -213,9 +213,38 @@ function applyAssignedLocationLocks(){
     ["District","district"],["Area","area"],["Pincode","pincode"],["Locality","locality"],["Masjid","masjidName"]
   ];
 
-  // The first assigned location is the user's access boundary. Everything
-  // above and including that boundary is fixed/hidden; only lower levels
-  // remain selectable.
+  // If this user has exactly one Masjid in the backend-filtered master data,
+  // show the complete Masjid Information and lock every location field.
+  // This keeps the fields visible while preventing the user from changing
+  // the assigned Masjid/location.
+  const singleMasjid = locations.length === 1 ? locations[0] : null;
+  if(singleMasjid){
+    levels.forEach(([id,key])=>{
+      const el=$("r"+id); if(!el) return;
+      const value=String(singleMasjid[key]??"").trim();
+      if(value){
+        // Ensure the assigned value is present even if the cascade had a
+        // different placeholder/value before the lock is applied.
+        el.innerHTML='<option value="'+esc(value)+'">'+esc(value)+'</option>';
+        el.value=value;
+      }else{
+        el.value="";
+      }
+      el.disabled=true;
+      const wrap=el.closest('.location-field');
+      if(wrap){wrap.classList.add('assigned-fixed');wrap.classList.remove('assigned-hidden');}
+    });
+    const day=String(singleMasjid.ijtimaDay??"").trim();
+    if($("rDay") && day){
+      $("rDay").innerHTML='<option value="'+esc(day)+'">'+esc(day)+'</option>';
+      $("rDay").value=day;
+      $("rDay").disabled=true;
+    }
+    return;
+  }
+
+  // For users with multiple accessible Masjids, preserve the existing
+  // assignment-boundary behavior.
   const assignedIndex=levels.findIndex(([id])=>{
     const v=assignedValue(id);
     return v && v.toLowerCase()!=="all";
@@ -237,35 +266,14 @@ function applyAssignedLocationLocks(){
         if(wrap) wrap.classList.remove("assigned-fixed");
       }
 
-      // Hide Country/Region/etc. once that level is the assigned boundary.
-      // Lower levels stay visible so the user can continue selecting downwards.
       if(wrap){
         const shouldHide=assignedIndex>=0 && i<=assignedIndex;
         wrap.classList.toggle("assigned-hidden",shouldHide);
       }
 
-      if(assigned && assigned.toLowerCase()!=="all"){
-        rows=rows.filter(r=>String(r[key]??"").trim()===assigned);
-      }
+      if(assigned && assigned.toLowerCase()!=="all") rows=rows.filter(r=>String(r[key]??"").trim()===assigned);
     });
-
-    // Rebuild only the visible child dropdowns from the already restricted
-    // master rows. Assigned fields retain their fixed values.
-    for(let i=0;i<levels.length;i++){
-      const [id,key]=levels[i],el=$(prefix+id);
-      if(!el) continue;
-      const wrap=el.closest(".location-field");
-      if(wrap?.classList.contains("assigned-hidden")) continue;
-      const vals=valuesForLocation(rows,key);
-      const current=el.value;
-      if(vals.length){
-        el.innerHTML='<option value="">Select</option>'+vals.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("");
-        if(vals.includes(current)) el.value=current;
-      }
-    }
   });
-
-  updateReportCascade(-1);
 }
 
 function uniq(rows,key){return [...new Set(rows.map(x=>x[key]).filter(Boolean))]}
