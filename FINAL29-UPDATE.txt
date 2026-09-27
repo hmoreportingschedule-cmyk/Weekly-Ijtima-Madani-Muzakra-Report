@@ -1,0 +1,1 @@
+FINAL29: Precise login composition fix. Full Islamic background fills the login shell. Left title is centered inside the large mosque mihrab; right login form is centered inside the cream mihrab. Existing functionality preserved.
