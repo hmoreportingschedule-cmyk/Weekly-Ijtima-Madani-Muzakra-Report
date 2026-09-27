@@ -1,0 +1,5 @@
+FINAL43 UPDATE
+
+Only one change from FINAL42:
+- Login Page: “Weekly Ijtima & Madani Muzakra” heading font size reduced by 2.5pt.
+- Reporting Dashboard, login form, icon, spacing, background, and all other functionality remain unchanged.
