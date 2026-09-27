@@ -1,0 +1,1 @@
+FINAL49 — Removed the WELCOME label, dynamic Welcome title, and role/Admin badge from the dashboard welcome strip. Kept the Image 2 Islamic background/look and LIVE SYSTEM pill unchanged. No other functionality changed.

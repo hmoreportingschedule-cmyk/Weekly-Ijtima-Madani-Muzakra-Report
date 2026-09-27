@@ -1,0 +1,1 @@
+FINAL50 — Welcome box background/decorative artwork removed only. The existing WELCOME, Welcome title, LIVE SYSTEM and Admin text/content are kept unchanged.

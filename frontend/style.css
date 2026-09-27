@@ -2449,3 +2449,31 @@ body{margin:0}
 }
 .welcome-strip > div:first-child{padding-left:0!important}
 .welcome-strip > div:first-child:before{display:none!important;content:none!important}
+
+/* FINAL49 — Remove Welcome / welcome title / Admin badge from the dashboard welcome strip. */
+.welcome-strip .eyebrow,
+.welcome-strip #welcome,
+.welcome-strip #roleBadge{
+  display:none!important;
+}
+.welcome-strip > div:first-child{
+  display:none!important;
+}
+
+/* FINAL50 — Welcome box: remove decorative/background artwork only; keep text/content unchanged */
+.welcome-strip{
+  background:#fff!important;
+  background-image:none!important;
+  border:2px solid #e2b94f!important;
+}
+.welcome-strip:before,
+.welcome-strip:after,
+.welcome-strip > div:first-child:before{
+  display:none!important;
+  content:none!important;
+  background:none!important;
+  box-shadow:none!important;
+}
+.welcome-strip > div:first-child{
+  padding-left:0!important;
+}
