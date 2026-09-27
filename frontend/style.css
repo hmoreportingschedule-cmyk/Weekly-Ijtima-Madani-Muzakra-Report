@@ -2405,3 +2405,29 @@ body{margin:0}
 @media(max-width:600px){
   .login-brand-sub{font-size:calc(11px + 4pt)!important;}
 }
+
+
+/* FINAL46 — Welcome dashboard box updated to Image 2 Islamic background/look. Visual-only. */
+.welcome-strip{
+  min-height:136px!important;
+  padding:18px 30px!important;
+  background-image:url("assets/welcome-strip-bg-final46.png")!important;
+  background-size:100% 100%!important;
+  background-position:center!important;
+  background-repeat:no-repeat!important;
+  border:2px solid #e4b83f!important;
+  border-radius:18px!important;
+  box-shadow:0 6px 18px rgba(20,72,62,.10)!important;
+}
+.welcome-strip:after{display:none!important}
+.welcome-strip > div:first-child{padding-left:128px!important}
+.welcome-strip > div:first-child:before{
+  background:#fff1d0!important;
+  color:#b17b0e!important;
+  box-shadow:inset 0 0 0 1px #ecd48c, 0 3px 8px rgba(177,123,14,.12)!important;
+}
+.welcome-strip h2{color:#102a54!important}
+.live-pill{background:#e2f7ed!important;color:#087c5f!important}
+@media(max-width:600px){
+  .welcome-strip{min-height:110px!important;padding:14px!important;background-size:cover!important}
+}

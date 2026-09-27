@@ -1,0 +1,1 @@
+FINAL46 — Dashboard welcome box updated to match the supplied Image 2 Islamic background/look. Only the welcome-strip visual styling/background was changed; dashboard functionality remains unchanged.
