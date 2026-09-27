@@ -2397,3 +2397,11 @@ body{margin:0}
 @media(max-width:600px){
   .login-brand-overlay h1{font-size:calc(26px - 4.5pt)!important;}
 }
+
+/* FINAL45 — Login page Reporting Dashboard sub-heading +3pt only. */
+.login-brand-sub{
+  font-size:calc(clamp(11px,.95vw,15px) + 4pt)!important;
+}
+@media(max-width:600px){
+  .login-brand-sub{font-size:calc(11px + 4pt)!important;}
+}
