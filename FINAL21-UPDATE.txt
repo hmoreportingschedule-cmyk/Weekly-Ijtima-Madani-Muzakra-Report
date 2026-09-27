@@ -1,0 +1,1 @@
+FINAL21: Islamic login redesign based on supplied reference pattern; preserved existing dashboard, API URL and reporting logic. Login handler hardened with validation, better error handling and one CORS-simple retry. Added login-reference-pattern.png.

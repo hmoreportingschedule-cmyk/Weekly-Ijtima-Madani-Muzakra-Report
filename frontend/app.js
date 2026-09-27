@@ -1,4 +1,4 @@
-const APP_BUILD="FINAL20";
+const APP_BUILD="FINAL21";
 const API_URL="https://script.google.com/macros/s/AKfycbwbP22HW0lrV4vSjelbiiURjcn9E_MH1DphI5caVWMX8nwmcnkClw4kH_i9QxBXSOiqmA/exec";
 let session=null,locations=[],progressType="Ijtima",progressRows=[],publicReportToken="",publicReportMeta=null;
 
@@ -6,12 +6,27 @@ const $=id=>document.getElementById(id);
 const msg=(id,t,ok=false)=>{if($(id)){ $(id).textContent=t;$(id).style.color=ok?"#087f5b":"#c92a2a"; }};
 async function api(action,payload={}){
   if(!API_URL.startsWith("http"))throw Error("Set API_URL in frontend/app.js");
-  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),30000);
-  try{
-    const r=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action,...payload}),signal:controller.signal});
-    const d=await r.json();if(!d.ok)throw Error(d.error||"Request failed");return d;
-  }catch(e){if(e.name==="AbortError")throw Error("Server response timed out. Please try again.");throw e}
-  finally{clearTimeout(timer)}
+  const body=JSON.stringify({action,...payload});
+  const request=async(contentType)=>{
+    const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),45000);
+    try{
+      const r=await fetch(API_URL,{method:"POST",headers:{"Content-Type":contentType},body,cache:"no-store",redirect:"follow",signal:controller.signal});
+      const text=await r.text();
+      let d;
+      try{d=JSON.parse(text)}catch(_){throw Error("Google Apps Script returned an invalid response. Please deploy the latest Code.gs Web App version.")}
+      if(!d.ok)throw Error(d.error||"Request failed");
+      return d;
+    }catch(e){if(e.name==="AbortError")throw Error("Server response timed out. Please try again.");throw e}
+    finally{clearTimeout(timer)}
+  };
+  try{return await request("text/plain;charset=utf-8")}catch(first){
+    // Google Apps Script Web Apps occasionally behave differently with cached/proxy requests.
+    // Retry once with another CORS-simple content type before showing the error.
+    if(/Failed to fetch|NetworkError|Load failed|invalid response/i.test(String(first.message||first))){
+      try{return await request("application/x-www-form-urlencoded;charset=UTF-8")}catch(second){throw second}
+    }
+    throw first;
+  }
 }
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function clock(){
@@ -85,9 +100,12 @@ async function openPublicIjtimaLink(token){
 }
 
 async function login(){
-  $("loginBtn").disabled=true;$("loginBtn").textContent="SIGNING IN…";msg("loginMsg","Connecting…",true);
+  const username=$("username").value.trim(),password=$("password").value;
+  if(!username||!password){msg("loginMsg","Please enter User ID and Password.");return;}
+  $("loginBtn").disabled=true;$("loginBtn").textContent="Signing in…";msg("loginMsg","Connecting to reporting server…",true);
   try{
-    const d=await api("login",{username:$("username").value.trim(),password:$("password").value});
+    const d=await api("login",{username,password});
+    if(!d||!d.user)throw Error("Login response is missing user details.");
     session=d.user;localStorage.setItem("ijtimaDashboardSession",JSON.stringify(session));$("loginCard").hidden=true;$("dashboard").hidden=false;
     $("notificationBell").hidden=false;
     $("welcome").textContent="Welcome, "+session.name;
@@ -97,11 +115,12 @@ async function login(){
     $("sideAvatar").textContent=(session.name||session.username||"U").split(/\s+/).map(x=>x[0]).join("").slice(0,2).toUpperCase();
     buildNav();
     setupMuzakraDate(); setTimeout(loadLocationsFast,20);
-  }catch(e){msg("loginMsg",e.message)}
-  finally{$("loginBtn").disabled=false;$("loginBtn").textContent="SIGN IN"}
+  }catch(e){msg("loginMsg",e.message||"Login failed. Please try again.");}
+  finally{$("loginBtn").disabled=false;$("loginBtn").textContent="↪  Login"}
 }
 $("loginBtn").onclick=login;$("password").onkeydown=e=>{if(e.key==="Enter")login()};
 $("showPassword").onchange=e=>{if($("password"))$("password").type=e.target.checked?"text":"password"};
+$("togglePasswordBtn").onclick=()=>{const p=$("password");if(!p)return;const show=p.type==="password";p.type=show?"text":"password";$("togglePasswordBtn").textContent=show?"◉":"◌"};
 setupIjtimaCalendar();
 $("resetPasswordOpen").onclick=()=>{$("resetPasswordPanel").hidden=false;$("resetUserId").value=$("username").value.trim();$("resetMsg").textContent=""};
 $("resetCancel").onclick=()=>{$("resetPasswordPanel").hidden=true;$("resetMsg").textContent=""};

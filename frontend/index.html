@@ -6,39 +6,45 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Weekly Ijtima Report</title>
-<link rel="stylesheet" href="style.css?v=FINAL20">
+<link rel="stylesheet" href="style.css?v=FINAL21">
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-<script src="app.js?v=FINAL20" defer></script>
+<script src="app.js?v=FINAL21" defer></script>
 </head>
 <body>
 <div class="app">
 <section id="loginCard" class="login-card-shell">
   <div class="login-brand-side">
-    <div class="brand-mark-large">◈</div>
-    <div class="login-brand-title">Weekly Ijtima &amp; Madani Muzakra</div>
-    <div class="login-brand-sub">Ijtima • Madani Muzakra • Volunteer Reporting</div>
-    <div class="login-brand-note">Fast, secure & location-based reporting dashboard</div>
+    <div class="login-brand-overlay">
+      <div class="brand-mark-large">◈</div>
+      <div class="login-brand-title">Weekly Ijtima &amp;<br>Madani Muzakra</div>
+      <div class="login-brand-sub">REPORTING SYSTEM</div>
+      <div class="login-brand-note">Weekly Ijtima • Madani Muzakra • Volunteer Reporting</div>
+    </div>
   </div>
   <div class="login-form-card">
-    <div class="login-icon">🔐</div>
-    <h2>Welcome Back</h2>
-    <p class="login-subtitle">Sign in to continue to your reporting dashboard</p>
-    <label>User ID</label>
-    <input id="username" placeholder="Enter User ID" autocomplete="username">
-    <label>Password</label>
-    <input id="password" type="password" placeholder="Enter password" autocomplete="current-password">
-    <label class="check-row"><input id="showPassword" type="checkbox"> <span>Show Password</span></label>
-    <button id="loginBtn" class="login-primary">SIGN IN</button>
-    <button id="resetPasswordOpen" class="login-reset-link" type="button">Reset Password</button>
-    <p id="loginMsg" class="msg"></p>
-    <div id="resetPasswordPanel" class="reset-panel" hidden>
-      <div class="reset-title">Reset Password</div>
-      <input id="resetUserId" placeholder="User ID">
-      <input id="resetOldPassword" type="password" placeholder="Old Password">
-      <input id="resetNewPassword" type="password" placeholder="New Password">
-      <input id="resetConfirmPassword" type="password" placeholder="Confirm New Password">
-      <div class="reset-actions"><button id="resetPasswordBtn" type="button">Update Password</button><button id="resetCancel" type="button" class="secondary">Cancel</button></div>
-      <p id="resetMsg" class="msg"></p>
+    <div class="login-form-arch">
+      <div class="login-icon">⌂</div>
+      <h2>Welcome Back</h2>
+      <p class="login-subtitle">Login to access your reporting dashboard</p>
+      <div class="login-divider"></div>
+      <label for="username">User ID</label>
+      <div class="login-input-wrap"><span>♙</span><input id="username" placeholder="Enter User ID" autocomplete="username"></div>
+      <label for="password">Password</label>
+      <div class="login-input-wrap"><span>▣</span><input id="password" type="password" placeholder="Enter password" autocomplete="current-password"><button id="togglePasswordBtn" type="button" class="password-toggle" aria-label="Show password">◉</button></div>
+      <label class="check-row"><input id="showPassword" type="checkbox"> <span>Remember / Show Password</span></label>
+      <button id="loginBtn" class="login-primary" type="button">↪ &nbsp; Login</button>
+      <button id="resetPasswordOpen" class="login-reset-link" type="button">Reset Password</button>
+      <p id="loginMsg" class="msg"></p>
+      <div id="resetPasswordPanel" class="reset-panel" hidden>
+        <div class="reset-title">Reset Password</div>
+        <input id="resetUserId" placeholder="User ID">
+        <input id="resetOldPassword" type="password" placeholder="Old Password">
+        <input id="resetNewPassword" type="password" placeholder="New Password">
+        <input id="resetConfirmPassword" type="password" placeholder="Confirm New Password">
+        <div class="reset-actions"><button id="resetPasswordBtn" type="button">Update Password</button><button id="resetCancel" type="button" class="secondary">Cancel</button></div>
+        <p id="resetMsg" class="msg"></p>
+      </div>
+      <div class="login-feature-row"><span>▥<small>Track<br>Progress</small></span><span>♟<small>Manage<br>Teams</small></span><span>▤<small>Generate<br>Reports</small></span></div>
     </div>
   </div>
 </section>
