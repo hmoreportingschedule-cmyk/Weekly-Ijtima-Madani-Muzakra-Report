@@ -2538,3 +2538,15 @@ body{margin:0}
   background:none!important;
   box-shadow:none!important;
 }
+
+/* FINAL54 — Welcome box background height +0.5 inch and welcome text group shifted 2 inches left. */
+.welcome-strip{
+  min-height:158px!important;
+}
+.welcome-strip > div:first-child{
+  padding-left:calc(23% - 192px)!important;
+}
+@media(max-width:600px){
+  .welcome-strip{min-height:144px!important}
+  .welcome-strip > div:first-child{padding-left:calc(23% - 48px)!important}
+}

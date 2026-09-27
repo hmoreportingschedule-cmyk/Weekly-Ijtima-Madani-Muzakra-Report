@@ -1,0 +1,1 @@
+FINAL54 — Increased the dashboard Welcome box background height by 0.5 inch (48px) and shifted the WELCOME / Welcome, System Administrator / Admin text group 2 inches (192px) to the left. No other functionality changed.
