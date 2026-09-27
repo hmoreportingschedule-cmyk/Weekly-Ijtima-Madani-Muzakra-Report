@@ -2308,17 +2308,17 @@ body{margin:0}
   display:flex!important;
   align-items:center!important;
   justify-content:center!important;
-  height:54px!important;
+  height:96px!important;
   margin:0 0 5px!important;
   line-height:1!important;
 }
 .login-form-card .login-icon img{
-  width:54px!important;
-  height:54px!important;
+  width:96px!important;
+  height:96px!important;
   object-fit:contain!important;
   display:block!important;
 }
 @media(max-width:600px){
-  .login-form-card .login-icon{height:48px!important;}
-  .login-form-card .login-icon img{width:48px!important;height:48px!important;}
+  .login-form-card .login-icon{height:72px!important;}
+  .login-form-card .login-icon img{width:72px!important;height:72px!important;}
 }

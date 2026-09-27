@@ -1,0 +1,1 @@
+FINAL38 — Login Page Welcome Back icon increased to approximately 1 inch (96px) on desktop; mobile uses 72px. No other UI or functionality changes.
