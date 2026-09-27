@@ -1,0 +1,1 @@
+FINAL17 visual-only update: compacted left sidebar width, narrowed the right Ijtima panel from its left edge while preserving the right edge, and repositioned header title/subtitle inside the supplied header artwork. No reporting logic changed. Frontend cache version bumped to FINAL17.

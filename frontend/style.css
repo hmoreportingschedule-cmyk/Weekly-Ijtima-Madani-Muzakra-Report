@@ -1660,3 +1660,64 @@ body{margin:0}
   background-color:#003c35!important;
 }
 .app-sidebar:before,.app-sidebar:after{display:none!important}
+
+
+/* FINAL17 — compact sidebar, narrower right report panel, correctly positioned header text */
+.app-sidebar{
+  width:260px!important;
+}
+.app-main{
+  margin-left:260px!important;
+}
+.ijtima-layout{
+  grid-template-columns:minmax(0,2.28fr) minmax(325px,.82fr)!important;
+  gap:12px!important;
+}
+.topbar{
+  min-height:142px!important;
+  padding:12px 28px 12px 128px!important;
+  display:flex!important;
+  align-items:center!important;
+}
+.topbar-title{
+  flex:1 1 auto!important;
+  min-width:0!important;
+  align-self:center!important;
+  transform:translateY(1px);
+}
+.topbar-title h1{
+  margin:0!important;
+  font-size:34px!important;
+  line-height:1.04!important;
+  white-space:nowrap!important;
+  max-width:780px!important;
+  color:#fff!important;
+  text-shadow:0 2px 3px rgba(0,0,0,.24)!important;
+}
+.topbar-title small{
+  display:block!important;
+  margin-top:7px!important;
+  font-size:19px!important;
+  line-height:1.1!important;
+  color:#f0cf6b!important;
+  opacity:1!important;
+  font-weight:900!important;
+}
+.topbar-actions{
+  flex:0 0 auto!important;
+  align-self:center!important;
+}
+@media(max-width:1100px){
+  .app-sidebar{width:260px!important}
+  .app-main{margin-left:260px!important}
+  .topbar{padding-left:95px!important}
+  .topbar-title h1{font-size:28px!important;max-width:650px!important}
+  .ijtima-layout{grid-template-columns:1fr!important}
+}
+@media(max-width:850px){
+  .app-sidebar{width:220px!important}
+  .app-main{margin-left:0!important}
+  .topbar{padding-left:55px!important}
+  .topbar-title h1{font-size:23px!important;white-space:normal!important}
+  .topbar-title small{font-size:15px!important}
+}
