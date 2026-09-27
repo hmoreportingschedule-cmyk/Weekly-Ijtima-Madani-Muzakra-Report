@@ -1,0 +1,12 @@
+FINAL60 UPDATE
+
+Weekly Ijtima Masjid Report Link advanced features added:
+1. Admin Generate Masjid Report Links table now includes Report Submitter Name and Contact Number. Admin can save these details and click Share Link; the link is copied.
+2. Shared Masjid report links now require User ID and Password. Both are the configured Report Submitter Contact Number.
+3. Public Masjid report users can use the calendar to view previous Ijtima weeks. Previous reports are read-only.
+4. A report can be submitted/updated only on the Ijtima date and for the following 3 calendar days. Example Friday -> Monday; Thursday -> Sunday.
+5. Existing submitted reports can show Update Report during the 3-day window; after that they are View Only.
+6. Thursday spelling variants including Thurday/Thu are normalized server-side.
+7. Ijtima master template supports Report Token, Report Submitter Name, and Report Submitter Contact columns.
+
+Only the requested Weekly Ijtima Masjid-link/report access features were updated.

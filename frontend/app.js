@@ -1,6 +1,6 @@
-const APP_BUILD="FINAL24";
+const APP_BUILD="FINAL60";
 const API_URL="https://script.google.com/macros/s/AKfycbwbP22HW0lrV4vSjelbiiURjcn9E_MH1DphI5caVWMX8nwmcnkClw4kH_i9QxBXSOiqmA/exec";
-let session=null,locations=[],progressType="Ijtima",progressRows=[],publicReportToken="",publicReportMeta=null,ijtimaCalendarReady=false;
+let session=null,locations=[],progressType="Ijtima",progressRows=[],publicReportToken="",publicSessionToken="",publicReportMeta=null,ijtimaCalendarReady=false;
 
 const $=id=>document.getElementById(id);
 const msg=(id,t,ok=false)=>{if($(id)){ $(id).textContent=t;$(id).style.color=ok?"#087f5b":"#c92a2a"; }};
@@ -43,16 +43,44 @@ setInterval(clock,1000);clock();
 function publicApi(action,payload={}){ return api(action,payload); }
 function isoToDisplay(iso){if(!iso)return '';const p=String(iso).split('-');return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:'';}
 async function refreshPublicReportForDate(date){
-  if(!publicReportToken||!date)return;
+  if(!publicReportToken||!publicSessionToken||!date)return;
   try{
-    const info=await publicApi('ijtimaPublicInfo',{reportToken:publicReportToken,date});
+    const info=await publicApi('ijtimaPublicInfo',{publicSessionToken,date});
     publicReportMeta=info;
-    if(info.report){fillPublicReport(info.report);msg('reportMsg',info.report.status==='Submitted'?`Existing report loaded. ${Number(info.report.editCount||0)}/3 edits used.`:'Draft report loaded.',true);}
-    else {fillPublicReport(null);['totalZimmedaran','totalMadarisWale','totalAwam','participants','totalRaatRukneWale','totalGadiyanAyi','alakaiDaura','langareRazawiyyah','jadwalIshraq'].forEach(id=>{if($(id))$(id).value='';});msg('reportMsg','No report found for this date. New report ready.',true);}
-    if(info.report?.status==='Submitted'&&Number(info.report.editCount||0)>=3)lockSubmittedIjtima();
+    if(info.report){fillPublicReport(info.report);msg('reportMsg',info.canEdit?(info.report.status==='Submitted'?`Existing report loaded. Update allowed until 3 days after Ijtima.`:'Draft report loaded.'):`Previous report loaded — View Only.`,true);}
+    else {fillPublicReport(null);['totalZimmedaran','totalMadarisWale','totalAwam','participants','totalRaatRukneWale','totalGadiyanAyi','alakaiDaura','langareRazawiyyah','jadwalIshraq'].forEach(id=>{if($(id))$(id).value='';});msg('reportMsg',info.canEdit?'No report found for this date. New report ready.':'No report found for this previous date.',true);}
+    applyPublicReportAccess(info);
   }catch(e){msg('reportMsg',e.message);}
 }
+function applyPublicReportAccess(info){
+  if(!publicReportToken)return;
+  const canEdit=!!info?.canEdit;
+  const save=$('saveIjtimaDraft'),sub=$('submitIjtima');
+  if(save)save.disabled=!canEdit;
+  if(sub){sub.disabled=!canEdit;sub.textContent=canEdit?(info?.report?.status==='Submitted'?'▣ Update Report':'▣ Submit Report'):'View Only';}
+  ['totalZimmedaran','totalMadarisWale','totalAwam','totalRaatRukneWale','totalGadiyanAyi','alakaiDaura','langareRazawiyyah','jadwalIshraq'].forEach(id=>{if($(id))$(id).disabled=!canEdit;});
+  const date=$('ijtimaDate');if(date)date.disabled=false;
+  const btn=$('ijtimaDateCalendarBtn');if(btn)btn.disabled=false;
+}
 
+async function refreshUserReportForDate(date){
+  if(publicReportToken||!session?.token||!date)return;
+  try{
+    const rows=filtered();if(!rows.length)return;
+    const info=await api('ijtimaUserInfo',{sessionToken:session.token,date,report:{masjidName:rows[0].masjidName,pincode:rows[0].pincode}});
+    publicReportMeta=info;
+    if(info.report){fillPublicReport(info.report);msg('reportMsg',info.canEdit?(info.report.status==='Submitted'?'Existing report loaded. Update Report is available until 3 days after Ijtima.':'Draft report loaded.'):'Previous report loaded — View Only.',true);}
+    else {['totalZimmedaran','totalMadarisWale','totalAwam','participants','totalRaatRukneWale','totalGadiyanAyi','alakaiDaura','langareRazawiyyah','jadwalIshraq'].forEach(id=>{if($(id))$(id).value='';});msg('reportMsg',info.canEdit?'No report found for this Ijtima date. New report ready.':'No report found for this previous date.',true);}
+    const save=$('saveIjtimaDraft'),sub=$('submitIjtima'),canEdit=!!info.canEdit;
+    if(save)save.disabled=!canEdit;
+    if(sub){sub.disabled=!canEdit;sub.textContent=canEdit?(info.report?.status==='Submitted'?'▣ Update Report':'▣ Submit Report'):'View Only';}
+    ['totalZimmedaran','totalMadarisWale','totalAwam','totalRaatRukneWale','totalGadiyanAyi','alakaiDaura','langareRazawiyyah','jadwalIshraq'].forEach(id=>{if($(id))$(id).disabled=!canEdit;});
+  }catch(e){msg('reportMsg',e.message);}
+}
+function mostRecentIjtimaDateClient(day){
+  const idx=ijtimaDayIndex(day);if(idx<0)return '';
+  const d=new Date(),diff=(d.getDay()-idx+7)%7;d.setDate(d.getDate()-diff);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
 function fillPublicReport(rep){
   if(!rep)return;
   const set=(id,v)=>{if($(id))$(id).value=v??''};
@@ -60,45 +88,32 @@ function fillPublicReport(rep){
   set('totalZimmedaran',rep.totalZimmedaran); set('totalMadarisWale',rep.totalMadarisWale); set('totalAwam',rep.totalAwam); set('participants',rep.participants); set('totalRaatRukneWale',rep.totalRaatRukneWale); set('totalGadiyanAyi',rep.totalGadiyanAyi); set('alakaiDaura',rep.alakaiDaura); set('langareRazawiyyah',rep.langareRazawiyyah); set('jadwalIshraq',rep.jadwalIshraq);
 }
 async function openPublicIjtimaLink(token){
-  try{
-    publicReportToken=token;
-    const info=await publicApi('ijtimaPublicInfo',{reportToken:token});
-    publicReportMeta=info;
-    session={token:'',userId:'PUBLIC',username:'Public Link',name:info.master.masjidName,role:'Public'};
-    locations=[info.master];
-    $('loginCard').hidden=true;$('dashboard').hidden=false;$('notificationBell').hidden=true;
-    $('welcome').textContent='Weekly Ijtima Report — '+info.master.masjidName;
-    $('roleBadge').textContent='Direct Report Link'; $('sideUserName').textContent=info.master.masjidName; $('sideUserRole').textContent='Direct Link';
-    $('sideAvatar').textContent='IJ';
-    buildNav(); document.querySelector('[data-panel="userIjtima"]')?.click();
-    ['rCountry','rRegion','rState','rDivision','rDistrict','rArea','rPincode','rLocality','rMasjid'].forEach((id,i)=>{const keys=['country','region','state','division','district','area','pincode','locality','masjidName'];if($(id)){$(id).value=info.master[keys[i]]||'';$(id).disabled=true;}});
-
-    // Public Masjid link: lock the Ijtima Day to the Master value and
-    // initialise the calendar explicitly. This is important because a
-    // direct report link bypasses the normal location-cascade flow.
-    const masterDay=String(info.master.ijtimaDay||'').trim();
-    if($('rDay')){
-      $('rDay').innerHTML='<option value="'+esc(masterDay)+'">'+esc(masterDay)+'</option>';
-      $('rDay').value=masterDay;
-      $('rDay').disabled=true;
-    }
-    setupIjtimaCalendar();
-    const date=String(info.report?.date||info.date||'').trim();
-    if(date){
-      const p=date.split('-');
-      if(p.length===3) ijtimaCalendarMonth=new Date(Number(p[0]),Number(p[1])-1,1);
-      setIjtimaDateValue(date);
-    }else{
-      showIjtimaDate(masterDay);
-    }
-    showIjtimaDate(masterDay);
-    setupIjtimaCalendar();
-    renderIjtimaCalendar();
-    const locked=info.report?.status==='Submitted' && Number(info.report?.editCount||0)>=3;
-    const save=$('saveIjtimaDraft'),sub=$('submitIjtima');
-    if(locked){lockSubmittedIjtima(); msg('reportMsg','This report has reached the maximum 3 edits and is locked.');}
-    else {if(sub)sub.textContent=info.report?.status==='Submitted'?'▣ Update & Submit':'▣ Submit Report'; if(save)save.disabled=info.report?.status==='Submitted';if(sub)sub.disabled=false; msg('reportMsg',info.report?.status==='Submitted'?`Existing report loaded. ${Number(info.report.editCount||0)}/3 edits used.`:'New report — ready to submit.',true);}
-  }catch(e){$('loginCard').hidden=false;msg('loginMsg',e.message);}
+  publicReportToken=token;publicSessionToken='';publicReportMeta=null;
+  $('loginCard').hidden=false;$('dashboard').hidden=true;
+  $('username').value='';$('password').value='';
+  $('username').placeholder='Enter Contact Number';$('password').placeholder='Enter Contact Number';
+  $('loginMsg').textContent='';
+  const title=document.querySelector('.login-form-card h2'),sub=document.querySelector('.login-form-card .login-subtitle');
+  if(title)title.textContent='Masjid Report Login';
+  if(sub)sub.textContent='User ID & Password dono Contact Number hain';
+  $('resetPasswordOpen')?.setAttribute('hidden','hidden');
+  $('loginBtn').textContent='↪  Open Report';
+}
+async function startPublicDashboard(info){
+  session={token:'',userId:'PUBLIC',username:info.master.submitterContact,name:info.master.submitterName||info.master.masjidName,role:'Public'};
+  locations=[info.master];
+  $('loginCard').hidden=true;$('dashboard').hidden=false;$('notificationBell').hidden=true;
+  $('welcome').textContent='Weekly Ijtima Report — '+info.master.masjidName;
+  $('roleBadge').textContent='Direct Report Link';$('sideUserName').textContent=info.master.submitterName||info.master.masjidName;$('sideUserRole').textContent='Direct Link';$('sideAvatar').textContent='IJ';
+  buildNav();document.querySelector('[data-panel="userIjtima"]')?.click();
+  ['rCountry','rRegion','rState','rDivision','rDistrict','rArea','rPincode','rLocality','rMasjid'].forEach((id,i)=>{const keys=['country','region','state','division','district','area','pincode','locality','masjidName'];if($(id)){$(id).value=info.master[keys[i]]||'';$(id).disabled=true;}});
+  const masterDay=String(info.master.ijtimaDay||'').trim();
+  if($('rDay')){$('rDay').innerHTML='<option value="'+esc(masterDay)+'">'+esc(masterDay)+'</option>';$('rDay').value=masterDay;$('rDay').disabled=true;}
+  setupIjtimaCalendar();
+  const date=String(info.date||'').trim();
+  if(date){const p=date.split('-');if(p.length===3)ijtimaCalendarMonth=new Date(Number(p[0]),Number(p[1])-1,1);setIjtimaDateValue(date);}else{showIjtimaDate(masterDay);}
+  renderIjtimaCalendar();
+  await refreshPublicReportForDate(date);
 }
 
 async function login(){
@@ -106,6 +121,12 @@ async function login(){
   if(!username||!password){msg("loginMsg","Please enter User ID and Password.");return;}
   $("loginBtn").disabled=true;$("loginBtn").textContent="Signing in…";msg("loginMsg","Connecting to reporting server…",true);
   try{
+    if(publicReportToken){
+      const d=await api("ijtimaPublicLogin",{reportToken:publicReportToken,username,password});
+      publicSessionToken=d.accessToken;
+      await startPublicDashboard(d);
+      return;
+    }
     const d=await api("login",{username,password});
     if(!d||!d.user)throw Error("Login response is missing user details.");
     session=d.user;localStorage.setItem("ijtimaDashboardSession",JSON.stringify(session));$("loginCard").hidden=true;$("dashboard").hidden=false;
@@ -361,6 +382,8 @@ function setIjtimaDateValue(iso){
   el.value=isoToDisplay(iso);
   renderIjtimaCalendar();
 }
+function todayIso_(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}
+function isoCompare_(a,b){return String(a).localeCompare(String(b));}
 function renderIjtimaCalendar(){
   const box=$("ijtimaCalendar"),input=$("ijtimaDate");if(!box||!input)return;
   const wantedName=activeIjtimaDayName();
@@ -388,11 +411,13 @@ function renderIjtimaCalendar(){
     const date=new Date(Date.UTC(y,m,day));
     const weekdayIndex=date.getUTCDay();
     const dayName=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][weekdayIndex];
-    const allowed=weekdayIndex===wanted;
     const iso=`${y}-${String(m+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+    const allowed=weekdayIndex===wanted;
+    const isFuture=isoCompare_(iso,todayIso_())>0;
+    const selectable=allowed && (!publicReportToken || !isFuture);
     const sel=iso===selected;
     const todayCls=(today.getFullYear()===y&&today.getMonth()===m&&today.getDate()===day)?" today":"";
-    html+=`<button type="button" class="ijtima-calendar-day${allowed?" allowed":""}${sel?" selected":""}${todayCls}" data-iso="${iso}" data-weekday="${dayName}" data-weekday-index="${weekdayIndex}" ${allowed?"":"disabled"}>${day}</button>`;
+    html+=`<button type="button" class="ijtima-calendar-day${selectable?" allowed":""}${sel?" selected":""}${todayCls}" data-iso="${iso}" data-weekday="${dayName}" data-weekday-index="${weekdayIndex}" ${selectable?"":"disabled"}>${day}</button>`;
   }
   html+='</div><div class="ijtima-calendar-note">Sirf <b>'+esc(wantedName)+'</b> ki dates select ki ja sakti hain.</div>';
   box.innerHTML=html;
@@ -402,7 +427,7 @@ function renderIjtimaCalendar(){
   });
   box.querySelectorAll(".ijtima-calendar-day.allowed").forEach(b=>b.onclick=()=>{
     setIjtimaDateValue(b.dataset.iso);
-    if(publicReportToken)refreshPublicReportForDate(b.dataset.iso);
+    if(publicReportToken)refreshPublicReportForDate(b.dataset.iso);else refreshUserReportForDate(b.dataset.iso);
     box.hidden=true;
     input.setAttribute("aria-expanded","false");
     msg("reportMsg","");
@@ -562,6 +587,7 @@ async function submitIjtima(status){
     const result=await api(publicReportToken?"ijtimaPublicSave":"saveReport",{
       sessionToken:session.token,
       publicToken:publicReportToken||undefined,
+      publicSessionToken:publicSessionToken||undefined,
       reportToken:publicReportToken||undefined,
       type:"Ijtima",
       report:{
@@ -573,15 +599,12 @@ async function submitIjtima(status){
       }
     });
     if(result.reportId)window._lastIjtimaReportId=result.reportId;
-    if(status==="Submitted"){
-      if(publicReportToken){
-        const used=(publicReportMeta?.report?.status==='Submitted'?Number(publicReportMeta.report.editCount||0)+1:0);
-        if(publicReportMeta?.report?.status==='Submitted' && used>=3){lockSubmittedIjtima();msg("reportMsg","Report submitted. 3/3 edits used — report is now locked.",true);}
-        else {if(publicReportMeta?.report)publicReportMeta.report.editCount=used; if(save)save.disabled=true; msg("reportMsg",publicReportMeta?.report?.status==='Submitted'?`Report updated successfully. ${used}/3 edits used.`:'Report submitted successfully. You can edit it up to 3 times.',true);}
-      }else{lockSubmittedIjtima();msg("reportMsg","Report submitted successfully. Ab yeh report edit nahi ki ja sakti.",true);}
+    if(publicReportToken){
+      await refreshPublicReportForDate(date);
+      msg("reportMsg",status==="Submitted"?"Report saved successfully. Update Report is available only within 3 days of the Ijtima date.":"Draft saved successfully.",true);
     }else{
-      msg("reportMsg","Draft saved successfully. Aap is Draft ko edit karke dobara save kar sakte hain.",true);
-      draftBtn.disabled=false; submitBtn.disabled=false;
+      await refreshUserReportForDate(date);
+      msg("reportMsg",status==="Submitted"?"Report submitted successfully. Update Report is available only within 3 days of the Ijtima date.":"Draft saved successfully.",true);
     }
   }catch(e){
     draftBtn.disabled=false; submitBtn.disabled=false;
@@ -600,8 +623,8 @@ $("saveIjtimaDraft").onclick=()=>submitIjtima("Draft");
 $("submitIjtima").onclick=()=>submitIjtima("Submitted");
 
 function downloadTemplate(type){
-  const headers=type==="Ijtima"?["Country","Region","State","Division","District","Area","Locality","Masjid Name","Pincode","Ijtima Day"]:["Country","Region","State","Division","District","Area","Pincode","Masjid Name","Name","Mobile","Details"];
-  const ws=XLSX.utils.aoa_to_sheet([headers, type==="Ijtima"?["India","","","","","","","Example Masjid","400001","Thursday"]:["India","","","","","","400001","Example Masjid","Example Volunteer","9876543210",""]]);
+  const headers=type==="Ijtima"?["Country","Region","State","Division","District","Area","Locality","Masjid Name","Pincode","Ijtima Day","Report Token","Report Submitter Name","Report Submitter Contact"]:["Country","Region","State","Division","District","Area","Pincode","Masjid Name","Name","Mobile","Details"];
+  const ws=XLSX.utils.aoa_to_sheet([headers, type==="Ijtima"?["India","","","","","","","Example Masjid","400001","Thursday","","Example Submitter","9876543210"]:["India","","","","","","400001","Example Masjid","Example Volunteer","9876543210",""]]);
   const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,type==="Ijtima"?"Weekly Ijtima Master":"Volunteer Data");
   XLSX.writeFile(wb,type==="Ijtima"?"Weekly-Ijtima-Master-Format.xlsx":"Volunteer-Data-Format.xlsx");
 }
@@ -741,8 +764,12 @@ async function loadIjtimaLinks(){
     const base=window.location.origin+window.location.pathname.replace(/\/[^\/]*$/,'');
     const d=await api('ijtimaLinks',{sessionToken:session.token,baseUrl:base});
     const rows=d.links||[];
-    $('ijtimaLinksResult').innerHTML='<div class="table-wrap"><table><thead><tr><th>Masjid</th><th>Day</th><th>Location</th><th>Report Link</th><th>Copy</th></tr></thead><tbody>'+rows.map((x,i)=>`<tr><td>${esc(x.masjidName)}</td><td>${esc(x.ijtimaDay)}</td><td>${esc(x.state)} / ${esc(x.district)}</td><td><a href="${esc(x.url)}" target="_blank" rel="noopener">Open Report</a></td><td><button type="button" class="secondary copy-ijtima-link" data-link="${esc(x.url)}">Copy Link</button></td></tr>`).join('')+'</tbody></table></div>';
-    document.querySelectorAll('.copy-ijtima-link').forEach(b=>b.onclick=async()=>{await navigator.clipboard.writeText(b.dataset.link);b.textContent='Copied ✓';setTimeout(()=>b.textContent='Copy Link',1200);});
+    $('ijtimaLinksResult').innerHTML='<div class="table-wrap"><table><thead><tr><th>Masjid</th><th>Day</th><th>Submitter Name</th><th>Contact Number</th><th>Report Link</th><th>Share Link</th></tr></thead><tbody>'+rows.map((x,i)=>`<tr><td>${esc(x.masjidName)}</td><td>${esc(x.ijtimaDay)}</td><td><input class="ijtima-submitter-name" data-token="${esc(x.token)}" value="${esc(x.submitterName||'')}" placeholder="Submitter Name"></td><td><input class="ijtima-submitter-contact" data-token="${esc(x.token)}" value="${esc(x.submitterContact||'')}" placeholder="Contact Number" inputmode="tel"></td><td><a href="${esc(x.url)}" target="_blank" rel="noopener">Open Report</a></td><td><button type="button" class="secondary save-ijtima-contact" data-token="${esc(x.token)}" data-link="${esc(x.url)}">Share Link</button></td></tr>`).join('')+'</tbody></table></div>';
+    document.querySelectorAll('.save-ijtima-contact').forEach(b=>b.onclick=async()=>{
+      const token=b.dataset.token,name=document.querySelector(`.ijtima-submitter-name[data-token="${CSS.escape(token)}"]`)?.value.trim()||'',contact=document.querySelector(`.ijtima-submitter-contact[data-token="${CSS.escape(token)}"]`)?.value.trim()||'';
+      b.disabled=true;b.textContent='Saving…';
+      try{await api('saveIjtimaContact',{sessionToken:session.token,reportToken:token,submitterName:name,submitterContact:contact});await navigator.clipboard.writeText(b.dataset.link||'');b.textContent='Share Link Copied ✓';setTimeout(()=>{b.textContent='Share Link';b.disabled=false},1500);}catch(e){b.disabled=false;b.textContent='Share Link';msg('ijtimaMsg',e.message);}
+    });
   }catch(e){msg('ijtimaMsg',e.message);}
 }
 $('generateIjtimaLinks')?.addEventListener('click',loadIjtimaLinks);
