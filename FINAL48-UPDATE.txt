@@ -1,0 +1,5 @@
+FINAL48 — Dashboard Welcome Box
+- Removed the old Welcome box background/border treatment.
+- Set Image 2 Islamic background/look as the actual Welcome box background.
+- Kept the circle and symbol removed.
+- No functionality changes.

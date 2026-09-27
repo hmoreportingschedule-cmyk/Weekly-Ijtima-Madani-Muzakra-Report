@@ -2435,3 +2435,17 @@ body{margin:0}
 /* FINAL47 — Remove the Welcome box circle and icon only. Keep Image 2 background/look unchanged. */
 .welcome-strip > div:first-child{padding-left:0!important}
 .welcome-strip > div:first-child:before{display:none!important;content:none!important}
+
+/* FINAL48 — Use Image 2 itself as the Welcome box background; remove the old box background/border treatment. */
+.welcome-strip{
+  background-color:transparent!important;
+  background-image:url("assets/welcome-strip-bg-final46.png")!important;
+  background-size:100% 100%!important;
+  background-position:center!important;
+  background-repeat:no-repeat!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+}
+.welcome-strip > div:first-child{padding-left:0!important}
+.welcome-strip > div:first-child:before{display:none!important;content:none!important}
