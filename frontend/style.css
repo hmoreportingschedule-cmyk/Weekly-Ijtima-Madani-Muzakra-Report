@@ -1122,8 +1122,8 @@ body{margin:0}
 }
 .ijtima-layout{
   display:grid;
-  grid-template-columns:minmax(0,2.15fr) minmax(360px,1fr);
-  gap:12px;
+  grid-template-columns:minmax(0,1fr) minmax(340px,360px);
+  gap:20px;
   align-items:start;
 }
 .ijtima-left,.ijtima-right{
@@ -1662,7 +1662,7 @@ body{margin:0}
 .app-sidebar:before,.app-sidebar:after{display:none!important}
 
 
-/* FINAL17 — compact sidebar, narrower right report panel, correctly positioned header text */
+/* FINAL18 — compact sidebar, narrower right report panel, correctly positioned header text */
 .app-sidebar{
   width:260px!important;
 }

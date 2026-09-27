@@ -1,0 +1,1 @@
+FINAL18: Weekly Ijtima form layout only. Right Ijtima Schedule column narrowed to 360px and shifted to the right with a 20px gap from the left Masjid/Participants column. Existing functionality unchanged.
