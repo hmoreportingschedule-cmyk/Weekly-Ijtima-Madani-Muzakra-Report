@@ -1,0 +1,1 @@
+FINAL14: Fixed calendar placement by rendering leading blank cells and sequential 7-column dates. Removed forced weekday CSS columns. The actual weekday now determines allowed/clickable dates; Friday dates appear under Fri, Thursday under Thu, Sunday under Sun, etc. No background image added.

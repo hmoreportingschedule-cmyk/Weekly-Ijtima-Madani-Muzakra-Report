@@ -1,4 +1,4 @@
-const APP_BUILD="FINAL13";
+const APP_BUILD="FINAL14";
 const API_URL="https://script.google.com/macros/s/AKfycbwbP22HW0lrV4vSjelbiiURjcn9E_MH1DphI5caVWMX8nwmcnkClw4kH_i9QxBXSOiqmA/exec";
 let session=null,locations=[],progressType="Ijtima",progressRows=[];
 
@@ -268,8 +268,6 @@ function setIjtimaDateValue(iso){
 }
 function renderIjtimaCalendar(){
   const box=$("ijtimaCalendar"),input=$("ijtimaDate");if(!box||!input)return;
-  // IMPORTANT: the calendar always follows the CURRENT visible Ijtima Day option.
-  // Do not use a cached/stale weekday value.
   const wantedName=activeIjtimaDayName();
   const wanted=ijtimaDayIndex(wantedName);
   if(wanted<0){box.hidden=true;return;}
@@ -278,21 +276,28 @@ function renderIjtimaCalendar(){
 
   const y=ijtimaCalendarMonth.getFullYear(),m=ijtimaCalendarMonth.getMonth();
   const monthName=ijtimaCalendarMonth.toLocaleDateString("en-IN",{month:"long",year:"numeric"});
-  const first=new Date(y,m,1),days=new Date(y,m+1,0).getDate(),offset=first.getDay();
+  const first=new Date(Date.UTC(y,m,1));
+  const days=new Date(Date.UTC(y,m+1,0)).getUTCDate();
+  const offset=first.getUTCDay();
   const selected=input.dataset.iso||"";
   let html=`<div class="ijtima-calendar-head"><button type="button" class="ijtima-calendar-nav" data-cal-nav="-1">‹</button><div class="ijtima-calendar-title">${monthName}</div><button type="button" class="ijtima-calendar-nav" data-cal-nav="1">›</button></div>`;
   html+='<div class="ijtima-calendar-week"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div><div class="ijtima-calendar-grid">';
+
+  // IMPORTANT: Use a normal 7-column calendar grid with leading blanks.
+  // Do NOT force dates into columns with CSS. This keeps every date under
+  // its real weekday: Fri dates in Fri, Thu dates in Thu, etc.
+  for(let i=0;i<offset;i++) html+='<span class="ijtima-calendar-empty" aria-hidden="true"></span>';
+
   const today=new Date();
   for(let day=1;day<=days;day++){
     const date=new Date(Date.UTC(y,m,day));
     const weekdayIndex=date.getUTCDay();
-    const dayName=new Intl.DateTimeFormat("en-US",{weekday:"long",timeZone:"UTC"}).format(date);
+    const dayName=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][weekdayIndex];
     const allowed=weekdayIndex===wanted;
     const iso=`${y}-${String(m+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
     const sel=iso===selected;
     const todayCls=(today.getFullYear()===y&&today.getMonth()===m&&today.getDate()===day)?" today":"";
-    const weekdayClass=["sun","mon","tue","wed","thu","fri","sat"][weekdayIndex];
-    html+=`<button type="button" class="ijtima-calendar-day wd-${weekdayClass}${allowed?" allowed":""}${sel?" selected":""}${todayCls}" data-iso="${iso}" data-weekday="${dayName}" data-weekday-index="${weekdayIndex}" ${allowed?"":"disabled"}>${day}</button>`;
+    html+=`<button type="button" class="ijtima-calendar-day${allowed?" allowed":""}${sel?" selected":""}${todayCls}" data-iso="${iso}" data-weekday="${dayName}" data-weekday-index="${weekdayIndex}" ${allowed?"":"disabled"}>${day}</button>`;
   }
   html+='</div><div class="ijtima-calendar-note">Sirf <b>'+esc(wantedName)+'</b> ki dates select ki ja sakti hain.</div>';
   box.innerHTML=html;

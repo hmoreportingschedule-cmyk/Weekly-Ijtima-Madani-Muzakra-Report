@@ -1618,17 +1618,13 @@ body{margin:0}
 .ijtima-calendar-title{font-size:15px;font-weight:900;color:#123f3a}
 .ijtima-calendar-nav{width:34px;height:34px;border-radius:9px!important;border:1px solid #cbded9!important;background:#f0f8f6!important;color:#087f73!important;cursor:pointer!important;font-weight:900}
 .ijtima-calendar-week,.ijtima-calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.ijtima-calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.ijtima-calendar-empty{height:34px;display:block}
+
 .ijtima-calendar-week span{text-align:center;font-size:11px;font-weight:800;color:#70827f;padding:4px 0}
 .ijtima-calendar-day{height:34px;border-radius:8px!important;border:1px solid transparent!important;background:#f7faf9!important;color:#314b48!important;cursor:not-allowed!important;font-weight:700!important}
 .ijtima-calendar-day.allowed{background:#e5f6f2!important;color:#006f63!important;border-color:#a7d9d0!important;cursor:pointer!important}
 /* FINAL13: lock every date to its real weekday column. */
-.ijtima-calendar-grid .ijtima-calendar-day.wd-sun{grid-column:1!important}
-.ijtima-calendar-grid .ijtima-calendar-day.wd-mon{grid-column:2!important}
-.ijtima-calendar-grid .ijtima-calendar-day.wd-tue{grid-column:3!important}
-.ijtima-calendar-grid .ijtima-calendar-day.wd-wed{grid-column:4!important}
-.ijtima-calendar-grid .ijtima-calendar-day.wd-thu{grid-column:5!important}
-.ijtima-calendar-grid .ijtima-calendar-day.wd-fri{grid-column:6!important}
-.ijtima-calendar-grid .ijtima-calendar-day.wd-sat{grid-column:7!important}
 
 .ijtima-calendar-day.allowed:hover{background:#087f73!important;color:#fff!important}
 .ijtima-calendar-day.selected{background:#087f73!important;color:#fff!important;border-color:#087f73!important}
@@ -1643,3 +1639,6 @@ body{margin:0}
 #ijtimaDatePicker{position:relative;z-index:100!important}
 .ijtima-calendar-day.allowed{cursor:pointer!important}
 .ijtima-calendar-day:not(.allowed){cursor:not-allowed!important}
+
+/* FINAL14: real calendar placement; no weekday-column forcing */
+.ijtima-calendar-grid .ijtima-calendar-day{grid-column:auto!important;grid-row:auto!important}
