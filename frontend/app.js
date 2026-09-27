@@ -322,18 +322,31 @@ function updateReportCascade(changedIndex){
 }
 
 let ijtimaCalendarMonth=new Date();
+function normalizeIjtimaDay(day){
+  const key=String(day||"").trim().toLowerCase().replace(/\s+/g," ");
+  const map={
+    sunday:"Sunday",sunday:"Sunday",
+    monday:"Monday",mon:"Monday",
+    tuesday:"Tuesday",tue:"Tuesday",tues:"Tuesday",
+    wednesday:"Wednesday",wed:"Wednesday",
+    thursday:"Thursday",thu:"Thursday",thurs:"Thursday",thursdays:"Thursday",
+    friday:"Friday",fri:"Friday",
+    saturday:"Saturday",sat:"Saturday"
+  };
+  if(map[key])return map[key];
+  if(key.includes("thursday")||key.includes("jumerat")||key.includes("jumeraat"))return "Thursday";
+  return String(day||"").trim();
+}
 function ijtimaDayIndex(day){
   const names=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-  const key=String(day||"").trim().toLowerCase();
-  return names.findIndex(n=>n.toLowerCase()===key);
+  const normalized=normalizeIjtimaDay(day);
+  return names.findIndex(n=>n.toLowerCase()===normalized.toLowerCase());
 }
 function activeIjtimaDayName(){
   const select=$("rDay");
   if(!select)return "";
   const raw=String(select.value||select.options?.[select.selectedIndex]?.textContent||"").trim();
-  const key=raw.toLowerCase();
-  const map={sunday:"Sunday",monday:"Monday",tuesday:"Tuesday",wednesday:"Wednesday",thursday:"Thursday",friday:"Friday",saturday:"Saturday"};
-  return map[key]||String(select.options?.[select.selectedIndex]?.textContent||"").trim();
+  return normalizeIjtimaDay(raw);
 }
 function activeIjtimaDayIndex(){ return ijtimaDayIndex(activeIjtimaDayName()); }
 function isoToDisplay(iso){

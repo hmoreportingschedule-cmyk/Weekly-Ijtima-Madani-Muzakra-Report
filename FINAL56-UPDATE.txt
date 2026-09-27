@@ -1,0 +1,7 @@
+FINAL56 – THURSDAY IJTIMA CALENDAR FIX
+
+Only the Weekly Ijtima Report calendar day matching was updated.
+- Thursday is now explicitly normalized and recognized, including common variants such as Thu/Thurs/Thursdays and Jumerat/Jumeraat.
+- The existing calendar behavior for Friday, Sunday and other days remains unchanged.
+- Only dates matching the selected Ijtima Day remain selectable.
+- No backend/reporting/dashboard functionality was changed.
