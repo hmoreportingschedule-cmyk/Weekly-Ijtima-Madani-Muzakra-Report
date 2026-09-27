@@ -1,0 +1,6 @@
+FINAL23
+- Corrected the login visual using the clean left-side artwork from the original Islamic login reference.
+- Removed the duplicated/baked-in login panel and duplicate branding that appeared in the previous version.
+- The right side now contains only the real functional login form.
+- Preserved the existing login API, password show/hide, reset password, session restore, and dashboard behavior.
+- Updated frontend cache version to FINAL23.

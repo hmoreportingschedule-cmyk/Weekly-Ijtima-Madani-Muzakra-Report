@@ -1,0 +1,6 @@
+FINAL22
+- Reworked login page to use the supplied Islamic reference artwork only on the left branding panel, preventing the baked-in reference login panel from appearing twice.
+- Removed duplicate overlay branding text.
+- Preserved the existing functional login form and API URL.
+- Kept password show/hide, reset password, session restore, and dashboard behavior.
+- Updated frontend cache version to FINAL22.

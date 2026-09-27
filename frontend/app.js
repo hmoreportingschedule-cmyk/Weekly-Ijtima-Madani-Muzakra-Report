@@ -1,4 +1,4 @@
-const APP_BUILD="FINAL21";
+const APP_BUILD="FINAL23";
 const API_URL="https://script.google.com/macros/s/AKfycbwbP22HW0lrV4vSjelbiiURjcn9E_MH1DphI5caVWMX8nwmcnkClw4kH_i9QxBXSOiqmA/exec";
 let session=null,locations=[],progressType="Ijtima",progressRows=[],publicReportToken="",publicReportMeta=null;
 
@@ -12,6 +12,7 @@ async function api(action,payload={}){
     try{
       const r=await fetch(API_URL,{method:"POST",headers:{"Content-Type":contentType},body,cache:"no-store",redirect:"follow",signal:controller.signal});
       const text=await r.text();
+      if(!r.ok && !text) throw Error(`Server returned HTTP ${r.status}.`);
       let d;
       try{d=JSON.parse(text)}catch(_){throw Error("Google Apps Script returned an invalid response. Please deploy the latest Code.gs Web App version.")}
       if(!d.ok)throw Error(d.error||"Request failed");
