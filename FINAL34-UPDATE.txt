@@ -1,0 +1,4 @@
+FINAL34
+- Weekly Ijtima & Madani Muzakra + Reporting Dashboard heading shifted approximately 0.5 inch to the right on desktop.
+- Welcome Back login panel and all content shifted approximately 0.5 inch downward on desktop.
+- No other functionality or layout intentionally changed.

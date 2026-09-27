@@ -2272,3 +2272,14 @@ body{margin:0}
   .login-brand-overlay h1{font-size:26px!important;}
   .login-brand-sub{font-size:11px!important;letter-spacing:2px!important;}
 }
+
+
+/* FINAL34 — Move login heading ~0.5in right and right login panel ~0.5in down. */
+@media(min-width:1001px){
+  .login-brand-overlay{
+    left:calc(11% + 0.5in)!important;
+  }
+  .login-form-card{
+    top:calc(12% + 0.5in)!important;
+  }
+}
