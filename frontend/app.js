@@ -106,7 +106,14 @@ async function startPublicDashboard(info){
   $('welcome').textContent='Weekly Ijtima Report — '+info.master.masjidName;
   $('roleBadge').textContent='Direct Report Link';$('sideUserName').textContent=info.master.submitterName||info.master.masjidName;$('sideUserRole').textContent='Direct Link';$('sideAvatar').textContent='IJ';
   buildNav();document.querySelector('[data-panel="userIjtima"]')?.click();
-  ['rCountry','rRegion','rState','rDivision','rDistrict','rArea','rPincode','rLocality','rMasjid'].forEach((id,i)=>{const keys=['country','region','state','division','district','area','pincode','locality','masjidName'];if($(id)){$(id).value=info.master[keys[i]]||'';$(id).disabled=true;}});
+  // Shared Masjid link: keep every location value auto-filled/locked, but show only Masjid to the recipient.
+  const publicLocationIds=['rCountry','rRegion','rState','rDivision','rDistrict','rArea','rPincode','rLocality','rMasjid'];
+  publicLocationIds.forEach((id,i)=>{
+    const keys=['country','region','state','division','district','area','pincode','locality','masjidName'];
+    const el=$(id), label=el?.closest('label');
+    if(el){el.value=info.master[keys[i]]||'';el.disabled=true;}
+    if(label) label.classList.toggle('public-masjid-only-hidden',id!=='rMasjid');
+  });
   const masterDay=String(info.master.ijtimaDay||'').trim();
   if($('rDay')){$('rDay').innerHTML='<option value="'+esc(masterDay)+'">'+esc(masterDay)+'</option>';$('rDay').value=masterDay;$('rDay').disabled=true;}
   setupIjtimaCalendar();

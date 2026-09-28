@@ -2550,3 +2550,6 @@ body{margin:0}
   .welcome-strip{min-height:144px!important}
   .welcome-strip > div:first-child{padding-left:23%!important}
 }
+
+/* FINAL63 — Shared Masjid link: show only Masjid field while keeping all location values auto-filled and locked */
+.public-masjid-only-hidden{display:none!important}

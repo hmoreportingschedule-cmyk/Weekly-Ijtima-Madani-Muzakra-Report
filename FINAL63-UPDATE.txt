@@ -1,0 +1,3 @@
+FINAL63 UPDATE
+
+Shared Masjid Report Link only: when a recipient opens a Masjid share link, all Country/Region/State/Division/District/Area/Pincode/Locality values remain auto-filled and locked in the form, but only the Masjid field is visibly shown. No other report functionality changed.
