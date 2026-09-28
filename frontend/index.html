@@ -80,7 +80,13 @@
         <button id="importIjtima">Import Master File</button>
       <p id="ijtimaMsg" class="msg"></p></div>
       <div class="small">Expected columns: Country, Region, State, Division, District, Area, Locality, Masjid Name, Pincode, Ijtima Day.</div>
-      <div class="admin-buttons"><button id="generateIjtimaLinks" class="secondary">Generate Masjid Report Links</button></div><div id="ijtimaLinksResult"></div>
+      <div class="admin-buttons masjid-admin-tools">
+        <button id="generateIjtimaLinks" class="secondary">🔗 Generate Masjid Report Links</button>
+        <button id="ijtimaWeekSummaryBtn" class="secondary">📅 Date &amp; Week Summary</button>
+        <button id="ijtimaMasjidSummaryBtn" class="secondary">🕌 Total Masajid</button>
+      </div>
+      <div id="ijtimaSummaryResult"></div>
+      <div id="ijtimaLinksResult"></div>
     </div>
     <div id="adminMuzakra" class="card panel" hidden>
       <h2>Weekly Madani Muzakra Report</h2>

@@ -2573,3 +2573,42 @@ body{margin:0}
 .admin-buttons button:nth-child(2):before{content:"☪"!important;}
 .user-buttons button:nth-child(3):before,
 .admin-buttons button:nth-child(3):before{content:"☪"!important;}
+
+
+/* FINAL65 - Masjid report admin analytics */
+.masjid-admin-tools{align-items:center;gap:10px!important}
+.masjid-admin-tools button{min-height:42px;border-radius:12px!important;font-weight:800!important}
+.masjid-summary-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:14px 0}
+.masjid-summary-card{background:linear-gradient(135deg,#f7fffc,#fff);border:1px solid #cfe6df;border-radius:14px;padding:14px 16px;box-shadow:0 6px 18px rgba(0,60,50,.07)}
+.masjid-summary-card b{display:block;color:#087f70;font-size:12px;margin-bottom:7px}.masjid-summary-card strong{font-size:24px;color:#102a54}
+.masjid-summary-card small{display:block;color:#667;margin-top:4px}
+.status-yes{background:#dff7e9!important;color:#087b4b!important;font-weight:800}.status-no{background:#ffe5e5!important;color:#c53030!important;font-weight:800}
+.ijtima-admin-table td,.ijtima-admin-table th{white-space:nowrap}.ijtima-admin-table input{min-width:130px}
+@media(max-width:900px){.masjid-summary-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.masjid-summary-grid{grid-template-columns:1fr}.masjid-admin-tools{display:grid!important;grid-template-columns:1fr!important}.masjid-admin-tools button{width:100%}}
+
+/* FINAL65 - requested dashboard positioning / Islamic visuals */
+/* Image 1: Welcome box + content shift right 0.2in; right edge grows 0.3in */
+.dashboard-content > .welcome-strip{
+  transform:translateX(0.2in);
+  width:calc(100% + 0.3in)!important;
+}
+/* Image 2: top header shift left slightly and extend 0.3in to the right */
+.app-main > .topbar{
+  transform:translateX(-0.2in);
+  width:calc(100% + 0.3in)!important;
+}
+/* Image 3: replace report-card icons with Islamic-themed symbols */
+.admin-buttons button:before,.user-buttons button:before{font-family:Arial,sans-serif!important}
+.admin-buttons button:nth-child(1):before,.user-buttons button:nth-child(1):before{content:"🕌"!important}
+.admin-buttons button:nth-child(2):before,.user-buttons button:nth-child(2):before{content:"📖"!important}
+.admin-buttons button:nth-child(3):before,.user-buttons button:nth-child(3):before{content:"☪"!important}
+/* Image 4: keep the sidebar mosque artwork crisp; do not stretch it vertically */
+.app-sidebar{
+  background-image:url("assets/custom-left-sidebar.png")!important;
+  background-repeat:no-repeat!important;
+  background-position:center bottom!important;
+  background-size:100% auto!important;
+  background-color:#003c35!important;
+}
+.app-sidebar:before{display:none!important}

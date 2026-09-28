@@ -779,7 +779,7 @@ async function loadIjtimaLinks(){
     const base=window.location.origin+window.location.pathname.replace(/\/[^\/]*$/,'');
     const d=await api('ijtimaLinks',{sessionToken:session.token,baseUrl:base});
     const rows=d.links||[];
-    $('ijtimaLinksResult').innerHTML='<div class="table-wrap"><table><thead><tr><th>Masjid</th><th>Day</th><th>Submitter Name</th><th>Contact Number</th><th>Report Link</th><th>Share Link</th></tr></thead><tbody>'+rows.map((x,i)=>`<tr><td>${esc(x.masjidName)}</td><td>${esc(x.ijtimaDay)}</td><td><input class="ijtima-submitter-name" data-token="${esc(x.token)}" value="${esc(x.submitterName||'')}" placeholder="Submitter Name"></td><td><input class="ijtima-submitter-contact" data-token="${esc(x.token)}" value="${esc(x.submitterContact||'')}" placeholder="Contact Number" inputmode="tel"></td><td><a href="${esc(x.url)}" target="_blank" rel="noopener">Open Report</a></td><td><button type="button" class="secondary save-ijtima-contact" data-token="${esc(x.token)}" data-link="${esc(x.url)}">Share Link</button></td></tr>`).join('')+'</tbody></table></div>';
+    $('ijtimaLinksResult').innerHTML='<div class="table-wrap"><table class="ijtima-admin-table"><thead><tr><th>#</th><th>Masjid</th><th>Region</th><th>State</th><th>Division</th><th>Ijtima Day</th><th>Submitter Name</th><th>Contact Number</th><th>Share Link</th><th>Report Submitted</th><th>Report (Count)</th><th>Action</th></tr></thead><tbody>'+rows.map((x,i)=>`<tr><td>${i+1}</td><td><b>${esc(x.masjidName)}</b></td><td>${esc(x.region||'')}</td><td>${esc(x.state||'')}</td><td>${esc(x.division||'')}</td><td>${esc(x.ijtimaDay)}</td><td><input class="ijtima-submitter-name" data-token="${esc(x.token)}" value="${esc(x.submitterName||'')}" placeholder="Submitter Name"></td><td><input class="ijtima-submitter-contact" data-token="${esc(x.token)}" value="${esc(x.submitterContact||'')}" placeholder="Contact Number" inputmode="tel"></td><td><button type="button" class="secondary save-ijtima-contact" data-token="${esc(x.token)}" data-link="${esc(x.url)}">Share Link</button></td><td><span class="badge ${x.reportSubmitted?'status-yes':'status-no'}">${x.reportSubmitted?'Yes':'No'}</span></td><td><b>${Number(x.reportCount||0)}</b></td><td>${x.reportSubmitted?'<button type="button" class="secondary view-ijtima-report" data-token="'+esc(x.token)+'">View</button>':'<span class="small">Pending</span>'}</td></tr>`).join('')+'</tbody></table></div>';
     document.querySelectorAll('.save-ijtima-contact').forEach(b=>b.onclick=async()=>{
       const token=b.dataset.token,name=document.querySelector(`.ijtima-submitter-name[data-token="${CSS.escape(token)}"]`)?.value.trim()||'',contact=document.querySelector(`.ijtima-submitter-contact[data-token="${CSS.escape(token)}"]`)?.value.trim()||'';
       b.disabled=true;b.textContent='Saving…';
@@ -787,7 +787,32 @@ async function loadIjtimaLinks(){
     });
   }catch(e){msg('ijtimaMsg',e.message);}
 }
+async function loadIjtimaSummary(mode){
+  try{
+    const d=await api('ijtimaSummary',{sessionToken:session.token});
+    const s=d.summary||{}, day=s.dayWise||{}, rows=s.weekRows||[];
+    const submitted=(s.submitted||0),pending=(s.pending||0),total=(s.total||0);
+    const groups=(obj)=>Object.entries(obj||{}).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<button type="button" class="secondary summary-filter" data-filter="${esc(k)}">${esc(k)}: ${v}</button>`).join('');
+    let html=`<div class="masjid-summary-grid">
+      <div class="masjid-summary-card"><b>📅 Current Week</b><strong>${esc(s.weekLabel||'')}</strong><small>${esc(s.weekRange||'')}</small></div>
+      <div class="masjid-summary-card"><b>🕌 Total Masajid</b><strong>${total}</strong><small>All master Masajid</small></div>
+      <div class="masjid-summary-card"><b>✓ Submitted</b><strong>${submitted}</strong><small><button type="button" class="secondary summary-list-btn" data-kind="submitted">View Submitted List</button></small></div>
+      <div class="masjid-summary-card"><b>⏳ Pending</b><strong>${pending}</strong><small><button type="button" class="secondary summary-list-btn" data-kind="pending">View Pending List</button></small></div>
+    </div>
+    <div class="card" style="margin-top:10px"><h3>Masajid — Ijtima Day Wise</h3><div class="actions">${Object.entries(day).map(([k,v])=>`<button type="button" class="secondary summary-list-btn" data-day="${esc(k)}">${esc(k)}: ${v.total||0} | Submitted ${v.submitted||0} | Pending ${v.pending||0}</button>`).join('')}</div></div>
+    <div class="card" style="margin-top:10px"><h3>Region Wise</h3><div class="actions">${groups(s.regionWise)}</div><h3>State Wise</h3><div class="actions">${groups(s.stateWise)}</div><h3>Division Wise</h3><div class="actions">${groups(s.divisionWise)}</div></div>
+    <div id="ijtimaSummaryList" class="card" style="margin-top:10px" hidden></div>`;
+    $('ijtimaSummaryResult').innerHTML=html;
+    const showList=(list,title)=>{const box=$('ijtimaSummaryList');box.hidden=false;box.innerHTML='<h3>'+esc(title)+'</h3><div class="table-wrap"><table><thead><tr><th>#</th><th>Masjid</th><th>Region</th><th>State</th><th>Division</th><th>District</th><th>Ijtima Day</th><th>Status</th><th>Report Count</th></tr></thead><tbody>'+list.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.masjidName)}</td><td>${esc(x.region)}</td><td>${esc(x.state)}</td><td>${esc(x.division)}</td><td>${esc(x.district)}</td><td>${esc(x.ijtimaDay)}</td><td><span class="badge ${x.submitted?'status-yes':'status-no'}">${x.submitted?'Submitted':'Pending'}</span></td><td>${Number(x.reportCount||0)}</td></tr>`).join('')+'</tbody></table></div>';box.scrollIntoView({behavior:'smooth',block:'nearest'});};
+    document.querySelectorAll('.summary-list-btn[data-kind]').forEach(b=>b.onclick=()=>showList(b.dataset.kind==='submitted'?s.submittedRows:s.pendingRows,b.dataset.kind==='submitted'?'Submitted Masajid':'Pending Masajid'));
+    document.querySelectorAll('.summary-list-btn[data-day]').forEach(b=>b.onclick=()=>showList(rows.filter(x=>String(x.ijtimaDay).toLowerCase()===String(b.dataset.day).toLowerCase()),b.dataset.day+' Masajid'));
+    document.querySelectorAll('.summary-filter').forEach(b=>b.onclick=()=>showList(rows.filter(x=>[x.region,x.state,x.division].map(String).includes(b.dataset.filter)),b.dataset.filter+' Reports'));
+  }catch(e){msg('ijtimaMsg',e.message);}
+}
 $('generateIjtimaLinks')?.addEventListener('click',loadIjtimaLinks);
+$('ijtimaWeekSummaryBtn')?.addEventListener('click',()=>loadIjtimaSummary('week'));
+$('ijtimaMasjidSummaryBtn')?.addEventListener('click',()=>loadIjtimaSummary('masjid'));
+
 function detectPublicIjtimaLink(){
   const token=new URLSearchParams(window.location.search).get('reportToken');
   if(token){openPublicIjtimaLink(token);return true;} return false;
