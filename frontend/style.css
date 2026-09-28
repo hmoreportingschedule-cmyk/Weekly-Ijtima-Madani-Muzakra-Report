@@ -2553,3 +2553,23 @@ body{margin:0}
 
 /* FINAL63 — Shared Masjid link: show only Masjid field while keeping all location values auto-filled and locked */
 .public-masjid-only-hidden{display:none!important}
+
+/* FINAL64 — Dashboard visual alignment + Islamic report icons (visual-only) */
+/* Image 1: move the complete top header box, background and controls 0.5 inch to the right. */
+.topbar{
+  transform:translateX(48px)!important;
+}
+
+/* Image 2: extend the Welcome box 0.2 inch to the left and 0.5 inch to the right. */
+.welcome-strip{
+  width:calc(100% + 67px)!important;
+  margin-left:-19px!important;
+}
+
+/* Image 3: replace the existing shortcut symbols with Islamic-themed icons. */
+.user-buttons button:nth-child(1):before,
+.admin-buttons button:nth-child(1):before{content:"☪"!important;}
+.user-buttons button:nth-child(2):before,
+.admin-buttons button:nth-child(2):before{content:"☪"!important;}
+.user-buttons button:nth-child(3):before,
+.admin-buttons button:nth-child(3):before{content:"☪"!important;}

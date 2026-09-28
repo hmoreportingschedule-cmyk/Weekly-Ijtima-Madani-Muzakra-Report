@@ -1,0 +1,7 @@
+FINAL64 UPDATE
+
+Dashboard visual-only update:
+1. Moved the complete top header box/background/content/buttons 0.5 inch to the right.
+2. Extended the Welcome box 0.2 inch to the left and 0.5 inch to the right.
+3. Replaced the existing report shortcut button symbols with an Islamic-themed crescent symbol.
+No report logic, login, data, API, or existing functionality was changed.
