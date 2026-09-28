@@ -2612,3 +2612,12 @@ body{margin:0}
   background-color:#003c35!important;
 }
 .app-sidebar:before{display:none!important}
+
+
+/* FINAL66 — Match top header width to the dashboard content boxes. Visual-only. */
+.app-main > .topbar{
+  transform:none!important;
+  margin-left:22px!important;
+  width:calc(100% - 44px)!important;
+  box-sizing:border-box!important;
+}

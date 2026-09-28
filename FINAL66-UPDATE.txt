@@ -1,0 +1,1 @@
+FINAL66: Only the top header box width was adjusted to match the lower dashboard content boxes. No other functionality changed.
