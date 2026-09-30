@@ -1,8 +1,21 @@
-const APP_BUILD="FINAL62";
+const APP_BUILD="FINAL67";
 const API_URL="https://script.google.com/macros/s/AKfycbwbP22HW0lrV4vSjelbiiURjcn9E_MH1DphI5caVWMX8nwmcnkClw4kH_i9QxBXSOiqmA/exec";
 let session=null,locations=[],progressType="Ijtima",progressRows=[],publicReportToken="",publicSessionToken="",publicReportMeta=null,ijtimaCalendarReady=false;
 
 const $=id=>document.getElementById(id);
+let xlsxPromise=null;
+function ensureXlsx(){
+  if(window.XLSX)return Promise.resolve(window.XLSX);
+  if(xlsxPromise)return xlsxPromise;
+  xlsxPromise=new Promise((resolve,reject)=>{
+    const sc=document.createElement("script");
+    sc.src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js";
+    sc.async=true; sc.onload=()=>resolve(window.XLSX); sc.onerror=()=>reject(Error("Excel module could not be loaded. Please check your internet connection."));
+    document.head.appendChild(sc);
+  });
+  return xlsxPromise;
+}
+
 const msg=(id,t,ok=false)=>{if($(id)){ $(id).textContent=t;$(id).style.color=ok?"#087f5b":"#c92a2a"; }};
 async function api(action,payload={}){
   if(!API_URL.startsWith("http"))throw Error("Set API_URL in frontend/app.js");
@@ -637,7 +650,8 @@ function lockSubmittedIjtima(){
 $("saveIjtimaDraft").onclick=()=>submitIjtima("Draft");
 $("submitIjtima").onclick=()=>submitIjtima("Submitted");
 
-function downloadTemplate(type){
+async function downloadTemplate(type){
+  await ensureXlsx();
   const headers=type==="Ijtima"?["Country","Region","State","Division","District","Area","Locality","Masjid Name","Pincode","Ijtima Day","Report Token","Report Submitter Name","Report Submitter Contact"]:["Country","Region","State","Division","District","Area","Pincode","Masjid Name","Name","Mobile","Details"];
   const ws=XLSX.utils.aoa_to_sheet([headers, type==="Ijtima"?["India","","","","","","","Example Masjid","400001","Thursday","","Example Submitter","9876543210"]:["India","","","","","","400001","Example Masjid","Example Volunteer","9876543210",""]]);
   const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,type==="Ijtima"?"Weekly Ijtima Master":"Volunteer Data");
@@ -648,7 +662,7 @@ document.querySelectorAll("#downloadVolunteerTemplate").forEach(b=>b.onclick=()=
 
 async function importFile(input,msgId,type){
   const f=input.files[0];if(!f)return msg(msgId,"Please select an Excel/CSV file.");
-  try{const buf=await f.arrayBuffer(),wb=XLSX.read(buf,{type:"array"}),ws=wb.Sheets[wb.SheetNames[0]],rows=XLSX.utils.sheet_to_json(ws,{defval:""});if(!rows.length)throw Error("File has no data.");await api("importData",{sessionToken:session.token,type,rows});msg(msgId,"Imported successfully. The selected file has been cleared from the form.",true);input.value="";if(type==="IjtimaMaster")loadLocationsFast()}catch(e){msg(msgId,e.message)}
+  try{await ensureXlsx();const buf=await f.arrayBuffer(),wb=XLSX.read(buf,{type:"array"}),ws=wb.Sheets[wb.SheetNames[0]],rows=XLSX.utils.sheet_to_json(ws,{defval:""});if(!rows.length)throw Error("File has no data.");await api("importData",{sessionToken:session.token,type,rows});msg(msgId,"Imported successfully. The selected file has been cleared from the form.",true);input.value="";if(type==="IjtimaMaster")loadLocationsFast()}catch(e){msg(msgId,e.message)}
 }
 $("importIjtima").onclick=()=>importFile($("ijtimaFile"),"ijtimaMsg","IjtimaMaster");
 $("importVolunteer").onclick=()=>importFile($("volunteerFile"),"volunteerMsg","Volunteer");
@@ -662,8 +676,8 @@ function setupUserCascades(){
  const first=document.getElementById('uCountry');if(first){const opts=[...new Set(locations.map(r=>r.country).filter(Boolean))].sort();first.innerHTML='<option value="">All</option>'+opts.map(v=>'<option value="'+esc(v)+'">'+esc(v)+'</option>').join('');update(0)}
 }
 $("saveUser").onclick=async()=>{try{const u={userId:$("uId").value.trim(),username:$("uUsername").value.trim(),name:$("uName").value.trim(),role:$("uRole").value,active:$("uActive").value,password:$("uPassword").value};['Country','Region','State','Division','District','Area','Pincode'].forEach(k=>u[k.toLowerCase()]=$("u"+k)?.value||'All');const d=await api('saveUser',{sessionToken:session.token,user:u});msg('userMsg',d.message,true)}catch(e){msg('userMsg',e.message)}};
-$("downloadUserTemplate").onclick=()=>{const headers=['User ID','Username','Password','Name','Role','Active','Country','Region','State','Division','District','Area','Pincode'];const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([headers]),'Users');XLSX.writeFile(wb,'Weekly-Ijtima-Users-Format.xlsx')};
-$("importUsers").onclick=async()=>{try{const f=$("userFile").files[0];if(!f)throw Error('Select Excel/CSV file.');const wb=XLSX.read(await f.arrayBuffer(),{type:'array'}),rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});const d=await api('importUsers',{sessionToken:session.token,rows});msg('userImportMsg','Imported '+d.imported+' users.',true);$("userFile").value=''}catch(e){msg('userImportMsg',e.message)}};
+$("downloadUserTemplate").onclick=async()=>{await ensureXlsx();const headers=['User ID','Username','Password','Name','Role','Active','Country','Region','State','Division','District','Area','Pincode'];const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([headers]),'Users');XLSX.writeFile(wb,'Weekly-Ijtima-Users-Format.xlsx')};
+$("importUsers").onclick=async()=>{try{await ensureXlsx();const f=$("userFile").files[0];if(!f)throw Error('Select Excel/CSV file.');const wb=XLSX.read(await f.arrayBuffer(),{type:'array'}),rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});const d=await api('importUsers',{sessionToken:session.token,rows});msg('userImportMsg','Imported '+d.imported+' users.',true);$("userFile").value=''}catch(e){msg('userImportMsg',e.message)}};
 
 $("submitMuzakra").onclick=async()=>{
   try{

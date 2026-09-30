@@ -1,0 +1,3 @@
+FINAL67 UPDATE
+
+Professional Islamic light/smooth dashboard polish, stronger mobile responsive layout, deferred Excel/SheetJS loading for faster initial dashboard load, Google Sheet structure/header auto-repair, automatic removal of unrecognized extra sheets while preserving report-year sheets, batched Masjid token generation, short-lived master-data caching, and cache invalidation after master/contact updates. Existing reporting functionality is preserved.

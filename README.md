@@ -128,3 +128,10 @@ The script uses: My Drive / Dashboard Working / Dashboard Name / Weekly Ijtima &
 - Weekly/monthly/yearly progress comparison keeps the existing backend and adds a bar + trend-line visual.
 - Mobile responsive layout and a 15-second request timeout were added without changing the Google Sheet data model.
 - Google Apps Script includes the changePassword action for the login-page password reset.
+
+
+FINAL67: Performance + Mobile + Google Sheet Maintenance
+- SheetJS is loaded only when Excel import/export is actually used, reducing initial page load.
+- Masjid master data is cached briefly on the Apps Script side and token generation is batched.
+- Login/setup automatically verifies required Google Sheet tabs and headers and removes unrecognized extra tabs, while preserving yearly Weekly Ijtima / Weekly Madani Muzakra report tabs.
+- Dashboard received a lighter professional Islamic responsive/mobile polish.
